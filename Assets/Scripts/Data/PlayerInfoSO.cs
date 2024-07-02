@@ -9,5 +9,13 @@ namespace ConnectSphere
     {
         public string PlayerName;
         public int AvatarIndex;
+        public NetworkRole Role;
+    }
+
+    public enum NetworkRole
+    {
+        Server = 0,
+        Client = 1,
+        Host = 2
     }
 }

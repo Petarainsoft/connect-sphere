@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 namespace ConnectSphere
 {
-    public class StartManager : Singleton<StartManager>
+    public class SelectionManager : Singleton<SelectionManager>
     {
         [SerializeField] private Transform _avatarsContainer;
         [SerializeField] private TMP_InputField _inputPlayerName;
