@@ -14,7 +14,13 @@ namespace Unity.RenderStreaming.Samples
             }
         }
 
-        public RenderStreamingSettings Settings => m_settings;
+        public RenderStreamingSettings Settings
+        {
+            get
+            {
+                return m_settings;
+            }
+        }
 
         RenderStreamingSettings m_settings;
 

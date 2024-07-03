@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Unity.RenderStreaming;
 using UnityEngine;
 
@@ -32,6 +33,22 @@ namespace Chat
         private VideoCodecInfo receiverVideoCodec = null;
         [SerializeField]
         private VideoCodecInfo senderVideoCodec = null;
+        
+        public void ApplyH264Codec()
+        {
+            var codecArray = VideoStreamReceiver.GetAvailableCodecs();
+            var codec = Array.Find<VideoCodecInfo>(VideoStreamReceiver.GetAvailableCodecs().ToArray(), codec => codec is H264CodecInfo);
+            if ( senderVideoCodec == null )
+            {
+                senderVideoCodec = codec;
+            }
+            
+            if ( receiverVideoCodec == null )
+            {
+                receiverVideoCodec = codec;
+            }
+        }
+
 
         public bool UseDefaultSettings
         {
