@@ -16,6 +16,7 @@ namespace ConnectSphere
 
         [Header("Objects")]
         [SerializeField] private CinemachineVirtualCamera _virtualCamera;
+        [SerializeField] private PlayerInput _playerInput;
 
         private Vector2 _spawnPosition = Vector2.zero;
 
@@ -29,7 +30,7 @@ namespace ConnectSphere
             GameObject playerObject = Instantiate(_playerPrefab, _spawnPosition, Quaternion.identity);
             GameObject characterObject = Instantiate(_characterModelsPrefabs[_playerInfoSo.AvatarIndex], playerObject.transform);
             playerObject.GetComponent<Player>().SetName(_playerInfoSo.PlayerName);
-            playerObject.GetComponent<PlayerInput>().SetupComponents();
+            _playerInput.SetupComponents(playerObject);
             _virtualCamera.Follow = playerObject.transform;
         }
     }

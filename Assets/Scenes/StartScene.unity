@@ -807,7 +807,7 @@ GameObject:
   - component: {fileID: 456013120}
   - component: {fileID: 456013121}
   m_Layer: 0
-  m_Name: NetworkManagerHud
+  m_Name: NetworkManagerObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4914,7 +4914,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 6.921875
+  orthographic size: 6.75
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

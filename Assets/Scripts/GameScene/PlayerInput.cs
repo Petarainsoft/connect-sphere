@@ -9,19 +9,18 @@ namespace ConnectSphere
         [SerializeField] private float _speed = 5f;
         private Rigidbody2D _rigidbody;
         private Animator _animator;
-        private SpriteRenderer _renderer;
         private Vector2 _movementDirection;
         private float _movementSpeed;
-
+        private bool _isMobile;
         private bool _externalInputBlocked = false;
 
         private int _hashHorizontal = Animator.StringToHash("Horizontal");
         private int _hashVertical = Animator.StringToHash("Vertical");
         private int _hashSpeed = Animator.StringToHash("Speed");
 
-        private void Awake()
+        private void Start()
         {
-            SetupComponents();
+            _isMobile = CheckRunOnMobile();
         }
 
         private void Update()
@@ -35,11 +34,22 @@ namespace ConnectSphere
             _rigidbody.velocity = _movementDirection * _movementSpeed * _speed * Time.deltaTime;
         }
 
-        public void SetupComponents()
+        public void SetupComponents(GameObject targetObject)
         {
-            _rigidbody = GetComponent<Rigidbody2D>();
-            _animator = GetComponentInChildren<Animator>();
-            _renderer = GetComponentInChildren<SpriteRenderer>();
+            _rigidbody = targetObject.GetComponent<Rigidbody2D>();
+            _animator = targetObject.GetComponentInChildren<Animator>();
+        }
+
+        private bool CheckRunOnMobile()
+        {
+            bool isMobile = false;
+            if (Application.isMobilePlatform)
+                isMobile = true;
+
+#if UNITY_ANDROID || UNITY_IPHONE
+            isMobile = true;
+#endif
+            return isMobile;
         }
 
         private void MovementHandler()
@@ -50,9 +60,21 @@ namespace ConnectSphere
                 return;
             }
 
-            _movementDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
+            if (!_isMobile)
+            {
+                SetMovement();
+            }
             _movementSpeed = Mathf.Clamp(_movementDirection.sqrMagnitude, 0f, 1f);
-            _movementDirection.Normalize();
+        }
+
+        private void SetMovement()
+        {
+            _movementDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
+        }
+
+        public void SetMovement(Vector2 movement)
+        {
+            _movementDirection = new Vector2(movement.x, movement.y);
         }
 
         private void Animate()

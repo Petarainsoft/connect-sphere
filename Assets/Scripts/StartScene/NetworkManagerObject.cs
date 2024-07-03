@@ -7,7 +7,7 @@ namespace ConnectSphere
 {
     [RequireComponent(typeof(NetworkManager))]
     [DisallowMultipleComponent]
-    public class NetworkManagerHud : MonoBehaviour
+    public class NetworkManagerObject : MonoBehaviour
     {
         
     }

@@ -13,3 +13,4 @@ EditorBuildSettings:
     guid: 25ad46f2b39d3ba4e841ecec90ff973f
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 41374dc567db9364b837107bdca60f6d, type: 2}
+    com.unity.renderstreaming.settings: {fileID: 11400000, guid: eaaad242393318e4f85c45e69c8837f0, type: 2}
