@@ -2861,6 +2861,7 @@ MonoBehaviour:
   connectionIdInput: {fileID: 185332756}
   localVideoImage: {fileID: 1363584101}
   remoteVideoImage: {fileID: 1221238573}
+  receiveAudioSource: {fileID: 0}
   webCamStreamer: {fileID: 1915034404}
   receiveVideoViewer: {fileID: 1915034405}
   microphoneStreamer: {fileID: 1363584104}

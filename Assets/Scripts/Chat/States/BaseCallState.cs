@@ -4,6 +4,6 @@ namespace Chat.States
 {
     public class BaseCallState : MonoState
     {
-        protected VideoCall ThisVideoCall => ((VideoCallFsm)SuperMachine)?.Owner;
+        protected VivoxVideoCall ThisVideoCall => ((VivoxVideoCallFsm)SuperMachine)?.Owner;
     }
 }
