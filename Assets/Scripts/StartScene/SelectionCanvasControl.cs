@@ -5,18 +5,22 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 namespace ConnectSphere
 {
-    public class SelectionManager : Singleton<SelectionManager>
+    public class SelectionCanvasControl : Singleton<SelectionCanvasControl>
     {
+        [Header("UI")]
         [SerializeField] private Transform _avatarsContainer;
         [SerializeField] private TMP_InputField _inputPlayerName;
         [SerializeField] private Button _buttonStart;
+
+        [Header("Data")]
         [SerializeField] private PlayerInfoSO _playerInfoSo;
+        [SerializeField] public string InGameSceneName = "GameScene";
 
         private int _selectedIndex = 0;
-        private readonly string GAME_SCENE = "GameScene";
 
         public Action<int> OnAvatarImageClicked;
 
@@ -52,7 +56,43 @@ namespace ConnectSphere
         {
             _playerInfoSo.PlayerName = _inputPlayerName.text.Trim();
             _playerInfoSo.AvatarIndex = _selectedIndex;
-            SceneManager.LoadSceneAsync(GAME_SCENE);
+            GoToInGame();
+        }
+
+        private void GoToInGame()
+        {
+            if (_playerInfoSo.Role == NetworkRole.Host)
+            {
+                if (NetworkManager.Singleton.StartHost())
+                {
+                    SceneTransitionHandler.sceneTransitionHandler.RegisterCallbacks();
+                    SceneTransitionHandler.sceneTransitionHandler.SwitchScene(InGameSceneName);
+                }
+                else
+                {
+                    Debug.LogError("Failed to start host.");
+                }
+            }
+
+            if (_playerInfoSo.Role == NetworkRole.Server)
+            {
+                if (NetworkManager.Singleton.StartServer())
+                {
+                    SceneTransitionHandler.sceneTransitionHandler.SwitchScene(InGameSceneName);
+                }
+            }
+
+            if (_playerInfoSo.Role == NetworkRole.Client)
+            {
+                if (NetworkManager.Singleton.StartClient())
+                {
+                    SceneTransitionHandler.sceneTransitionHandler.SwitchScene(InGameSceneName);
+                }
+                else
+                {
+                    Debug.LogError("Failed to start client.");
+                }
+            }
         }
     }
 }

@@ -15,7 +15,7 @@ namespace ConnectSphere
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            SelectionManager.Instance.OnAvatarImageClicked?.Invoke(_index);
+            SelectionCanvasControl.Instance.OnAvatarImageClicked?.Invoke(_index);
         }
     }
 }
