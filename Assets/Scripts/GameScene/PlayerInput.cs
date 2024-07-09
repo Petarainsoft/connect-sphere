@@ -25,12 +25,18 @@ namespace ConnectSphere
 
         private void Update()
         {
+            if (_rigidbody == null || _animator == null)
+                return;
+
             MovementHandler();
             Animate();
         }
 
         private void FixedUpdate()
         {
+            if (_rigidbody == null || _animator == null)
+                return;
+
             _rigidbody.velocity = _movementDirection * _movementSpeed * _speed * Time.deltaTime;
         }
 
@@ -79,6 +85,9 @@ namespace ConnectSphere
 
         private void Animate()
         {
+            if (_animator == null)
+                return;
+
             _animator.SetFloat(_hashSpeed, _movementSpeed);
             _animator.SetFloat(_hashHorizontal, _movementDirection.x);
             _animator.SetFloat(_hashVertical, _movementDirection.y);
