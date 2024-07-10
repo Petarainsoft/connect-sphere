@@ -29,6 +29,11 @@ MonoBehaviour:
           m_credentialType: 0
           m_credential: 
         - m_urls:
+          - turn:relay1.expressturn.com:3478
+          m_username: ef02UUPNLA7YLMD3V6
+          m_credentialType: 1
+          m_credential: XbdzmZYPmMSGWvH2
+        - m_urls:
           - turn:numb.viagenie.ca
           m_username: muazkh
           m_credentialType: 0

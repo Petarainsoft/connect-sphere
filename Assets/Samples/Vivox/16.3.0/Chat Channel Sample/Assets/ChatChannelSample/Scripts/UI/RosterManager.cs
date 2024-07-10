@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Services.Vivox;
@@ -10,8 +11,9 @@ public class RosterManager : MonoBehaviour
 
     Dictionary<string, List<RosterItem>> m_RosterObjects = new Dictionary<string, List<RosterItem>>();
 
-    private void Awake()
+    private IEnumerator Start()
     {
+        yield return new WaitUntil(()=> VivoxService.Instance != null);
         VivoxService.Instance.ParticipantAddedToChannel += OnParticipantAdded;
         VivoxService.Instance.ParticipantRemovedFromChannel += OnParticipantRemoved;
         VivoxService.Instance.LoggedOut += OnUserLoggedOut;

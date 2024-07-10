@@ -44,7 +44,7 @@ public class MessageObjectUI : MonoBehaviour
     {
         var updatedMessage = MessageInputField.text;
         EnableEditMode(false);
-        await VivoxService.Instance.EditChannelTextMessageAsync(VivoxVoiceManager.LobbyChannelName, m_vivoxMessage.MessageId, updatedMessage);
+        await VivoxService.Instance.EditChannelTextMessageAsync(VivoxVoiceManager.Instance.RoomNameOrDefault, m_vivoxMessage.MessageId, updatedMessage);
     }
 
     private void OnDeleteButtonClick()
@@ -54,7 +54,7 @@ public class MessageObjectUI : MonoBehaviour
     private async void OnConfirmDeleteButtonClick()
     {
         EnableEditMode(false);
-        await VivoxService.Instance.DeleteChannelTextMessageAsync(VivoxVoiceManager.LobbyChannelName, m_vivoxMessage.MessageId);
+        await VivoxService.Instance.DeleteChannelTextMessageAsync(VivoxVoiceManager.Instance.RoomNameOrDefault, m_vivoxMessage.MessageId);
     }
 
     private void OnEditButtonClick()
