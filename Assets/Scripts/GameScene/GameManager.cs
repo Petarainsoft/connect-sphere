@@ -2,36 +2,58 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using Common;
+using Fusion;
 
 namespace ConnectSphere
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : NetworkBehaviour
     {
-        [Header("Data")]
-        [SerializeField] private PlayerInfoSO _playerInfoSo;
-
-        [Header("Prefabs")]
-        [SerializeField] private GameObject _playerPrefab;
-        [SerializeField] private List<GameObject> _characterModelsPrefabs;
-
-        [Header("Objects")]
-        [SerializeField] private CinemachineVirtualCamera _virtualCamera;
-        [SerializeField] private PlayerInput _playerInput;
-
-        private Vector2 _spawnPosition = Vector2.zero;
-
-        private void Start()
+        enum GamePhase
         {
-            SpawnPlayer();
+            Starting,
+            Running,
+            Ending
         }
 
-        private void SpawnPlayer()
+        [Networked] private GamePhase Phase { get; set; }
+        private List<NetworkBehaviourId> _playerDataNetworkedIds = new List<NetworkBehaviourId>();
+
+        private void Awake()
         {
-            GameObject playerObject = Instantiate(_playerPrefab, _spawnPosition, Quaternion.identity);
-            GameObject characterObject = Instantiate(_characterModelsPrefabs[_playerInfoSo.AvatarIndex], playerObject.transform);
-            playerObject.GetComponent<Player>().SetName(_playerInfoSo.PlayerName);
-            _playerInput.SetupComponents(playerObject);
-            _virtualCamera.Follow = playerObject.transform;
+            GetComponent<NetworkObject>().Flags |= NetworkObjectFlags.MasterClientObject;
+        }
+
+        public override void Spawned()
+        {
+            if (Object.HasStateAuthority)
+            {
+                // Initialize the game state on the master client
+                Phase = GamePhase.Starting;
+            }
+        }
+
+        public override void Render()
+        {
+            switch (Phase)
+            {
+                case GamePhase.Starting:
+                    UpdateStarter();
+                    break;
+                case GamePhase.Running:
+                    break;
+                case GamePhase.Ending:
+                    break;
+            }
+        }
+
+        private void UpdateStarter()
+        {
+            if (!Object.HasStateAuthority)
+                return;
+
+            FindObjectOfType<PlayerSpawner>().StartPlayerSpawner();
+            Phase = GamePhase.Running;
         }
     }
 }
