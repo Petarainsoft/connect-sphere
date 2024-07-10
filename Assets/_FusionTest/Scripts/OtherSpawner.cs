@@ -1,0 +1,20 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Fusion;
+
+namespace ConnectSphere
+{
+    public class OtherSpawner : SimulationBehaviour, IPlayerJoined
+    {
+        public GameObject PlayerPrefab;
+
+        public void PlayerJoined(PlayerRef player)
+        {
+            if (player == Runner.LocalPlayer)
+            {
+                Runner.Spawn(PlayerPrefab, new Vector3(0, 1, 0), Quaternion.identity);
+            }
+        }
+    }
+}
