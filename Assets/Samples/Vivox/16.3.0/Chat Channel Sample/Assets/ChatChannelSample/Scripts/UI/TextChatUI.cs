@@ -88,7 +88,7 @@ public class TextChatUI : MonoBehaviour
                 TimeEnd = oldestMessage
             };
             var historyMessages =
-                await VivoxService.Instance.GetChannelTextMessageHistoryAsync(VivoxVoiceManager.LobbyChannelName, 10,
+                await VivoxService.Instance.GetChannelTextMessageHistoryAsync(VivoxVoiceManager.Instance.RoomNameOrDefault, 10,
                     chatHistoryOptions);
             var reversedMessages = historyMessages.Reverse();
             foreach (var historyMessage in reversedMessages)
@@ -176,7 +176,7 @@ public class TextChatUI : MonoBehaviour
             return;
         }
 
-        VivoxService.Instance.SendChannelTextMessageAsync(VivoxVoiceManager.LobbyChannelName, MessageInputField.text);
+        VivoxService.Instance.SendChannelTextMessageAsync(VivoxVoiceManager.Instance.RoomNameOrDefault, MessageInputField.text);
         ClearTextField();
     }
 

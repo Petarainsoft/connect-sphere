@@ -29,23 +29,23 @@ public class ToggleFullscreenUI : MonoBehaviour
     
     public void SetFullScreen(bool fullscreen)
     {
-        if (uiPanel == null) return;
-
-        if (fullscreen)
-        {
-            uiPanel.sizeDelta = originalSize;
-            uiPanel.anchorMin = new Vector2(0f, 0f);
-            uiPanel.anchorMax = new Vector2(1f, 1f);
-            uiPanel.pivot = new Vector2(0.5f, 0.5f);
-            uiPanel.anchoredPosition = originalPosition;
-        }
-        else
-        {
-            uiPanel.sizeDelta = rectangleSize;
-            uiPanel.anchorMin = new Vector2(1, 1);
-            uiPanel.anchorMax = new Vector2(1, 1);
-            uiPanel.pivot = new Vector2(1, 1);
-            uiPanel.anchoredPosition = new Vector2(-10, -10); // 10 pixels from top-right corner
-        }
+        // if (uiPanel == null) return;
+        //
+        // if (fullscreen)
+        // {
+        //     uiPanel.sizeDelta = originalSize;
+        //     uiPanel.anchorMin = new Vector2(0f, 0f);
+        //     uiPanel.anchorMax = new Vector2(1f, 1f);
+        //     uiPanel.pivot = new Vector2(0.5f, 0.5f);
+        //     uiPanel.anchoredPosition = originalPosition;
+        // }
+        // else
+        // {
+        //     uiPanel.sizeDelta = rectangleSize;
+        //     uiPanel.anchorMin = new Vector2(1, 1);
+        //     uiPanel.anchorMax = new Vector2(1, 1);
+        //     uiPanel.pivot = new Vector2(1, 1);
+        //     uiPanel.anchoredPosition = new Vector2(-10, -10); // 10 pixels from top-right corner
+        // }
     }
 }

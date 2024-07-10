@@ -5,7 +5,6 @@ using Unity.Services.Authentication;
 using Unity.Services.Vivox;
 using UnityEngine;
 using UnityEngine.Android;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Chat
@@ -19,6 +18,9 @@ namespace Chat
         [SerializeField] private bool _useDeviceAsName = false;
         [SerializeField] private string _userName;
         [SerializeField] private GameObject _vivoxChatUI;
+        
+
+        [SerializeField] private Button _openChat;
 
 
         public bool IsReady { get; private set; }
@@ -39,11 +41,25 @@ namespace Chat
             VivoxService.Instance.ConnectionRecovered += OnConnectionRecovered;
             VivoxService.Instance.ConnectionRecovering += OnConnectionRecovering;
             VivoxService.Instance.ConnectionFailedToRecover += OnConnectionFailedToRecover;
+            
+            _openChat.onClick.AddListener(() =>
+            {
+                _vivoxChatUI.SetActive(!_vivoxChatUI.activeSelf);
+            });
+        }
+
+        private void Update()
+        {
 
 #if !(UNITY_STANDALONE || UNITY_IOS || UNITY_ANDROID)
             IsReady = false;
             return;
 #endif
+            #if UNITY_EDITOR
+            var callerId = ParrelSync.ClonesManager.GetArgument();
+            if (string.IsNullOrWhiteSpace(callerId)) callerId = "0";
+            _userName = $"Caller {callerId}";
+            #else
 
             if ( _useDeviceAsName )
             {
@@ -54,6 +70,7 @@ namespace Chat
                     deviceName.Substring(0,
                         Math.Min(KDefaultMaxStringLength, deviceName.Length));
             }
+            #endif
 
             IsReady = true;
         }
@@ -66,6 +83,8 @@ namespace Chat
             VivoxService.Instance.ConnectionRecovered -= OnConnectionRecovered;
             VivoxService.Instance.ConnectionRecovering -= OnConnectionRecovering;
             VivoxService.Instance.ConnectionFailedToRecover -= OnConnectionFailedToRecover;
+            
+            _openChat.onClick.RemoveAllListeners();
         }
 
 #if (UNITY_ANDROID && !UNITY_EDITOR) || __ANDROID__
@@ -204,7 +223,7 @@ namespace Chat
         {
             Debug.Log($" *** JoinLobbyChannel {VivoxVoiceManager.Instance.RoomNameOrDefault}");
             return VivoxService.Instance.JoinGroupChannelAsync(VivoxVoiceManager.Instance.RoomNameOrDefault,
-                ChatCapability.AudioOnly);
+                ChatCapability.TextAndAudio);
         }
 
         public async void JoinRoom()
@@ -214,9 +233,10 @@ namespace Chat
 
         public async void LogoutOfVivoxServiceAsync()
         {
+            await VivoxService.Instance.LeaveChannelAsync(VivoxVoiceManager.Instance.RoomNameOrDefault);
             await VivoxService.Instance.LogoutAsync();
             AuthenticationService.Instance.SignOut();
-            if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(false);
+            // if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(false);
         }
 
         private async Task LoginToVivox()
@@ -268,7 +288,7 @@ namespace Chat
         void OnConnectionFailedToRecover()
         {
             Debug.Log("<color=green>\tConnectionFailedToRecovered</color>");
-            if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(false);
+            // if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(false);
         }
 
         private void OnUserLoggedIn()

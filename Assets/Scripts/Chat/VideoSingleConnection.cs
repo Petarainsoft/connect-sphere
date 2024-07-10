@@ -10,23 +10,35 @@ namespace Chat
         [SerializeField] public VideoStreamReceiver receiveVideoViewer;
         [SerializeField] public SingleConnection singleConnection;
         public bool IsWorking = false;
-        
-        private int index = 0;
+
+        private int _index = -1;
         private Action<Texture, int> cb;
 
-        public void SetIndex(int Index)
+        public void SetTextureIndex(int index)
         {
-            index = Index;
-            receiveVideoViewer.OnUpdateReceiveTexture += texture =>
-                {
-                    cb?.Invoke(texture, index);
-                }
-                ;
+            _index = index;
+            if ( receiveVideoViewer != null ) receiveVideoViewer.OnUpdateReceiveTexture += OnUpdateReceiveTexture;
+        }
+
+        private void OnUpdateReceiveTexture(Texture texture)
+        {
+            if ( _index == -1 )
+            {
+                Debug.Log("Invalid texture index");
+                return;
+            }
+            cb?.Invoke(texture, _index);
         }
 
         public void SetTextureReceiveCb(Action<Texture, int> onTextureReceive)
         {
             cb = onTextureReceive;
+        }
+
+        public void Release()
+        {
+            cb = null;
+            if ( receiveVideoViewer != null ) receiveVideoViewer.OnUpdateReceiveTexture -= OnUpdateReceiveTexture;
         }
     }
 }
