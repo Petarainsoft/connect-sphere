@@ -194,6 +194,7 @@ GameObject:
   - component: {fileID: 5245026758945779323}
   - component: {fileID: 2339769151879083542}
   - component: {fileID: 4240557050209378173}
+  - component: {fileID: 1606296977522031923}
   m_Layer: 0
   m_Name: Text_PlayerName
   m_TagString: Untagged
@@ -317,6 +318,23 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1606296977522031923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2997616755258553352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 2112719403
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours: []
 --- !u!1 &7377415151454356574
 GameObject:
   m_ObjectHideFlags: 0
@@ -370,8 +388,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 2175336781
   ObjectInterest: 1
-  Flags: 262145
-  NestedObjects: []
+  Flags: 786433
+  NestedObjects:
+  - {fileID: 1606296977522031923}
   NetworkedBehaviours:
   - {fileID: 7812197399596740779}
   - {fileID: 3725942119853658236}
@@ -400,6 +419,7 @@ MonoBehaviour:
   - {fileID: 9100000, guid: 08e596f2002f2924e962e64043bfa7c2, type: 2}
   _textPlayerName: {fileID: 4240557050209378173}
   __avatarIndex: -1
+  __playerName: 
 --- !u!50 &106020574678124259
 Rigidbody2D:
   serializedVersion: 4
@@ -440,7 +460,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 170
-  _smoothTime: 0.05
   _horizontalParam: 0
   _verticalPararm: 0
   _speedParam: 0
@@ -526,7 +545,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 2126312759
-  m_SortingOrder: 0
+  m_SortingOrder: 50
   m_TargetDisplay: 0
 --- !u!114 &4320539426356023833
 MonoBehaviour:

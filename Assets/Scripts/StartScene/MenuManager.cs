@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System;
+using Cysharp.Threading.Tasks;
 
 namespace ConnectSphere
 {
@@ -89,7 +90,7 @@ namespace ConnectSphere
                 _tempPlayerName = _inputPlayerName.text;
             }
 
-            _playerInfoSo.PlayerName = _inputPlayerName.text.Trim();
+            _playerInfoSo.PlayerName = _tempPlayerName;
             _playerInfoSo.AvatarIndex = _selectedAvatarIndex;
 
             StartGame(GameMode.Shared, _tempRoomName, _gameScenePath);
@@ -108,7 +109,7 @@ namespace ConnectSphere
 
             // Let the Fusion Runner know that we will be providing user input
             _runnerInstance.ProvideInput = true;
-            _loadingCanvas.SetActive(true);
+            await ShowLoadingScreen();
             var startGameArgs = new StartGameArgs()
             {
                 GameMode = mode,
@@ -123,6 +124,12 @@ namespace ConnectSphere
             {
                 await _runnerInstance.LoadScene(sceneName);
             }
+        }
+
+        private async UniTask ShowLoadingScreen()
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(0.25f));
+            _loadingCanvas.SetActive(true);
         }
     }
 }

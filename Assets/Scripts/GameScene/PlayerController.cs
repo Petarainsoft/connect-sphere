@@ -13,6 +13,7 @@ namespace ConnectSphere
         private Vector2 _movementDirection;
         private float _movementSpeed;
         private bool _isMobile;
+        private Vector2 refVelocity;
 
         [Networked, OnChangedRender(nameof(OnHorizontalChanged))] public float horizontalParam { get; set; }
         [Networked, OnChangedRender(nameof(OnVerticalChanged))] public float verticalPararm { get; set; }
@@ -56,7 +57,7 @@ namespace ConnectSphere
 #endif
             return isMobile;
         }
-        Vector2 refVelocity;
+        
         private void MovementHandler(PlayerInput input)
         {
             if (!_isMobile)
@@ -84,9 +85,13 @@ namespace ConnectSphere
             if (_animator == null || _animator.runtimeAnimatorController == null)
                 return;
 
+            
             speedParam = _movementSpeed;
-            horizontalParam = _movementDirection.x;
-            verticalPararm = _movementDirection.y;
+            if (_movementDirection != Vector2.zero)
+            {
+                horizontalParam = _movementDirection.x;
+                verticalPararm = _movementDirection.y;
+            }
         }
 
         private void OnSpeedChanged()
