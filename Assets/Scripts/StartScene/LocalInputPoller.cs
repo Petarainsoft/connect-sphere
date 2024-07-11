@@ -22,8 +22,8 @@ namespace ConnectSphere
         {
             PlayerInput localInput = new PlayerInput();
 
-            localInput.HorizontalInput = Input.GetAxis(AXIS_HORIZONTAL);
-            localInput.VerticalInput = Input.GetAxis(AXIS_VERTICAL);
+            localInput.HorizontalInput = Input.GetAxisRaw(AXIS_HORIZONTAL);
+            localInput.VerticalInput = Input.GetAxisRaw(AXIS_VERTICAL);
             //localInput.Buttons.Set(PlayerButtons.Fire, Input.GetButton(BUTTON_FIRE1));
 
             input.Set(localInput);
