@@ -13,7 +13,6 @@ namespace ConnectSphere
         private Vector2 _movementDirection;
         private float _movementSpeed;
         private bool _isMobile;
-        private bool _externalInputBlocked = false;
 
         [Networked, OnChangedRender(nameof(OnHorizontalChanged))] public float horizontalParam { get; set; }
         [Networked, OnChangedRender(nameof(OnVerticalChanged))] public float verticalPararm { get; set; }

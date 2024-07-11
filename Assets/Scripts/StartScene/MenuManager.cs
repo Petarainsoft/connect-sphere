@@ -7,7 +7,7 @@ using System;
 
 namespace ConnectSphere
 {
-    public class MenuManager : Singleton<MenuManager>
+    public class MenuManager : MonoBehaviour
     {
         [Header("Prefabs")]
         [SerializeField] private NetworkRunner _networkRunnerPrefab;
@@ -24,6 +24,7 @@ namespace ConnectSphere
         [SerializeField] private Button _buttonStart;
 
         [Header("Others")]
+        [SerializeField] GameObject _loadingCanvas;
         [SerializeField] GameObject _networkCanvasObject;
         [SerializeField] GameObject _selectionCanvasObject;
         [SerializeField] private PlayerInfoSO _playerInfoSo;
@@ -34,7 +35,7 @@ namespace ConnectSphere
         private string _tempPlayerName;
         private int _selectedAvatarIndex = 0;
 
-        public Action<int> OnAvatarImageClicked;
+        public static Action<int> OnAvatarImageClicked;
 
         private void OnEnable()
         {
@@ -107,14 +108,13 @@ namespace ConnectSphere
 
             // Let the Fusion Runner know that we will be providing user input
             _runnerInstance.ProvideInput = true;
-
+            _loadingCanvas.SetActive(true);
             var startGameArgs = new StartGameArgs()
             {
                 GameMode = mode,
                 SessionName = roomName,
                 Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath(_gameScenePath)),
             };
-
             // GameMode.Host = Start a session with a specific name
             // GameMode.Client = Join a session with a specific name
             await _runnerInstance.StartGame(startGameArgs);
