@@ -78,6 +78,10 @@ public class MessageObjectUI : MonoBehaviour
             EditButton.gameObject.SetActive(false);
             DeleteButton.gameObject.SetActive(false);
         }
+        
+        // anh nguyen tempo hide
+        EditButton.gameObject.SetActive(false);
+        DeleteButton.gameObject.SetActive(false);
 
         if (deleted)
         {
@@ -89,7 +93,7 @@ public class MessageObjectUI : MonoBehaviour
         if (message.FromSelf)
         {
             MessageText.alignment = TextAnchor.MiddleRight;
-            MessageText.text = string.Format($"{message.MessageText} :<color=blue>{message.SenderDisplayName} </color>\n<color=#5A5A5A><size=8>{editedText}{message.ReceivedTime}</size></color>");
+            MessageText.text = string.Format($"{message.MessageText} :<color=blue>{message.SenderDisplayName} </color>\n<color=#AAAA5A><size=15>{editedText}{message.ReceivedTime}</size></color>");
         }
         else
         {

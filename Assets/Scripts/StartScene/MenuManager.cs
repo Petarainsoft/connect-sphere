@@ -36,6 +36,8 @@ namespace ConnectSphere
 
         public Action<int> OnAvatarImageClicked;
 
+        public string RoomName => _tempRoomName;
+
         private void OnEnable()
         {
             OnAvatarImageClicked += HandleSelectedAvatar;

@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ConnectSphere;
+using Doozy.Engine.UI;
+using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Vivox;
 using UnityEngine;
@@ -26,13 +31,28 @@ namespace Chat
         public bool IsReady { get; private set; }
 
         public string UserName => _userName;
+        
+        
+        // REGION: ADAPT MULTIPLAYER
+        [SerializeField]
+        private TMP_Text gloablRoomName;
+        [SerializeField]
+        private TMP_Text gloablRoomNameInChat;
+
+        [SerializeField]
+        private UIToggle ChatToggle;
+
+
+        [SerializeField] private GameObject _loadingScreen;
+        
+
 
         private void Awake()
         {
             IsReady = false;
         }
 
-        private void Start()
+        private IEnumerator Start()
         {
             VivoxService.Instance.LoggedIn += OnUserLoggedIn;
             VivoxService.Instance.LoggedOut += OnUserLoggedOut;
@@ -46,6 +66,19 @@ namespace Chat
             {
                 _vivoxChatUI.SetActive(!_vivoxChatUI.activeSelf);
             });
+
+            _loadingScreen.SetActive(true);
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            
+            // auto connect when running, comment this when running the VideoCall-Vivox scene
+            Debug.Log($"<color=blue>CALLLING VIXOOOOV {MenuManager.Instance.RoomName}</color>");
+            LoginVivoxAndJoinRoom("Petarain");
+            // MenuManager.Instance.RoomName
+            gloablRoomName.text = $"{"Petarain"} Office";
+            gloablRoomNameInChat.text = $"{"Petarain"} Office";
+   
         }
 
         private void Update()
@@ -217,6 +250,9 @@ namespace Chat
 
             Debug.Log("LoginVivoxAndJoinRoom step 6");
             if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(true);
+            ChatToggle.ToggleOn();
+            ChatToggle.ExecuteClick();
+            _loadingScreen.SetActive(false);
         }
 
         private Task JoinLobbyChannel()
@@ -244,6 +280,7 @@ namespace Chat
             if ( string.IsNullOrWhiteSpace(_userName) ) return;
             var validName = Regex.Replace(_userName, "[^a-zA-Z0-9_-]", "");
 
+            Debug.Log($"<color=green>\tLogin VIVVOX With {_userName}</color>");
             await VivoxVoiceManager.Instance.InitializeAsync(validName);
             var loginOptions = new LoginOptions()
             {
@@ -258,7 +295,9 @@ namespace Chat
         {
             Debug.Log("______LoginToVivoxBool step 1");
             if ( string.IsNullOrWhiteSpace(_userName) ) return false;
+            _userName = _userName.Replace(" ", string.Empty);
             Debug.Log("______LoginToVivoxBool step 2");
+            Debug.Log($"<color=green>\tLogin VIVVOX With {_userName}</color>");
             var validName = Regex.Replace(_userName, "[^a-zA-Z0-9_-]", "");
 
             await VivoxVoiceManager.Instance.InitializeAsync(validName);
