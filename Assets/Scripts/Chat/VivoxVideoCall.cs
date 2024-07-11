@@ -9,6 +9,7 @@ using ParrelSync;
 #endif
 using TMPro;
 using Unity.RenderStreaming;
+using VInspector;
 
 namespace Chat
 {
@@ -21,7 +22,7 @@ namespace Chat
     /// Handle both video streaming using webrtc and audio using vivox
     /// </summary>
     [RequireComponent(typeof(VivoxVideoCallFsm))]
-    public class VivoxVideoCall : NetworkBehaviour
+    public class VivoxVideoCall : MonoBehaviour
     {
         [SerializeField] private List<SignalingManager> _renderStreamings;
         [SerializeField] private TMP_Dropdown _webcamSelectDropdown;
@@ -116,10 +117,18 @@ namespace Chat
             }
 
             yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(1f);
             
             // anhnguyen, for demo, run right after having webcam working
-            yield return new WaitUntil(() => Runner != null && Runner.ActivePlayers != null);
-            SetUp(_playerSO.RoomName, Runner.ActivePlayers.Count());
+            // yield return new WaitUntil(() => Runner != null && Runner.ActivePlayers != null);
+            Debug.Log($"<color=yellow>Start calling {_playerSO.RoomName} ___ indexCall {0}</color>");
+            // SetUp(_playerSO.RoomName, 0);
+        }
+
+        [Button]
+        public void DoWebRTC()
+        {
+            SetUp(_playerSO.RoomName, 0);
         }
 
         private Texture2D RotateTexture90Degrees(WebCamTexture originalTexture)
