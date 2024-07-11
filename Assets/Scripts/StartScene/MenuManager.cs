@@ -4,10 +4,11 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System;
+using Cysharp.Threading.Tasks;
 
 namespace ConnectSphere
 {
-    public class MenuManager : Singleton<MenuManager>
+    public class MenuManager : MonoBehaviour
     {
         [Header("Prefabs")]
         [SerializeField] private NetworkRunner _networkRunnerPrefab;
@@ -24,6 +25,7 @@ namespace ConnectSphere
         [SerializeField] private Button _buttonStart;
 
         [Header("Others")]
+        [SerializeField] GameObject _loadingCanvas;
         [SerializeField] GameObject _networkCanvasObject;
         [SerializeField] GameObject _selectionCanvasObject;
         [SerializeField] private PlayerInfoSO _playerInfoSo;
@@ -34,7 +36,7 @@ namespace ConnectSphere
         private string _tempPlayerName;
         private int _selectedAvatarIndex = 0;
 
-        public Action<int> OnAvatarImageClicked;
+        public static Action<int> OnAvatarImageClicked;
 
         public string RoomName => _tempRoomName;
 
@@ -90,7 +92,7 @@ namespace ConnectSphere
                 _tempPlayerName = _inputPlayerName.text;
             }
 
-            _playerInfoSo.PlayerName = _inputPlayerName.text.Trim();
+            _playerInfoSo.PlayerName = _tempPlayerName;
             _playerInfoSo.AvatarIndex = _selectedAvatarIndex;
 
             StartGame(GameMode.Shared, _tempRoomName, _gameScenePath);
@@ -109,14 +111,13 @@ namespace ConnectSphere
 
             // Let the Fusion Runner know that we will be providing user input
             _runnerInstance.ProvideInput = true;
-
+            await ShowLoadingScreen();
             var startGameArgs = new StartGameArgs()
             {
                 GameMode = mode,
                 SessionName = roomName,
                 Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath(_gameScenePath)),
             };
-
             // GameMode.Host = Start a session with a specific name
             // GameMode.Client = Join a session with a specific name
             await _runnerInstance.StartGame(startGameArgs);
@@ -125,6 +126,12 @@ namespace ConnectSphere
             {
                 await _runnerInstance.LoadScene(sceneName);
             }
+        }
+
+        private async UniTask ShowLoadingScreen()
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(0.25f));
+            _loadingCanvas.SetActive(true);
         }
     }
 }

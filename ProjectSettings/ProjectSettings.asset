@@ -140,9 +140,7 @@ PlayerSettings:
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
   bundleVersion: 1.0
-  preloadedAssets:
-  - {fileID: 11400000, guid: 41374dc567db9364b837107bdca60f6d, type: 2}
-  - {fileID: 11400000, guid: 71fa5929b27c2d542b6eb4e07c452acc, type: 2}
+  preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -323,15 +321,13 @@ PlayerSettings:
   - m_BuildTarget: Android
     m_Icons:
     - m_Textures:
-      - {fileID: 2800000, guid: 7e7b1957c1325944489e186a342066f2, type: 3}
-      - {fileID: 0}
+      - {fileID: 2800000, guid: 4e757a24e9d28b046b85c2f34f05baba, type: 3}
+      - {fileID: 2800000, guid: 4e757a24e9d28b046b85c2f34f05baba, type: 3}
       m_Width: 432
       m_Height: 432
       m_Kind: 2
       m_SubKind: 
-    - m_Textures:
-      - {fileID: 0}
-      - {fileID: 2800000, guid: 7e7b1957c1325944489e186a342066f2, type: 3}
+    - m_Textures: []
       m_Width: 324
       m_Height: 324
       m_Kind: 2
@@ -357,7 +353,7 @@ PlayerSettings:
       m_Kind: 2
       m_SubKind: 
     - m_Textures:
-      - {fileID: 2800000, guid: 7e7b1957c1325944489e186a342066f2, type: 3}
+      - {fileID: 2800000, guid: 4e757a24e9d28b046b85c2f34f05baba, type: 3}
       m_Width: 192
       m_Height: 192
       m_Kind: 1
@@ -388,7 +384,7 @@ PlayerSettings:
       m_Kind: 1
       m_SubKind: 
     - m_Textures:
-      - {fileID: 2800000, guid: 7e7b1957c1325944489e186a342066f2, type: 3}
+      - {fileID: 2800000, guid: 4e757a24e9d28b046b85c2f34f05baba, type: 3}
       m_Width: 192
       m_Height: 192
       m_Kind: 0
