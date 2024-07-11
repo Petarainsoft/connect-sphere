@@ -94,6 +94,7 @@ namespace ConnectSphere
 
             _playerInfoSo.PlayerName = _tempPlayerName;
             _playerInfoSo.AvatarIndex = _selectedAvatarIndex;
+            _playerInfoSo.RoomName = _tempRoomName;
 
             StartGame(GameMode.Shared, _tempRoomName, _gameScenePath);
         }

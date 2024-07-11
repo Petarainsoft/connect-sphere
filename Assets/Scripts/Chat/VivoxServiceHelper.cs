@@ -38,12 +38,18 @@ namespace Chat
         private TMP_Text gloablRoomName;
         [SerializeField]
         private TMP_Text gloablRoomNameInChat;
+        
+        [SerializeField]
+        private TMP_Text gloablListChatName;
 
         [SerializeField]
         private UIToggle ChatToggle;
 
 
         [SerializeField] private GameObject _loadingScreen;
+
+
+        [SerializeField] private PlayerInfoSO _playerInfoSo;
         
 
 
@@ -73,11 +79,12 @@ namespace Chat
             yield return new WaitForEndOfFrame();
             
             // auto connect when running, comment this when running the VideoCall-Vivox scene
-            Debug.Log($"<color=blue>CALLLING VIXOOOOV {MenuManager.Instance.RoomName}</color>");
-            LoginVivoxAndJoinRoom("Petarain");
+            Debug.Log($"<color=blue>CALLLING VIXOOOOV {_playerInfoSo.RoomName}</color>");
+            LoginVivoxAndJoinRoom(_playerInfoSo.RoomName);
             // MenuManager.Instance.RoomName
-            gloablRoomName.text = $"{"Petarain"} Office";
-            gloablRoomNameInChat.text = $"{"Petarain"} Office";
+            gloablRoomName.text = $"{_playerInfoSo.RoomName} Office";
+            gloablRoomNameInChat.text = $"{_playerInfoSo.RoomName} Office";
+            gloablListChatName.text = $"{_playerInfoSo.RoomName} Office";
    
         }
 
@@ -88,10 +95,12 @@ namespace Chat
             IsReady = false;
             return;
 #endif
+            if ( IsReady ) return;
             #if UNITY_EDITOR
-            var callerId = ParrelSync.ClonesManager.GetArgument();
-            if (string.IsNullOrWhiteSpace(callerId)) callerId = "0";
-            _userName = $"Caller {callerId}";
+            // var callerId = ParrelSync.ClonesManager.GetArgument();
+            // if (string.IsNullOrWhiteSpace(callerId)) callerId = "0";
+            // _userName = $"Caller {callerId}";
+            _userName = _playerInfoSo.PlayerName;
             #else
 
             if ( _useDeviceAsName )
@@ -210,7 +219,7 @@ namespace Chat
 
         public async Task LoginVivoxAndJoinRoom(string roomId)
         {
-            VivoxVoiceManager.Instance.SetRoomName($"Room{roomId}");
+            VivoxVoiceManager.Instance.SetRoomName(roomId);
             Debug.Log("LoginVivoxAndJoinRoom step 1");
             var loggedIn = false;
             if ( IsMicPermissionGranted() )
