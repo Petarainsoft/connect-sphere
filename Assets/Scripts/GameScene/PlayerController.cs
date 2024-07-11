@@ -14,7 +14,6 @@ namespace ConnectSphere
         private float _movementSpeed;
         private bool _isMobile;
         private bool _externalInputBlocked = false;
-        public float _smoothTime = 0.05f;
 
         [Networked, OnChangedRender(nameof(OnHorizontalChanged))] public float horizontalParam { get; set; }
         [Networked, OnChangedRender(nameof(OnVerticalChanged))] public float verticalPararm { get; set; }
@@ -68,9 +67,7 @@ namespace ConnectSphere
             _movementSpeed = Mathf.Clamp(_movementDirection.sqrMagnitude, 0f, 1f);
 
 
-            //_rigidbody.velocity = _movementDirection * _movementSpeed * _speed * Runner.DeltaTime;
-
-            _rigidbody.velocity = Vector2.SmoothDamp(_rigidbody.velocity, _movementDirection * _movementSpeed * _speed, ref refVelocity, _smoothTime);
+            _rigidbody.velocity = _movementDirection * _movementSpeed * _speed * Runner.DeltaTime;
         }
 
         private void SetMovement(PlayerInput input)
@@ -87,10 +84,6 @@ namespace ConnectSphere
         {
             if (_animator == null || _animator.runtimeAnimatorController == null)
                 return;
-
-            //_animator.SetFloat(_hashSpeed, _movementSpeed);
-            //_animator.SetFloat(_hashHorizontal, _movementDirection.x);
-            //_animator.SetFloat(_hashVertical, _movementDirection.y);
 
             speedParam = _movementSpeed;
             horizontalParam = _movementDirection.x;
