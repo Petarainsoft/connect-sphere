@@ -126,13 +126,13 @@ namespace Chat
             // yield return new WaitUntil(() => Runner != null && Runner.ActivePlayers != null);
             Debug.Log($"<color=yellow>Start calling {_playerSO.RoomName} ___ indexCall {0}</color>");
             yield return new WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
-            SetUp(_playerSO.RoomName, 0);
+            // SetUp(_playerSO.RoomName, 2);
         }
 
         [Button]
         public void DoWebRTC()
         {
-            SetUp(_playerSO.RoomName, 0);
+            SetUp(_playerSO.RoomName, 2);
         }
 
         private Texture2D RotateTexture90Degrees(WebCamTexture originalTexture)
