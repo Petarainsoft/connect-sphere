@@ -50,7 +50,8 @@ namespace Chat
 
 
         [SerializeField] private PlayerInfoSO _playerInfoSo;
-        
+
+        public bool IsReadyForVoiceAndChat = false;
 
 
         private void Awake()
@@ -60,6 +61,7 @@ namespace Chat
 
         private IEnumerator Start()
         {
+            yield return new WaitUntil(()=>VivoxService.Instance != null);
             VivoxService.Instance.LoggedIn += OnUserLoggedIn;
             VivoxService.Instance.LoggedOut += OnUserLoggedOut;
 
@@ -111,6 +113,9 @@ namespace Chat
                 _userName =
                     deviceName.Substring(0,
                         Math.Min(KDefaultMaxStringLength, deviceName.Length));
+            }
+            else {
+               _userName = _playerInfoSo.PlayerName;
             }
             #endif
 
@@ -262,6 +267,7 @@ namespace Chat
             ChatToggle.ToggleOn();
             ChatToggle.ExecuteClick();
             _loadingScreen.SetActive(false);
+            IsReadyForVoiceAndChat = true;
         }
 
         private Task JoinLobbyChannel()
@@ -282,6 +288,7 @@ namespace Chat
             await VivoxService.Instance.LogoutAsync();
             AuthenticationService.Instance.SignOut();
             // if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(false);
+            IsReadyForVoiceAndChat = false;
         }
 
         private async Task LoginToVivox()
@@ -337,6 +344,7 @@ namespace Chat
         {
             Debug.Log("<color=green>\tConnectionFailedToRecovered</color>");
             // if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(false);
+            IsReadyForVoiceAndChat = false;
         }
 
         private void OnUserLoggedIn()
@@ -348,6 +356,7 @@ namespace Chat
         {
             if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(false);
             Debug.Log("*** LOGGED OUT VIVOX****");
+            IsReadyForVoiceAndChat = false;
         }
     }
 }

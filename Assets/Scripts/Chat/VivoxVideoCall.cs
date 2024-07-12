@@ -9,6 +9,7 @@ using ParrelSync;
 #endif
 using TMPro;
 using Unity.RenderStreaming;
+using Unity.Services.Vivox;
 using VInspector;
 
 namespace Chat
@@ -31,6 +32,7 @@ namespace Chat
         [SerializeField] private Button _hangUpButton;
         [SerializeField] private InputField _connectionIdInput;
         [SerializeField] private RawImage _localVideoImage;
+        [SerializeField] private RawImage _trayBarVideoImage;
         [SerializeField] private List<RawImage> _remoteVideoImages;
 
         [SerializeField] private GameObject _videoSinglePrefab;
@@ -39,7 +41,7 @@ namespace Chat
 
 
         // anhnguyen tempo comment
-        // [SerializeField] private VivoxServiceHelper _vivoxHelper;
+        [SerializeField] private VivoxServiceHelper _vivoxHelper;
 
         [SerializeField] private TMP_Text _screenText;
         [SerializeField] private InputField _callIndexInput;
@@ -81,6 +83,7 @@ namespace Chat
             if ( _localVideoImage == null ) yield break;
 
             _localVideoImage.texture = mWebcamTexture;
+            _trayBarVideoImage.texture = mWebcamTexture;
             Debug.Log($"Container Size w:{_localVideoImage.texture.width} h{_localVideoImage.texture.height}");
 #endif
 
@@ -122,7 +125,8 @@ namespace Chat
             // anhnguyen, for demo, run right after having webcam working
             // yield return new WaitUntil(() => Runner != null && Runner.ActivePlayers != null);
             Debug.Log($"<color=yellow>Start calling {_playerSO.RoomName} ___ indexCall {0}</color>");
-            // SetUp(_playerSO.RoomName, 0);
+            yield return new WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
+            SetUp(_playerSO.RoomName, 0);
         }
 
         [Button]
@@ -190,11 +194,13 @@ namespace Chat
         {
             Debug.Log($"Receive Texture for index {textureIndex}");
             _remoteVideoImages[textureIndex].texture = receiveTexture;
+            _remoteVideoImages[textureIndex].transform.parent.gameObject.SetActive(true);
 
             // if ( textureIndex == 0 )
             // {
             Debug.Log("Resize local camera texture to top right");
             _localVideoImage.GetComponent<ToggleFullscreenUI>()?.SetFullScreen(false);
+            _trayBarVideoImage.texture = _localVideoImage.texture;
 
             if ( !callVivox )
             {

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3af745489f1528d4b86af752bd12343c, type: 3}
   m_Name: PlayerInfoSO
   m_EditorClassIdentifier: 
-  PlayerName: natu
+  PlayerName: anh
   AvatarIndex: 1
   Role: 0
+  RoomName: remind
