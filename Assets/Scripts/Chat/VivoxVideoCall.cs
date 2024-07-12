@@ -2,18 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using Chat.States;
+using ConnectSphere;
 using Cysharp.Threading.Tasks;
 #if UNITY_EDITOR
 using ParrelSync;
 #endif
 using TMPro;
 using Unity.RenderStreaming;
+using Unity.Services.Vivox;
+using VInspector;
 
 namespace Chat
 {
     using System.Linq;
     using UnityEngine;
     using UnityEngine.UI;
+    using Fusion;
 
     /// <summary>
     /// Handle both video streaming using webrtc and audio using vivox
@@ -28,6 +32,7 @@ namespace Chat
         [SerializeField] private Button _hangUpButton;
         [SerializeField] private InputField _connectionIdInput;
         [SerializeField] private RawImage _localVideoImage;
+        [SerializeField] private RawImage _trayBarVideoImage;
         [SerializeField] private List<RawImage> _remoteVideoImages;
 
         [SerializeField] private GameObject _videoSinglePrefab;
@@ -35,6 +40,7 @@ namespace Chat
         [SerializeField] private List<VideoSingleConnection> _availableConnection = new List<VideoSingleConnection>();
 
 
+        // anhnguyen tempo comment
         [SerializeField] private VivoxServiceHelper _vivoxHelper;
 
         [SerializeField] private TMP_Text _screenText;
@@ -47,6 +53,9 @@ namespace Chat
         private string connectionId;
 
         [SerializeField] private RenderStreamingSettings _settings;
+
+        [SerializeField] private PlayerInfoSO _playerSO;
+        
 
         private VivoxVideoCallFsm fsm;
 
@@ -74,6 +83,7 @@ namespace Chat
             if ( _localVideoImage == null ) yield break;
 
             _localVideoImage.texture = mWebcamTexture;
+            _trayBarVideoImage.texture = mWebcamTexture;
             Debug.Log($"Container Size w:{_localVideoImage.texture.width} h{_localVideoImage.texture.height}");
 #endif
 
@@ -108,6 +118,21 @@ namespace Chat
                 con.SetTextureIndex(i);
                 con.SetTextureReceiveCb(OnTextureReceive);
             }
+
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(1f);
+            
+            // anhnguyen, for demo, run right after having webcam working
+            // yield return new WaitUntil(() => Runner != null && Runner.ActivePlayers != null);
+            Debug.Log($"<color=yellow>Start calling {_playerSO.RoomName} ___ indexCall {0}</color>");
+            yield return new WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
+            // SetUp(_playerSO.RoomName, 2);
+        }
+
+        [Button]
+        public void DoWebRTC()
+        {
+            SetUp(_playerSO.RoomName, 2);
         }
 
         private Texture2D RotateTexture90Degrees(WebCamTexture originalTexture)
@@ -169,17 +194,19 @@ namespace Chat
         {
             Debug.Log($"Receive Texture for index {textureIndex}");
             _remoteVideoImages[textureIndex].texture = receiveTexture;
+            _remoteVideoImages[textureIndex].transform.parent.gameObject.SetActive(true);
 
             // if ( textureIndex == 0 )
             // {
             Debug.Log("Resize local camera texture to top right");
             _localVideoImage.GetComponent<ToggleFullscreenUI>()?.SetFullScreen(false);
+            _trayBarVideoImage.texture = _localVideoImage.texture;
 
             if ( !callVivox )
             {
                 // Debug.Log($"Start ConnectingVivox to {connectionId}");
                 Debug.Log($"<color=yellow>Start ConnectingVivox to {connectionId}</color>");
-                _vivoxHelper.LoginVivoxAndJoinRoom(connectionId);
+                // _vivoxHelper.LoginVivoxAndJoinRoom(connectionId);
                 callVivox = true;
             }
             // }
@@ -201,7 +228,7 @@ namespace Chat
 
             yield return new WaitUntil(() => VivoxVoiceManager.Instance != null && VivoxVoiceManager.Instance.IsReady);
             Debug.Log("VivoxVoiceManager is ready");
-            yield return new WaitUntil(() => _vivoxHelper != null && _vivoxHelper.IsReady);
+            // yield return new WaitUntil(() => _vivoxHelper != null && _vivoxHelper.IsReady);
             Debug.Log("VivoxServiceHelper is ready");
 
             foreach (var _renderStreaming in _renderStreamings)
@@ -219,7 +246,48 @@ namespace Chat
             _setUpButton.interactable = true;
             _hangUpButton.interactable = true;
             _connectionIdInput.interactable = true;
+            
+            
+            
         }
+        
+        
+        private async void SetUp(string roomName, int inCallIndex)
+        {
+            _setUpButton.interactable = false;
+            _hangUpButton.interactable = true;
+            _connectionIdInput.interactable = false;
+            callIndex = inCallIndex;
+            connectionId = roomName;
+
+            var _availableConnectionIndex = -1;
+
+            for (int i = 0; i <= _availableConnection.Count; i++)
+            {
+                if ( i == callIndex ) continue; //ignore self
+
+                var con = _availableConnection[++_availableConnectionIndex];
+
+                con.receiveVideoViewer.SetCodec(_settings.ReceiverVideoCodec);
+                con.webCamStreamer.SetCodec(_settings.SenderVideoCodec);
+
+                var connectionUniqueId = MakeConnectionUniqueId(i);
+
+                if ( !con.IsWorking )
+                {
+                    Debug.Log($"Start Connecting for {connectionUniqueId}");
+                    con.singleConnection.CreateConnection(connectionUniqueId);
+                    con.IsWorking = true;
+
+                    await UniTask.WaitUntil(() =>
+                        con.IsWorking && con.singleConnection.IsStable(connectionUniqueId));
+
+                    // Debug.Log($"Connected for {connectionUniqueId}");
+                    await UniTask.WaitForSeconds(WaitTime);
+                }
+            }
+        }
+
 
         private async void SetUp()
         {
@@ -301,7 +369,7 @@ namespace Chat
 #endif
             Debug.Log("Resize local camera texture to be full screen");
             _localVideoImage.GetComponent<ToggleFullscreenUI>()?.SetFullScreen(true);
-            _vivoxHelper.LogoutOfVivoxServiceAsync();
+            // _vivoxHelper.LogoutOfVivoxServiceAsync();
         }
     }
 }

@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ConnectSphere;
+using Doozy.Engine.UI;
+using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Vivox;
 using UnityEngine;
@@ -26,14 +31,37 @@ namespace Chat
         public bool IsReady { get; private set; }
 
         public string UserName => _userName;
+        
+        
+        // REGION: ADAPT MULTIPLAYER
+        [SerializeField]
+        private TMP_Text gloablRoomName;
+        [SerializeField]
+        private TMP_Text gloablRoomNameInChat;
+        
+        [SerializeField]
+        private TMP_Text gloablListChatName;
+
+        [SerializeField]
+        private UIToggle ChatToggle;
+
+
+        [SerializeField] private GameObject _loadingScreen;
+
+
+        [SerializeField] private PlayerInfoSO _playerInfoSo;
+
+        public bool IsReadyForVoiceAndChat = false;
+
 
         private void Awake()
         {
             IsReady = false;
         }
 
-        private void Start()
+        private IEnumerator Start()
         {
+            yield return new WaitUntil(()=>VivoxService.Instance != null);
             VivoxService.Instance.LoggedIn += OnUserLoggedIn;
             VivoxService.Instance.LoggedOut += OnUserLoggedOut;
 
@@ -46,6 +74,20 @@ namespace Chat
             {
                 _vivoxChatUI.SetActive(!_vivoxChatUI.activeSelf);
             });
+
+            _loadingScreen.SetActive(true);
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            
+            // auto connect when running, comment this when running the VideoCall-Vivox scene
+            Debug.Log($"<color=blue>CALLLING VIXOOOOV {_playerInfoSo.RoomName}</color>");
+            LoginVivoxAndJoinRoom(_playerInfoSo.RoomName);
+            // MenuManager.Instance.RoomName
+            gloablRoomName.text = $"{_playerInfoSo.RoomName} Office";
+            gloablRoomNameInChat.text = $"{_playerInfoSo.RoomName} Office";
+            gloablListChatName.text = $"{_playerInfoSo.RoomName} Office";
+   
         }
 
         private void Update()
@@ -55,10 +97,12 @@ namespace Chat
             IsReady = false;
             return;
 #endif
+            if ( IsReady ) return;
             #if UNITY_EDITOR
-            var callerId = ParrelSync.ClonesManager.GetArgument();
-            if (string.IsNullOrWhiteSpace(callerId)) callerId = "0";
-            _userName = $"Caller {callerId}";
+            // var callerId = ParrelSync.ClonesManager.GetArgument();
+            // if (string.IsNullOrWhiteSpace(callerId)) callerId = "0";
+            // _userName = $"Caller {callerId}";
+            _userName = _playerInfoSo.PlayerName;
             #else
 
             if ( _useDeviceAsName )
@@ -69,6 +113,9 @@ namespace Chat
                 _userName =
                     deviceName.Substring(0,
                         Math.Min(KDefaultMaxStringLength, deviceName.Length));
+            }
+            else {
+               _userName = _playerInfoSo.PlayerName;
             }
             #endif
 
@@ -177,7 +224,7 @@ namespace Chat
 
         public async Task LoginVivoxAndJoinRoom(string roomId)
         {
-            VivoxVoiceManager.Instance.SetRoomName($"Room{roomId}");
+            VivoxVoiceManager.Instance.SetRoomName(roomId);
             Debug.Log("LoginVivoxAndJoinRoom step 1");
             var loggedIn = false;
             if ( IsMicPermissionGranted() )
@@ -217,6 +264,10 @@ namespace Chat
 
             Debug.Log("LoginVivoxAndJoinRoom step 6");
             if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(true);
+            ChatToggle.ToggleOn();
+            ChatToggle.ExecuteClick();
+            _loadingScreen.SetActive(false);
+            IsReadyForVoiceAndChat = true;
         }
 
         private Task JoinLobbyChannel()
@@ -237,6 +288,7 @@ namespace Chat
             await VivoxService.Instance.LogoutAsync();
             AuthenticationService.Instance.SignOut();
             // if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(false);
+            IsReadyForVoiceAndChat = false;
         }
 
         private async Task LoginToVivox()
@@ -244,6 +296,7 @@ namespace Chat
             if ( string.IsNullOrWhiteSpace(_userName) ) return;
             var validName = Regex.Replace(_userName, "[^a-zA-Z0-9_-]", "");
 
+            Debug.Log($"<color=green>\tLogin VIVVOX With {_userName}</color>");
             await VivoxVoiceManager.Instance.InitializeAsync(validName);
             var loginOptions = new LoginOptions()
             {
@@ -258,7 +311,9 @@ namespace Chat
         {
             Debug.Log("______LoginToVivoxBool step 1");
             if ( string.IsNullOrWhiteSpace(_userName) ) return false;
+            _userName = _userName.Replace(" ", string.Empty);
             Debug.Log("______LoginToVivoxBool step 2");
+            Debug.Log($"<color=green>\tLogin VIVVOX With {_userName}</color>");
             var validName = Regex.Replace(_userName, "[^a-zA-Z0-9_-]", "");
 
             await VivoxVoiceManager.Instance.InitializeAsync(validName);
@@ -289,6 +344,7 @@ namespace Chat
         {
             Debug.Log("<color=green>\tConnectionFailedToRecovered</color>");
             // if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(false);
+            IsReadyForVoiceAndChat = false;
         }
 
         private void OnUserLoggedIn()
@@ -300,6 +356,7 @@ namespace Chat
         {
             if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(false);
             Debug.Log("*** LOGGED OUT VIVOX****");
+            IsReadyForVoiceAndChat = false;
         }
     }
 }

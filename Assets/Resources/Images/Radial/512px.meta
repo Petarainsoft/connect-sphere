@@ -1,6 +1,10 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/ThirdParty/Doozy/Examples/_Scenes/E10 - Animated Bars - Landscape - 2D.unity.meta
+guid: 435aad82c3094994e9231450f75bc2ac
+========
 guid: 1a53c03868c304a45891c1f2082893d1
 folderAsset: yes
+>>>>>>>> main:Assets/Resources/Images/Radial/512px.meta
 DefaultImporter:
   externalObjects: {}
   userData: 

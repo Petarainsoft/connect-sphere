@@ -68,7 +68,8 @@ public class RosterItem : MonoBehaviour
         if (participant.IsSelf)
         {
             // Can't change our own participant volume, so turn off the slider
-            ParticipantVolumeSlider.gameObject.SetActive(false);
+            //anhnguyen tempo accept showing slider volumebar
+            // ParticipantVolumeSlider.gameObject.SetActive(false);
         }
         else
         {

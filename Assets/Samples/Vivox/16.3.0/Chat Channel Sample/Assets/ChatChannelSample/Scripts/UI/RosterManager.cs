@@ -55,7 +55,7 @@ public class RosterManager : MonoBehaviour
     void CleanRoster(string channelName)
     {
         RectTransform rt = this.gameObject.GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(0, m_RosterObjects[channelName].Count * 50);
+        rt.sizeDelta = new Vector2(0, m_RosterObjects[channelName].Count * 110);
     }
 
     void OnChannelDisconnected(string channelName)

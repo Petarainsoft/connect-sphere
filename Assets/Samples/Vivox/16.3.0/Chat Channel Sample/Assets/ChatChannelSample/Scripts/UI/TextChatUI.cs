@@ -27,8 +27,9 @@ public class TextChatUI : MonoBehaviour
     private Task FetchMessages = null;
     private DateTime? oldestMessage = null;
 
-    void Start()
+    IEnumerator Start()
     {
+        yield return new WaitUntil(() => VivoxService.Instance != null);
         VivoxService.Instance.ChannelJoined += OnChannelJoined;
         VivoxService.Instance.DirectedMessageReceived += OnDirectedMessageReceived;
         VivoxService.Instance.ChannelMessageReceived += OnChannelMessageReceived;

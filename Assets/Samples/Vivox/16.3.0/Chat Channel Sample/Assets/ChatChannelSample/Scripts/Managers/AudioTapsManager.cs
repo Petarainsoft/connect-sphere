@@ -56,8 +56,9 @@ public class AudioTapsManager : MonoBehaviour
         }
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
+        yield return new WaitUntil(() => VivoxService.Instance != null);
         VivoxService.Instance.LoggedOut += DestroyAllEffectGameObjects;
     }
 
