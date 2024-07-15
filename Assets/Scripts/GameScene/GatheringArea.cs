@@ -1,24 +1,31 @@
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.Rendering.Universal;
+using System;
 
 namespace ConnectSphere
 {
-    public class FadeTrigger : MonoBehaviour
+    public class GatheringArea : MonoBehaviour
     {
-        public Transform FadeZone;
+        public Transform FadeTexture;
         public Light2D ZoneLight;
         public Light2D GlobalLight;
+
+        [SerializeField] private int areaId;
 
         private float focusIntensity = 0.6f;
         private float offIntensity = 0f;
         private float duration = 0.2f;
 
+        public static Action<int> OnPlayerEnteredArea;
+        public static Action<int> OnPlayerExitArea;
+
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (FadeZone != null)
+            OnPlayerEnteredArea?.Invoke(areaId);
+            if (FadeTexture != null)
             {
-                foreach (Transform child in FadeZone)
+                foreach (Transform child in FadeTexture)
                 {
                     Fade(child.GetComponent<SpriteRenderer>(), 0, duration);
                 }
@@ -33,9 +40,10 @@ namespace ConnectSphere
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (FadeZone != null)
+            OnPlayerExitArea?.Invoke(areaId);
+            if (FadeTexture != null)
             {
-                foreach (Transform child in FadeZone)
+                foreach (Transform child in FadeTexture)
                 {
                     Fade(child.GetComponent<SpriteRenderer>(), 1, duration);
                 }

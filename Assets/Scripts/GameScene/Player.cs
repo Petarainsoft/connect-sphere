@@ -1,4 +1,5 @@
 using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -16,6 +17,7 @@ namespace ConnectSphere
         [Header("References")]
         [SerializeField] private PlayerController _controller;
         [SerializeField] private Animator _animator;
+        [SerializeField] private BubbleChat _bubbleChat;
 
         [Header("Data")]
         [SerializeField] private PlayerInfoSO _playerInfoSo;
@@ -26,6 +28,18 @@ namespace ConnectSphere
 
         [Networked, OnChangedRender(nameof(OnAvatarChanged))] public int _avatarIndex { get; set; } = -1;
         [Networked, OnChangedRender(nameof(OnNameChanged))] public string _playerName { get; set; } = "";
+
+        public static Action<Sprite> OnEmoticonClicked;
+
+        private void OnEnable()
+        {
+            OnEmoticonClicked += ShowBubbleChat;
+        }
+
+        private void OnDisable()
+        {
+            OnEmoticonClicked -= ShowBubbleChat;
+        }
 
         public override void Spawned()
         {
@@ -62,6 +76,11 @@ namespace ConnectSphere
         private void OnNameChanged()
         {
             _textPlayerName.text = _playerName;
+        }
+
+        private void ShowBubbleChat(Sprite sprite)
+        {
+            StartCoroutine(_bubbleChat.Show(sprite));
         }
     }
 }
