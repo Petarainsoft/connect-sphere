@@ -24,21 +24,19 @@ namespace ConnectSphere
         [SerializeField] private PlayerInfoSO _playerInfoSo;
         [SerializeField] private List<RuntimeAnimatorController> _animatorControllers;
 
-        private ObjectPhase _phase = ObjectPhase.Init;
-
-        [Networked, OnChangedRender(nameof(OnAvatarChanged))] public int _avatarIndex { get; set; } = -1;
+        [Networked] public int AvatarIndex { get; set; } = -1;
         [HideInInspector] [Networked] public NetworkString<_16> NickName { get; private set; }
 
         public static Action<int> OnEmoticonClicked;
 
         private void OnEnable()
         {
-            OnEmoticonClicked += ShowBubbleChatRpc;
+            OnEmoticonClicked += ShowBubbleChat;
         }
 
         private void OnDisable()
         {
-            OnEmoticonClicked -= ShowBubbleChatRpc;
+            OnEmoticonClicked -= ShowBubbleChat;
         }
 
         public override void Spawned()
@@ -47,34 +45,14 @@ namespace ConnectSphere
             if (Object.HasStateAuthority)
             {
                 NickName = _playerInfoSo.PlayerName;
+                AvatarIndex = _playerInfoSo.AvatarIndex;
             }
             _textPlayerName.text = $"{NickName}";
+            _animator.runtimeAnimatorController = _animatorControllers[AvatarIndex];
         }
 
-        public override void Render()
+        private void ShowBubbleChat(int spriteIndex)
         {
-            switch (_phase)
-            {
-                case ObjectPhase.Init:
-                    SetAvatar(_playerInfoSo.AvatarIndex);
-                    _phase = ObjectPhase.Running;
-                    break;
-            }
-        }
-
-        public void SetAvatar(int index)
-        {
-            _avatarIndex = index;
-        }
-
-        private void OnAvatarChanged()
-        {
-            _animator.runtimeAnimatorController = _animatorControllers[_avatarIndex];
-        }
-
-        private void ShowBubbleChatRpc(int spriteIndex)
-        {
-            //StartCoroutine(_bubbleChat.Show(spriteIndex));
             _bubbleChat.SetBubbleSprite(spriteIndex);
         }
     }
