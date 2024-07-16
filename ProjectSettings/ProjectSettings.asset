@@ -702,23 +702,23 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: DOTWEEN;FUSION_WEAVER;FUSION2;dUI_MANAGER
-    EmbeddedLinux: DOTWEEN;dUI_MANAGER
-    GameCoreScarlett: DOTWEEN;dUI_MANAGER
-    GameCoreXboxOne: DOTWEEN;dUI_MANAGER
-    LinuxHeadlessSimulation: DOTWEEN;dUI_MANAGER
-    Nintendo Switch: DOTWEEN;dUI_MANAGER
-    PS4: DOTWEEN;dUI_MANAGER
-    PS5: DOTWEEN;dUI_MANAGER
-    QNX: DOTWEEN;dUI_MANAGER
-    Stadia: DOTWEEN;dUI_MANAGER
-    Standalone: DOTWEEN;FUSION_WEAVER;FUSION2;dUI_MANAGER
-    VisionOS: DOTWEEN;dUI_MANAGER
-    WebGL: DOTWEEN;dUI_MANAGER
-    Windows Store Apps: DOTWEEN;dUI_MANAGER
-    XboxOne: DOTWEEN;dUI_MANAGER
-    iPhone: DOTWEEN;dUI_MANAGER
-    tvOS: DOTWEEN;dUI_MANAGER
+    Android: DOTWEEN;FUSION_WEAVER;FUSION2;dUI_MANAGER;dUI_TextMeshPro
+    EmbeddedLinux: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    GameCoreScarlett: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    GameCoreXboxOne: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    LinuxHeadlessSimulation: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    Nintendo Switch: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    PS4: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    PS5: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    QNX: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    Stadia: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    Standalone: DOTWEEN;FUSION_WEAVER;FUSION2;dUI_MANAGER;dUI_TextMeshPro
+    VisionOS: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    WebGL: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    Windows Store Apps: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    XboxOne: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    iPhone: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    tvOS: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

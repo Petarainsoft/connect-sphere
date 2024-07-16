@@ -219,8 +219,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Delete
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: ff80ec21a9590f24fb4f5ed48bb41fb4, type: 2}
-  m_sharedMaterial: {fileID: 4662450126496938350, guid: ff80ec21a9590f24fb4f5ed48bb41fb4, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
+  m_sharedMaterial: {fileID: -7230054837815385662, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -621,8 +621,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Cancel
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: ff80ec21a9590f24fb4f5ed48bb41fb4, type: 2}
-  m_sharedMaterial: {fileID: 4662450126496938350, guid: ff80ec21a9590f24fb4f5ed48bb41fb4, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
+  m_sharedMaterial: {fileID: -7230054837815385662, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1510,9 +1510,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sign out the account will make you feel like you need to get back to the
-    account to be signed out again and you are trapped into the sign in/ sign out
-    forever!
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1847,7 +1845,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: 100
+  m_MinWidth: 150
   m_MinHeight: 100
   m_PreferredWidth: -1
   m_PreferredHeight: -1
@@ -4360,8 +4358,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: 90
-  m_MinHeight: 90
+  m_MinWidth: 150
+  m_MinHeight: 100
   m_PreferredWidth: -1
   m_PreferredHeight: -1
   m_FlexibleWidth: -1
@@ -6875,7 +6873,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: 100
+  m_MinWidth: 150
   m_MinHeight: 100
   m_PreferredWidth: -1
   m_PreferredHeight: -1

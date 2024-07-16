@@ -10,9 +10,10 @@ namespace ConnectSphere
     {
         public override void AddStates()
         {
+            AddState<CreateAccountState>();
             AddState<LoginState>();
             AddState<ResetPasswordState>();
-            SetInitialState<LoginState>();
+            SetInitialState<CreateAccountState>();
         }
     }
 }

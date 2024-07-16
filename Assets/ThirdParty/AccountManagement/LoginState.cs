@@ -25,10 +25,7 @@ namespace AccountManagement
             _resetPassButton.OnClick.OnTrigger.Event.AddListener(ToResetPass);
         }
 
-        private void ToResetPass()
-        {
-            Machine.ChangeState<ResetPasswordState>();
-        }
+        private void ToResetPass() => Machine?.ChangeState<ResetPasswordState>();
 
         public override void OnExit()
         {

@@ -76,7 +76,8 @@ namespace Doozy.Engine.UI
         public void SetButtonsCallbacks(params UnityAction[] callbacks)
         {
             if (callbacks == null || callbacks.Length == 0 || !HasButtons) return;
-            for (int i = 0; i < Buttons.Count; i++)
+            var loop = Math.Min(callbacks.Length, Buttons.Count);
+            for (int i = 0; i < loop; i++)
             {
                 UIButton button = Buttons[i];
                 if (button == null) continue;
@@ -101,11 +102,20 @@ namespace Doozy.Engine.UI
         public void SetButtonsLabels(params string[] buttonLabels)
         {
             if (buttonLabels == null || buttonLabels.Length == 0 || !HasButtons) return;
+            var avaiIndex = Math.Min(buttonLabels.Length, Buttons.Count);
             for (int i = 0; i < Buttons.Count; i++)
             {
-                UIButton button = Buttons[i];
-                if (button == null) continue;
-                button.SetLabelText(buttonLabels[i]);
+                if ( i < avaiIndex)
+                {
+                    UIButton button = Buttons[i];
+                    button.gameObject.SetActive(true);
+                    if ( button == null ) continue;
+                    button.SetLabelText(buttonLabels[i]);
+                }
+                else
+                {
+                    Buttons[i].gameObject.SetActive(false);
+                }
             }
         }
 
@@ -125,12 +135,21 @@ namespace Doozy.Engine.UI
         public void SetButtonsNames(params string[] buttonNames)
         {
             if (buttonNames == null || buttonNames.Length == 0 || !HasButtons) return;
+            var availableCount = Math.Min(buttonNames.Length, Buttons.Count);
             for (int i = 0; i < Buttons.Count; i++)
             {
-                UIButton button = Buttons[i];
-                if (button == null) continue;
-                button.ButtonCategory = UIButton.CustomButtonCategory;
-                button.ButtonName = buttonNames[i];
+                if ( i == availableCount - 1 )
+                {
+                    UIButton button = Buttons[i];
+                    button.gameObject.SetActive(true);
+                    if ( button == null ) continue;
+                    button.ButtonCategory = UIButton.CustomButtonCategory;
+                    button.ButtonName = buttonNames[i];
+                }
+                else
+                {
+                     Buttons[i].gameObject.SetActive(false);
+                }
             }
         }
 
