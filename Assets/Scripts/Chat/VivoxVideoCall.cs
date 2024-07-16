@@ -60,13 +60,13 @@ namespace Chat
 
         private VivoxVideoCallFsm fsm;
 
-        private WebCamTexture webcameTexture;
+        private WebCamTexture webcamTexture;
         private const float WaitTime = 1f;
 
         private async UniTask<bool> RequestCamera()
         {
 
-            if ( _localVideoImage == null || _trayBarVideoImage)
+            if ( _localVideoImage == null || _trayBarVideoImage == null)
             {
                 Debug.LogError("Texture for showing camera is null");
                 return false;
@@ -86,15 +86,15 @@ namespace Chat
             var cameraDevice = WebCamTexture.devices[0];
             if (WebCamTexture.devices.Length > 1) cameraDevice = WebCamTexture.devices[1]; // front camera for mobile devices
             
-            webcameTexture = new WebCamTexture(cameraDevice.name, 600, 480, (int)30);
-            webcameTexture.Play();
+            webcamTexture = new WebCamTexture(cameraDevice.name, 600, 480, (int)30);
+            webcamTexture.Play();
           
-            await UniTask.WaitUntil(() => webcameTexture.didUpdateThisFrame);
-            Debug.Log($"CameraTexture Size w:{webcameTexture.width} h{webcameTexture.height}");
+            await UniTask.WaitUntil(() => webcamTexture.didUpdateThisFrame);
+            Debug.Log($"CameraTexture Size w:{webcamTexture.width} h{webcamTexture.height}");
         
             
-            _localVideoImage.texture = webcameTexture;
-            _trayBarVideoImage.texture = webcameTexture;
+            _localVideoImage.texture = webcamTexture;
+            _trayBarVideoImage.texture = webcamTexture;
             
             Debug.Log($"Container Size w:{_localVideoImage.texture.width} h{_localVideoImage.texture.height}");
             
@@ -132,7 +132,7 @@ namespace Chat
             // yield return new WaitUntil(() => Runner != null && Runner.ActivePlayers != null);
             Debug.Log($"<color=yellow>Start calling {_playerSO.RoomName} ___ indexCall {0}</color>");
             await UniTask.WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
-            SetUp(_playerSO.RoomName, 2);
+            SetUp(_playerSO.RoomName, 1);
 
             return true;
         }
