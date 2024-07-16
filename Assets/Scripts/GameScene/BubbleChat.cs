@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,10 +7,11 @@ using UnityEngine.UI;
 
 namespace ConnectSphere
 {
-    public class BubbleChat : MonoBehaviour
+    public class BubbleChat : NetworkBehaviour
     {
         [SerializeField] private CanvasGroup _canvasGroup;
         [SerializeField] private Image _representImage;
+        [SerializeField] private List<Sprite> _sprites;
 
         private float _showDuration = 2.15f;
         private float _fadeDuration = 0.15f;
@@ -24,9 +26,9 @@ namespace ConnectSphere
             }
         }
 
-        public IEnumerator Show(Sprite sprite)
+        public IEnumerator Show(int index)
         {
-            _representImage.sprite = sprite;
+            _representImage.sprite = _sprites[index];
             _canvasGroup.DOFade(1, _fadeDuration);
             _elapsedTime = 0;
             _isShowing = true;
