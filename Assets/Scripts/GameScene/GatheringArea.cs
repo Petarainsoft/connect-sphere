@@ -2,6 +2,7 @@ using UnityEngine;
 using DG.Tweening;
 using UnityEngine.Rendering.Universal;
 using System;
+using Fusion;
 
 namespace ConnectSphere
 {
@@ -22,6 +23,16 @@ namespace ConnectSphere
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
+            if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
+            {
+                if (!playerObject.HasStateAuthority)
+                    return;
+            }
+            else
+            {
+                return;
+            }
+
             OnPlayerEnteredArea?.Invoke(areaId);
             if (FadeTexture != null)
             {
@@ -40,6 +51,16 @@ namespace ConnectSphere
 
         private void OnTriggerExit2D(Collider2D collision)
         {
+            if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
+            {
+                if (!playerObject.HasStateAuthority)
+                    return;
+            }
+            else
+            {
+                return;
+            }
+
             OnPlayerExitArea?.Invoke(areaId);
             if (FadeTexture != null)
             {

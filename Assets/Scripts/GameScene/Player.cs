@@ -47,6 +47,7 @@ namespace ConnectSphere
                 NickName = _playerInfoSo.PlayerName;
                 AvatarIndex = _playerInfoSo.AvatarIndex;
             }
+            FindObjectOfType<GameManager>().TrackNewPlayer(this);
             _textPlayerName.text = $"{NickName}";
             _animator.runtimeAnimatorController = _animatorControllers[AvatarIndex];
         }
