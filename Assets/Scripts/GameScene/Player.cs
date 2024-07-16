@@ -72,10 +72,10 @@ namespace ConnectSphere
             _animator.runtimeAnimatorController = _animatorControllers[_avatarIndex];
         }
 
-        [Rpc()]
         private void ShowBubbleChatRpc(int spriteIndex)
         {
-            StartCoroutine(_bubbleChat.Show(spriteIndex));
+            //StartCoroutine(_bubbleChat.Show(spriteIndex));
+            _bubbleChat.SetBubbleSprite(spriteIndex);
         }
     }
 }

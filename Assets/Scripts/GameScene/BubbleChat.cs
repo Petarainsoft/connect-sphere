@@ -13,6 +13,8 @@ namespace ConnectSphere
         [SerializeField] private Image _representImage;
         [SerializeField] private List<Sprite> _sprites;
 
+        [Networked, OnChangedRender(nameof(OnSpriteChanged))] public int NetworkedSpriteIndex { get; set; } = -1;
+
         private float _showDuration = 2.15f;
         private float _fadeDuration = 0.15f;
         private float _elapsedTime = 0;
@@ -23,6 +25,19 @@ namespace ConnectSphere
             if (_isShowing)
             {
                 _elapsedTime += Time.deltaTime;
+            }
+        }
+
+        public void SetBubbleSprite(int index)
+        {
+            NetworkedSpriteIndex = index;
+        }
+
+        private void OnSpriteChanged()
+        {
+            if (NetworkedSpriteIndex != -1)
+            {
+                StartCoroutine(Show(NetworkedSpriteIndex));
             }
         }
 
@@ -41,6 +56,7 @@ namespace ConnectSphere
 
         public void Hide()
         {
+            NetworkedSpriteIndex = -1;
             _isShowing = false;
             _canvasGroup.DOFade(0, _fadeDuration);
         }
