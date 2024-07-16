@@ -41,8 +41,6 @@ namespace Chat
                 {
                     OnPermissionResult?.Invoke(true);
                 }
-
-                var dd = Enum.Parse(typeof(UserAuthorization), ToString());
             }
         }
         
