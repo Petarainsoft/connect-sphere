@@ -55,5 +55,10 @@ namespace ConnectSphere
             FindObjectOfType<PlayerSpawner>().StartPlayerSpawner();
             Phase = GamePhase.Running;
         }
+
+        public void TrackNewPlayer(NetworkBehaviourId playerDataNetworkedId)
+        {
+            _playerDataNetworkedIds.Add(playerDataNetworkedId);
+        }
     }
 }

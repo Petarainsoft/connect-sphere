@@ -1,4 +1,5 @@
 using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -16,20 +17,38 @@ namespace ConnectSphere
         [Header("References")]
         [SerializeField] private PlayerController _controller;
         [SerializeField] private Animator _animator;
+        [SerializeField] private BubbleChat _bubbleChat;
+        [SerializeField] private TMP_Text _textPlayerName;
 
         [Header("Data")]
         [SerializeField] private PlayerInfoSO _playerInfoSo;
         [SerializeField] private List<RuntimeAnimatorController> _animatorControllers;
-        [SerializeField] private TMP_Text _textPlayerName;
 
         private ObjectPhase _phase = ObjectPhase.Init;
 
         [Networked, OnChangedRender(nameof(OnAvatarChanged))] public int _avatarIndex { get; set; } = -1;
-        [Networked, OnChangedRender(nameof(OnNameChanged))] public string _playerName { get; set; } = "";
+        [HideInInspector] [Networked] public NetworkString<_16> NickName { get; private set; }
+
+        public static Action<int> OnEmoticonClicked;
+
+        private void OnEnable()
+        {
+            OnEmoticonClicked += ShowBubbleChatRpc;
+        }
+
+        private void OnDisable()
+        {
+            OnEmoticonClicked -= ShowBubbleChatRpc;
+        }
 
         public override void Spawned()
         {
             _controller.SetupComponents();
+            if (Object.HasStateAuthority)
+            {
+                NickName = _playerInfoSo.PlayerName;
+            }
+            _textPlayerName.text = $"{NickName}";
         }
 
         public override void Render()
@@ -37,16 +56,10 @@ namespace ConnectSphere
             switch (_phase)
             {
                 case ObjectPhase.Init:
-                    SetName(_playerInfoSo.PlayerName);
                     SetAvatar(_playerInfoSo.AvatarIndex);
                     _phase = ObjectPhase.Running;
                     break;
             }
-        }
-
-        public void SetName(string name)
-        {
-            _playerName = name;
         }
 
         public void SetAvatar(int index)
@@ -59,9 +72,10 @@ namespace ConnectSphere
             _animator.runtimeAnimatorController = _animatorControllers[_avatarIndex];
         }
 
-        private void OnNameChanged()
+        private void ShowBubbleChatRpc(int spriteIndex)
         {
-            _textPlayerName.text = _playerName;
+            //StartCoroutine(_bubbleChat.Show(spriteIndex));
+            _bubbleChat.SetBubbleSprite(spriteIndex);
         }
     }
 }
