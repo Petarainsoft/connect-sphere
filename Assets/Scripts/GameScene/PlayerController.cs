@@ -30,9 +30,6 @@ namespace ConnectSphere
 
         public override void FixedUpdateNetwork()
         {
-            if (!HasStateAuthority)
-                return;
-
             if (GetInput<PlayerInput>(out var input))
             {
                 MovementHandler(input);
@@ -70,11 +67,13 @@ namespace ConnectSphere
             _rigidbody.velocity = _movementDirection * _movementSpeed * _speed * Runner.DeltaTime;
         }
 
+        // keyboard input
         private void SetMovement(PlayerInput input)
         {
             _movementDirection = new Vector2(input.HorizontalInput, input.VerticalInput).normalized;
         }
 
+        // virtual joystick input
         public void SetMovement(Vector2 movement)
         {
             _movementDirection = new Vector2(movement.x, movement.y);

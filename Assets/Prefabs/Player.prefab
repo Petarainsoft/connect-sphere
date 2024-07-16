@@ -221,6 +221,7 @@ MonoBehaviour:
   - {fileID: 21300012, guid: dffef66376be4fa480fb02b19edbe903, type: 3}
   - {fileID: 21300014, guid: dffef66376be4fa480fb02b19edbe903, type: 3}
   - {fileID: 21300016, guid: dffef66376be4fa480fb02b19edbe903, type: 3}
+  _NetworkedSpriteIndex: -1
 --- !u!1 &2111642017982399848
 GameObject:
   m_ObjectHideFlags: 0
@@ -529,7 +530,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SortKey: 2175336781
-  ObjectInterest: 0
+  ObjectInterest: 1
   Flags: 262145
   NestedObjects:
   - {fileID: 1606296977522031923}
@@ -562,7 +563,7 @@ MonoBehaviour:
   - {fileID: 9100000, guid: 0ddb48fc868c48f44b225ae84f94e2ec, type: 2}
   - {fileID: 9100000, guid: eb0522e15b7074a488fea7663931b7da, type: 2}
   - {fileID: 9100000, guid: 08e596f2002f2924e962e64043bfa7c2, type: 2}
-  __avatarIndex: -1
+  _AvatarIndex: -1
   _NickName:
     _length: 0
     _data:
@@ -740,8 +741,8 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 2126312759
-  m_SortingOrder: 50
+  m_SortingLayerID: 1944039885
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!114 &4320539426356023833
 MonoBehaviour:
