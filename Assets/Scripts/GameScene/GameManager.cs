@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
-using Common;
 using Fusion;
 
 namespace ConnectSphere
@@ -59,6 +57,7 @@ namespace ConnectSphere
         public void TrackNewPlayer(NetworkBehaviourId playerDataNetworkedId)
         {
             _playerDataNetworkedIds.Add(playerDataNetworkedId);
+            Debug.Log($"<color=green>New player: {playerDataNetworkedId}</color>");
         }
     }
 }
