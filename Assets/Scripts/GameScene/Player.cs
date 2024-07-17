@@ -1,4 +1,5 @@
 using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -16,52 +17,44 @@ namespace ConnectSphere
         [Header("References")]
         [SerializeField] private PlayerController _controller;
         [SerializeField] private Animator _animator;
+        [SerializeField] private BubbleChat _bubbleChat;
+        [SerializeField] private TMP_Text _textPlayerName;
 
         [Header("Data")]
         [SerializeField] private PlayerInfoSO _playerInfoSo;
         [SerializeField] private List<RuntimeAnimatorController> _animatorControllers;
-        [SerializeField] private TMP_Text _textPlayerName;
 
-        private ObjectPhase _phase = ObjectPhase.Init;
+        [Networked] public int AvatarIndex { get; set; } = -1;
+        [HideInInspector] [Networked] public NetworkString<_16> NickName { get; private set; }
 
-        [Networked, OnChangedRender(nameof(OnAvatarChanged))] public int _avatarIndex { get; set; } = -1;
-        [Networked, OnChangedRender(nameof(OnNameChanged))] public string _playerName { get; set; } = "";
+        public static Action<int> OnEmoticonClicked;
+
+        private void OnEnable()
+        {
+            OnEmoticonClicked += ShowBubbleChat;
+        }
+
+        private void OnDisable()
+        {
+            OnEmoticonClicked -= ShowBubbleChat;
+        }
 
         public override void Spawned()
         {
             _controller.SetupComponents();
-        }
-
-        public override void Render()
-        {
-            switch (_phase)
+            if (Object.HasStateAuthority)
             {
-                case ObjectPhase.Init:
-                    SetName(_playerInfoSo.PlayerName);
-                    SetAvatar(_playerInfoSo.AvatarIndex);
-                    _phase = ObjectPhase.Running;
-                    break;
+                NickName = _playerInfoSo.PlayerName;
+                AvatarIndex = _playerInfoSo.AvatarIndex;
             }
+            FindObjectOfType<GameManager>().TrackNewPlayer(this);
+            _textPlayerName.text = $"{NickName}";
+            _animator.runtimeAnimatorController = _animatorControllers[AvatarIndex];
         }
 
-        public void SetName(string name)
+        private void ShowBubbleChat(int spriteIndex)
         {
-            _playerName = name;
-        }
-
-        public void SetAvatar(int index)
-        {
-            _avatarIndex = index;
-        }
-
-        private void OnAvatarChanged()
-        {
-            _animator.runtimeAnimatorController = _animatorControllers[_avatarIndex];
-        }
-
-        private void OnNameChanged()
-        {
-            _textPlayerName.text = _playerName;
+            _bubbleChat.SetBubbleSprite(spriteIndex);
         }
     }
 }

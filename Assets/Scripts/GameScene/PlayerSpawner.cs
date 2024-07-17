@@ -20,9 +20,9 @@ namespace ConnectSphere
         [Header("Objects")]
         [SerializeField] private CinemachineVirtualCamera _virtualCamera;
         [SerializeField] private DynamicJoystick _joystick;
+        [SerializeField] private Transform _spawnPositions;
         [Networked] private bool _gameIsReady { get; set; } = false;
 
-        private Vector2 _spawnPosition = Vector2.zero;
         private List<NetworkBehaviourId> _playerDataNetworkedIds = new List<NetworkBehaviourId>();
 
         public override void Spawned()
@@ -47,7 +47,9 @@ namespace ConnectSphere
 
         private void SpawnPlayer(PlayerRef player)
         {
-            NetworkObject playerObject = Runner.Spawn(_playerPrefab, _spawnPosition, Quaternion.identity, player);
+            var index = Random.Range(0, _spawnPositions.childCount);
+            var spawnPos = _spawnPositions.GetChild(index);
+            NetworkObject playerObject = Runner.Spawn(_playerPrefab, spawnPos.position, Quaternion.identity, player);
             Runner.SetPlayerObject(player, playerObject);
             _joystick.OnJoystickValueChanged.AddListener(playerObject.GetComponent<PlayerController>().SetMovement);
             _virtualCamera.Follow = playerObject.transform;

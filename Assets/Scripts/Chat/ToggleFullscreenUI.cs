@@ -1,5 +1,4 @@
 using UnityEngine;
-using VInspector;
 
 public class ToggleFullscreenUI : MonoBehaviour
 {
@@ -19,13 +18,7 @@ public class ToggleFullscreenUI : MonoBehaviour
             originalSize = uiPanel.sizeDelta;
             originalPosition = uiPanel.anchoredPosition;
         }
-    }
-
-    [Button]
-    private void SetFS() => SetFullScreen(true);
-    [Button]
-    private void SetSS() => SetFullScreen(false);
-    
+    }    
     
     public void SetFullScreen(bool fullscreen)
     {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ConnectSphere;
@@ -87,7 +86,6 @@ namespace Chat
             gloablRoomName.text = $"{_playerInfoSo.RoomName} Office";
             gloablRoomNameInChat.text = $"{_playerInfoSo.RoomName} Office";
             gloablListChatName.text = $"{_playerInfoSo.RoomName} Office";
-   
         }
 
         private void Update()

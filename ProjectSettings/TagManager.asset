@@ -47,3 +47,6 @@ TagManager:
   - name: Foreground
     uniqueID: 2126312759
     locked: 0
+  - name: Fadeground
+    uniqueID: 1944039885
+    locked: 0
