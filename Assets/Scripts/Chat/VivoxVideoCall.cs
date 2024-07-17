@@ -10,7 +10,6 @@ using ParrelSync;
 using TMPro;
 using Unity.RenderStreaming;
 using Unity.Services.Vivox;
-using VInspector;
 
 namespace Chat
 {
@@ -96,16 +95,6 @@ namespace Chat
                 con.webCamStreamer.sourceTexture = _localVideoImage.texture;
                 Debug.Log("2");
                 con.webCamStreamer.OnStartedStream += id => con.receiveVideoViewer.enabled = true;
-                con.webCamStreamer.OnStartedStream += _ =>
-                {
-                    // if ( _localVideoImage.texture == null )
-                    // {
-                    //     _localVideoImage.texture = con.webCamStreamer.sourceWebCamTexture;
-                    // }
-                    #if !UNITY_EDITOR
-                    _localVideoImage.texture = mWebcamTexture;
-                    #endif
-                };
 
                 if ( _settings != null )
                 {
@@ -128,8 +117,7 @@ namespace Chat
             yield return new WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
             // SetUp(_playerSO.RoomName, 2);
         }
-
-        [Button]
+        
         public void DoWebRTC()
         {
             SetUp(_playerSO.RoomName, 2);
@@ -246,9 +234,6 @@ namespace Chat
             _setUpButton.interactable = true;
             _hangUpButton.interactable = true;
             _connectionIdInput.interactable = true;
-            
-            
-            
         }
         
         
@@ -281,8 +266,7 @@ namespace Chat
 
                     await UniTask.WaitUntil(() =>
                         con.IsWorking && con.singleConnection.IsStable(connectionUniqueId));
-
-                    // Debug.Log($"Connected for {connectionUniqueId}");
+                    
                     await UniTask.WaitForSeconds(WaitTime);
                 }
             }

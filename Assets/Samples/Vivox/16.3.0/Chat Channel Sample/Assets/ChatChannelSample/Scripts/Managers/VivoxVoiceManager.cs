@@ -54,7 +54,7 @@ public class VivoxVoiceManager : MonoBehaviour
                         var singletonObject = new GameObject();
                         m_Instance = singletonObject.AddComponent<VivoxVoiceManager>();
                         singletonObject.name = typeof(VivoxVoiceManager).ToString() + " (Singleton)";
-                    }
+                    }  
                 }
                 // Make instance persistent even if its already in the scene
                 DontDestroyOnLoad(m_Instance.gameObject);
