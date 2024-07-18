@@ -24,6 +24,11 @@ namespace ConnectSphere
 
         private List<NetworkObject> _playersInThisArea = new List<NetworkObject>();
 
+
+        public List<NetworkObject> PlayersInArea => _playersInThisArea;
+
+        public int AreaId => areaId;
+
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
