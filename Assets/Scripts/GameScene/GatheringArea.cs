@@ -3,6 +3,7 @@ using DG.Tweening;
 using UnityEngine.Rendering.Universal;
 using System;
 using Fusion;
+using System.Collections.Generic;
 
 namespace ConnectSphere
 {
@@ -21,6 +22,8 @@ namespace ConnectSphere
         public static Action<int> OnPlayerEnteredArea;
         public static Action<int> OnPlayerExitArea;
 
+        private List<NetworkObject> _playersInThisArea = new List<NetworkObject>();
+
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
@@ -34,6 +37,7 @@ namespace ConnectSphere
             }
 
             OnPlayerEnteredArea?.Invoke(areaId);
+            _playersInThisArea.Add(playerObject);
             if (FadeTexture != null)
             {
                 foreach (Transform child in FadeTexture)
@@ -62,6 +66,7 @@ namespace ConnectSphere
             }
 
             OnPlayerExitArea?.Invoke(areaId);
+            _playersInThisArea.Remove(playerObject);
             if (FadeTexture != null)
             {
                 foreach (Transform child in FadeTexture)

@@ -11,6 +11,8 @@ namespace ConnectSphere
         public int AvatarIndex;
         public NetworkRole Role;
         public string RoomName;
+        public string Email;
+        public int DatabaseId;
     }
 
     public enum NetworkRole
