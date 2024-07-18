@@ -247,6 +247,7 @@ namespace Chat
                                 con.singleConnection.DeleteConnection(existingConnection);
                                 con.IsWorking = false;
                                 con.Release();
+                                _remoteVideoImages[_availableConnectionIndex].transform.parent.gameObject.SetActive(false);
                             }
                         }
                     }
