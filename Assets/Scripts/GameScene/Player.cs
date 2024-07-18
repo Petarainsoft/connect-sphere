@@ -24,8 +24,10 @@ namespace ConnectSphere
         [SerializeField] private PlayerInfoSO _playerInfoSo;
         [SerializeField] private List<RuntimeAnimatorController> _animatorControllers;
 
+        [Networked] public NetworkString<_16> NickName { get; private set; }
         [Networked] public int AvatarIndex { get; set; } = -1;
-        [HideInInspector] [Networked] public NetworkString<_16> NickName { get; private set; }
+        [Networked] public NetworkString<_16> Email { get; private set; }
+        [Networked] public int DatabaseId { get; private set; } = -1;
 
         public static Action<int> OnEmoticonClicked;
 
@@ -46,6 +48,8 @@ namespace ConnectSphere
             {
                 NickName = _playerInfoSo.PlayerName;
                 AvatarIndex = _playerInfoSo.AvatarIndex;
+                Email = _playerInfoSo.Email;
+                DatabaseId = _playerInfoSo.DatabaseId;
             }
             FindObjectOfType<GameManager>().TrackNewPlayer(this);
             _textPlayerName.text = $"{NickName}";
