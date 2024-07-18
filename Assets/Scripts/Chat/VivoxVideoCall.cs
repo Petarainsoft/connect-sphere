@@ -86,7 +86,7 @@ namespace Chat
             var cameraDevice = WebCamTexture.devices[0];
             if (WebCamTexture.devices.Length > 1) cameraDevice = WebCamTexture.devices[1]; // front camera for mobile devices
             
-            webcamTexture = new WebCamTexture(cameraDevice.name, 600, 480, (int)30);
+            webcamTexture = new WebCamTexture(cameraDevice.name, 600, 480, (int)20);
             webcamTexture.Play();
           
             await UniTask.WaitUntil(() => webcamTexture.didUpdateThisFrame);
@@ -132,7 +132,7 @@ namespace Chat
             // yield return new WaitUntil(() => Runner != null && Runner.ActivePlayers != null);
             Debug.Log($"<color=yellow>Start calling {_playerSO.RoomName} ___ indexCall {0}</color>");
             await UniTask.WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
-            SetUp(_playerSO.RoomName, 1);
+            // SetUp(_playerSO.RoomName, 1);
 
             return true;
         }
@@ -142,7 +142,7 @@ namespace Chat
         {
             SetUp(_playerSO.RoomName, 2);
         }
-
+        
         private Texture2D RotateTexture90Degrees(WebCamTexture originalTexture)
         {
             int width = originalTexture.width;

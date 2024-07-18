@@ -18,11 +18,6 @@ namespace ConnectSphere
             _networkCanvas.SetActive(false);
         }
 
-
-        private async void Start()
-        {
-        }
-
         public void GotoNetworkSelect()
         {
             _networkCanvas.SetActive(true);
