@@ -33,6 +33,9 @@ namespace ConnectSphere
         {
             if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
             {
+                OnPlayerEnteredArea?.Invoke(areaId);
+                _playersInThisArea.Add(playerObject);
+                
                 if (!playerObject.HasStateAuthority)
                     return;
             }
@@ -41,8 +44,6 @@ namespace ConnectSphere
                 return;
             }
 
-            OnPlayerEnteredArea?.Invoke(areaId);
-            _playersInThisArea.Add(playerObject);
             if (FadeTexture != null)
             {
                 foreach (Transform child in FadeTexture)
@@ -62,6 +63,9 @@ namespace ConnectSphere
         {
             if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
             {
+                OnPlayerExitArea?.Invoke(areaId);
+                _playersInThisArea.Remove(playerObject);
+                
                 if (!playerObject.HasStateAuthority)
                     return;
             }
@@ -69,9 +73,7 @@ namespace ConnectSphere
             {
                 return;
             }
-
-            OnPlayerExitArea?.Invoke(areaId);
-            _playersInThisArea.Remove(playerObject);
+            
             if (FadeTexture != null)
             {
                 foreach (Transform child in FadeTexture)
