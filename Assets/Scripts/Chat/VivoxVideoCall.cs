@@ -206,11 +206,12 @@ namespace Chat
         private void OnDestroy()
         {
             GatheringArea.OnPlayerEnteredArea -= HandlePlayerEnter;
-            GatheringArea.OnPlayerExitArea += HandlePlayerExit;
+            GatheringArea.OnPlayerExitArea -= HandlePlayerExit;
         }
 
         private void HandlePlayerExit(int areaId)
         {
+            Debug.Log($"<color=red>PlayerEXIT {areaId}</color>");
             var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
             if ( area == null ) return;
             var listPlayers = area.PlayersInArea;
@@ -254,6 +255,7 @@ namespace Chat
 
         private async void HandlePlayerEnter(int areaId)
         {
+            Debug.Log($"<color=red>PlayerENTER {areaId}</color>");
             var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
             if ( area == null ) return;
             var listPlayers = area.PlayersInArea;
