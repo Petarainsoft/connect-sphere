@@ -261,7 +261,7 @@ namespace Chat
             var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
             if ( area == null ) return;
             var listPlayers = area.PlayersInArea;
-            Debug.Log($"<color=red>listPlayers {string.Join(",", listPlayers)}</color>");
+            Debug.Log($"<color=red>listPlayers {string.Join(",", listPlayers.Select(e=>e.GetComponent<Player>().DatabaseId))}</color>");
             // me went in
             var myId = PlayerPrefs.GetInt("userId");
             Debug.Log($"<color=red>MyId {myId}</color>");
