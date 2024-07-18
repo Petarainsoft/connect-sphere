@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Doozy.Engine.UI;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace AccountManagement
@@ -23,9 +24,11 @@ namespace AccountManagement
             if ( isauthen )
             {
                 Manager.GotoNetworkSelect();
+                Machine.ChangeState<Empty>();
             }
             else
             {
+                await UniTask.DelayFrame(1);
                 Machine.ChangeState<CreateAccountState>();
             }
         }

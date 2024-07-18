@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ConnectSphere;
 using Unity.Services.Vivox;
 using Unity.Services.Vivox.AudioTaps;
 using UnityEngine;
@@ -26,6 +27,7 @@ public class TextChatUI : MonoBehaviour
 
     private Task FetchMessages = null;
     private DateTime? oldestMessage = null;
+    
 
     IEnumerator Start()
     {
@@ -84,12 +86,17 @@ public class TextChatUI : MonoBehaviour
     {
         try
         {
+            if (string.IsNullOrEmpty(currentChannelName))
+            {
+                Debug.LogError("Current channel name is empty, cannot get chat history");
+                return;
+            }
             var chatHistoryOptions = new ChatHistoryQueryOptions()
             {
                 TimeEnd = oldestMessage
             };
             var historyMessages =
-                await VivoxService.Instance.GetChannelTextMessageHistoryAsync(VivoxVoiceManager.Instance.RoomNameOrDefault, 10,
+                await VivoxService.Instance.GetChannelTextMessageHistoryAsync(currentChannelName, 10,
                     chatHistoryOptions);
             var reversedMessages = historyMessages.Reverse();
             foreach (var historyMessage in reversedMessages)
@@ -177,7 +184,12 @@ public class TextChatUI : MonoBehaviour
             return;
         }
 
-        VivoxService.Instance.SendChannelTextMessageAsync(VivoxVoiceManager.Instance.RoomNameOrDefault, MessageInputField.text);
+        if (string.IsNullOrEmpty(currentChannelName))
+        {
+            Debug.LogError("CurrentChanel is empty");
+            return;
+        }
+        VivoxService.Instance.SendChannelTextMessageAsync(currentChannelName, MessageInputField.text.Trim());
         ClearTextField();
     }
 
@@ -206,8 +218,10 @@ public class TextChatUI : MonoBehaviour
         AddMessageToChat(message, false, true);
     }
 
+    private string currentChannelName = string.Empty;
     void OnChannelJoined(string channelName)
     {
+        currentChannelName = channelName;
         FetchMessages = FetchHistory(true);
     }
 
