@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4067017245740970401
+--- !u!1 &3992121367501739446
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,37 +8,37 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8066509914917892470}
-  - component: {fileID: 4036050744114317916}
+  - component: {fileID: 4215236959406463016}
+  - component: {fileID: 7533289791058393636}
   m_Layer: 0
-  m_Name: keyboard_2
+  m_Name: mug_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8066509914917892470
+--- !u!4 &4215236959406463016
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4067017245740970401}
+  m_GameObject: {fileID: 3992121367501739446}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -28.778286, y: 4.094036, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &4036050744114317916
+--- !u!212 &7533289791058393636
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4067017245740970401}
+  m_GameObject: {fileID: 3992121367501739446}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -72,8 +72,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 2126312759
   m_SortingLayer: 2
-  m_SortingOrder: 0
-  m_Sprite: {fileID: -1434105653, guid: efd396abc74830e4ebcdf64566f0298b, type: 3}
+  m_SortingOrder: 2
+  m_Sprite: {fileID: 1897468544, guid: 8145c8c91275af641a87a9922cb2c79e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
