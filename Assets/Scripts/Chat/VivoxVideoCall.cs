@@ -233,7 +233,7 @@ namespace Chat
                 }
 
                 var _availableConnectionIndex = -1;
-                for (int i = 0; i <= _availableConnection.Count; i++)
+                for (int i = 0; i < _availableConnection.Count; i++)
                 {
                     var con = _availableConnection[++_availableConnectionIndex];
                     if ( con.IsWorking )
@@ -280,7 +280,7 @@ namespace Chat
                 }
 
                 var _availableConnectionIndex = -1;
-                for (int i = 0; i <= _availableConnection.Count; i++)
+                for (int i = 0; i < _availableConnection.Count; i++)
                 {
                     var con = _availableConnection[++_availableConnectionIndex];
                     if ( !con.IsWorking )

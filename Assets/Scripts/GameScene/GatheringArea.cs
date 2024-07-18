@@ -33,8 +33,8 @@ namespace ConnectSphere
         {
             if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
             {
-                OnPlayerEnteredArea?.Invoke(areaId);
                 _playersInThisArea.Add(playerObject);
+                OnPlayerEnteredArea?.Invoke(areaId);
                 
                 if (!playerObject.HasStateAuthority)
                     return;
@@ -63,8 +63,8 @@ namespace ConnectSphere
         {
             if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
             {
-                OnPlayerExitArea?.Invoke(areaId);
                 _playersInThisArea.Remove(playerObject);
+                OnPlayerExitArea?.Invoke(areaId);
                 
                 if (!playerObject.HasStateAuthority)
                     return;

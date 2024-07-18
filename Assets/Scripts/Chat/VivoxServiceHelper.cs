@@ -75,7 +75,7 @@ namespace Chat
                 _vivoxChatUI.SetActive(!_vivoxChatUI.activeSelf);
             });
 
-            _loadingScreen.SetActive(true);
+            // _loadingScreen.SetActive(true);
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
