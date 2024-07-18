@@ -16,6 +16,9 @@ namespace AccountManagement
         [SerializeField] private UIButton _nextButton;
         [SerializeField] private UIButton _resetPassButton;
 
+        [SerializeField] private GameObject _networkCanvas;
+        
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -25,10 +28,7 @@ namespace AccountManagement
             _resetPassButton.OnClick.OnTrigger.Event.AddListener(ToResetPass);
         }
 
-        private void ToResetPass()
-        {
-            Machine.ChangeState<ResetPasswordState>();
-        }
+        private void ToResetPass() => Machine?.ChangeState<ResetPasswordState>();
 
         public override void OnExit()
         {
@@ -66,7 +66,8 @@ namespace AccountManagement
 
             if ( loginResult.data != null )
             {
-                // Machine.ChangeState<WorkingState>();
+                _networkCanvas.SetActive(true);
+                Machine.ChangeState<Empty>();
             }
             else
             {

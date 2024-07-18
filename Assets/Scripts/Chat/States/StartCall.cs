@@ -34,9 +34,8 @@ namespace Chat.States
         {
             if ( permissionDone )
             {
-                ThisVideoCall.StartLocalCamera();
+                ThisVideoCall.StartMyCamera();
             }
-            // Machine.ChangeState<>();
         }
     }
 }

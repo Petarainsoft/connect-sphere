@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using ConnectSphere;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace AccountManagement
@@ -34,6 +36,11 @@ namespace AccountManagement
 
             if ( AuthApi != null ) AuthApi.ClearToken();
             Debug.Log("Logged out");
+        }
+
+        public async UniTask<bool> CheckAuthen()
+        {
+            return await AuthApi.CheckAccessToken();
         }
     }
 }

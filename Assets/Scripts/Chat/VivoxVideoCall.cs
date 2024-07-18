@@ -10,6 +10,7 @@ using ParrelSync;
 using TMPro;
 using Unity.RenderStreaming;
 using Unity.Services.Vivox;
+using Unity.VisualScripting;
 using VInspector;
 
 namespace Chat
@@ -59,74 +60,81 @@ namespace Chat
 
         private VivoxVideoCallFsm fsm;
 
-        private WebCamTexture mWebcamTexture;
+        private WebCamTexture webcamTexture;
         private const float WaitTime = 1f;
 
-        private IEnumerator ShowLocalCamera()
+        private async UniTask<bool> RequestCamera()
         {
-#if UNITY_EDITOR
-            yield return new WaitForEndOfFrame();
-            if ( _localVideoImage.texture == null )
+
+            if ( _localVideoImage == null || _trayBarVideoImage == null)
             {
-                Debug.LogError("Please Set texture to the local video image to mimic webcam");
+                Debug.LogError("Texture for showing camera is null");
+                return false;
             }
-#else
-            yield return new WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length > 1);
-            var userCameraDevice = WebCamTexture.devices[1];
+            
+            var timeout = UniTask.WaitForSeconds(4f);
+            var waitForCameraAvailable =
+                UniTask.WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length >= 1);
+            await UniTask.WhenAny(timeout, waitForCameraAvailable);
 
-            mWebcamTexture = new WebCamTexture(userCameraDevice.name, 1280, 720, (int)30);
-            mWebcamTexture.Play();
-
-            yield return new WaitUntil(() => mWebcamTexture.didUpdateThisFrame);
-            Debug.Log($"CameraTexture Size w:{mWebcamTexture.width} h{mWebcamTexture.height}");
-
-            if ( _localVideoImage == null ) yield break;
-
-            _localVideoImage.texture = mWebcamTexture;
-            _trayBarVideoImage.texture = mWebcamTexture;
+            if ( WebCamTexture.devices == null || WebCamTexture.devices.Length == 0 )
+            {
+                return false;
+            }
+            
+            
+            var cameraDevice = WebCamTexture.devices[0];
+            if (WebCamTexture.devices.Length > 1) cameraDevice = WebCamTexture.devices[1]; // front camera for mobile devices
+            
+            webcamTexture = new WebCamTexture(cameraDevice.name, 600, 480, (int)30);
+            webcamTexture.Play();
+          
+            await UniTask.WaitUntil(() => webcamTexture.didUpdateThisFrame);
+            Debug.Log($"CameraTexture Size w:{webcamTexture.width} h{webcamTexture.height}");
+        
+            
+            _localVideoImage.texture = webcamTexture;
+            _trayBarVideoImage.texture = webcamTexture;
+            
             Debug.Log($"Container Size w:{_localVideoImage.texture.width} h{_localVideoImage.texture.height}");
-#endif
-
-
+            
             for (var i = 0; i < _availableConnection.Count; i++)
             {
-                var con = _availableConnection[i];
+                var connection = _availableConnection[i];
                 Debug.Log("1");
-                UnityEngine.Debug.Log($"WebcamTexture is null {_localVideoImage.texture == null}");
-                con.webCamStreamer.sourceTexture = _localVideoImage.texture;
+                Debug.Log($"WebcamTexture is null {_localVideoImage.texture == null}");
+                connection.webCamStreamer.sourceTexture = _localVideoImage.texture;
                 Debug.Log("2");
-                con.webCamStreamer.OnStartedStream += id => con.receiveVideoViewer.enabled = true;
-                con.webCamStreamer.OnStartedStream += _ =>
-                {
-                    // if ( _localVideoImage.texture == null )
-                    // {
-                    //     _localVideoImage.texture = con.webCamStreamer.sourceWebCamTexture;
-                    // }
-                    #if !UNITY_EDITOR
-                    _localVideoImage.texture = mWebcamTexture;
-                    #endif
-                };
-
+                connection.webCamStreamer.OnStartedStream += id => connection.receiveVideoViewer.enabled = true;
+                // connection.webCamStreamer.OnStartedStream += _ =>
+                // {
+                //     #if !UNITY_EDITOR
+                //     _localVideoImage.texture = mWebcamTexture;
+                //     #endif
+                // };
+            
                 if ( _settings != null )
                 {
-                    con.webCamStreamer.width = (uint)_settings.StreamSize.x;
-                    con.webCamStreamer.height = (uint)_settings.StreamSize.y;
-
+                    connection.webCamStreamer.width = (uint)_settings.StreamSize.x;
+                    connection.webCamStreamer.height = (uint)_settings.StreamSize.y;
+            
                     _settings.ApplyH264Codec();
                 }
-
-                con.SetTextureIndex(i);
-                con.SetTextureReceiveCb(OnTextureReceive);
+            
+                connection.SetTextureIndex(i);
+                connection.SetTextureReceiveCb(OnTextureReceive);
             }
-
-            yield return new WaitForEndOfFrame();
-            yield return new WaitForSeconds(1f);
+            
+            await UniTask.WaitForEndOfFrame(this);
+            await UniTask.WaitForSeconds(1f);
             
             // anhnguyen, for demo, run right after having webcam working
             // yield return new WaitUntil(() => Runner != null && Runner.ActivePlayers != null);
             Debug.Log($"<color=yellow>Start calling {_playerSO.RoomName} ___ indexCall {0}</color>");
-            yield return new WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
-            // SetUp(_playerSO.RoomName, 2);
+            await UniTask.WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
+            SetUp(_playerSO.RoomName, 1);
+
+            return true;
         }
 
         [Button]
@@ -212,12 +220,12 @@ namespace Chat
             // }
         }
 
-        public void StartLocalCamera()
+        public void StartMyCamera()
         {
             _startButton.interactable = false;
             _webcamSelectDropdown.interactable = false;
             _setUpButton.interactable = true;
-            StartCoroutine(ShowLocalCamera());
+            RequestCamera();
         }
 
         private IEnumerator Start()
