@@ -36999,6 +36999,7 @@ MonoBehaviour:
       m_MimeType: 
       m_SdpFmtpLine: 
   _playerSO: {fileID: 11400000, guid: 592e4bbe575cc0d418dbf8b8efa31ad3, type: 2}
+  _areas: []
 --- !u!114 &7528049980501378430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39644,7 +39645,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7345221862239314795
 RectTransform:
   m_ObjectHideFlags: 0

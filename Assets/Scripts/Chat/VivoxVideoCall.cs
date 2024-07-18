@@ -216,12 +216,14 @@ namespace Chat
             var listPlayers = area.PlayersInArea;
             
             // me went out
-            if ( !listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == PlayerPrefs.GetInt("userId")) )
+            var myId = PlayerPrefs.GetInt("userId");
+            if ( !listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
             {
                 var listOtherConnection = new List<string>();
                 foreach (var no in listPlayers)
                 {
                     var id = no.GetComponent<Player>().DatabaseId;
+                    if (id == myId) continue;
                     connectionId = areaId.ToString();
                     var connectionID = MakeConnectionUniqueId(id);
                     listOtherConnection.Add(connectionID);
@@ -257,13 +259,16 @@ namespace Chat
             var listPlayers = area.PlayersInArea;
             
             // me went in
-            if ( listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == PlayerPrefs.GetInt("userId")) )
+            var myId = PlayerPrefs.GetInt("userId");
+            if ( listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
             {
                 var listOtherConnection = new List<string>();
                 foreach (var no in listPlayers)
                 {
                     var id = no.GetComponent<Player>().DatabaseId;
+                    if (id == myId) continue;
                     connectionId = areaId.ToString();
+                   
                     var connectionID = MakeConnectionUniqueId(id);
                     listOtherConnection.Add(connectionID);
                 }
