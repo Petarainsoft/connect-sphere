@@ -227,7 +227,7 @@ namespace Chat
                     var id = no.GetComponent<Player>().DatabaseId;
                     if ( id == myId ) continue;
                     connectionId = areaId.ToString();
-                    var connectionID = MakeConnectionUniqueId(id);
+                    var connectionID = MakeConnectionUniqueId(id, myId);
                     Debug.Log($"<color=red>___conID {connectionID}</color>");
                     listOtherConnection.Add(connectionID);
                 }
@@ -274,7 +274,7 @@ namespace Chat
                     if ( id == myId ) continue;
                     connectionId = areaId.ToString();
 
-                    var connectionID = MakeConnectionUniqueId(id);
+                    var connectionID = MakeConnectionUniqueId(id, myId);
                     Debug.Log($"<color=red>___conID {connectionID}</color>");
                     listOtherConnection.Add(connectionID);
                 }
@@ -440,6 +440,13 @@ namespace Chat
         {
             var connectionUniqueId = $"{connectionId}_{callIndex}_{i}";
             if ( callIndex > i ) connectionUniqueId = $"{connectionId}_{i}_{callIndex}";
+            return connectionUniqueId;
+        }
+        
+        private string MakeConnectionUniqueId(int id1, int id2)
+        {
+            var connectionUniqueId = $"{connectionId}_{id1}_{id2}";
+            if ( id1 > id2 ) connectionUniqueId = $"{connectionId}_{id2}_{id1}";
             return connectionUniqueId;
         }
 
