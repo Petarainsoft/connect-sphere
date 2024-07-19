@@ -261,12 +261,12 @@ public class TextChatUI : MonoBehaviour
         if ( channelName.Trim() != currentChannelName )
         {
             currentChannelName = channelName.Trim();
-            ClearMessageObjectPool();
-            oldestMessage = null;
-            FetchMessages = FetchHistory(true);
-
-            _chatFrameTitle.text = GetDisplayName(currentChannelName);
+      
         }
+        ClearMessageObjectPool();
+        oldestMessage = null;
+        _chatFrameTitle.text = GetDisplayName(currentChannelName);
+        FetchMessages = FetchHistory(true);
     }
 
     private string GetDisplayName(string chatRoomId)

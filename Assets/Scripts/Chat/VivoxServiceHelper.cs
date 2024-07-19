@@ -153,6 +153,10 @@ namespace Chat
                 await VivoxService.Instance.JoinGroupChannelAsync($"chat_{_playerInfoSo.RoomName}",
                     ChatCapability.TextOnly);
                 AccountManagement.Utils.HideLoading();
+            } 
+            else
+            {
+                _textChatUI.OnChannelJoined($"chat_{_playerInfoSo.RoomName}");
             }
         }
         
@@ -163,6 +167,10 @@ namespace Chat
                 AccountManagement.Utils.ShowLoading();
                 await VivoxService.Instance.LeaveChannelAsync($"chat_{_playerInfoSo.RoomName}");
                 AccountManagement.Utils.HideLoading();
+            }
+            else
+            {
+                _textChatUI.ResetChannelName();
             }
         }
         
