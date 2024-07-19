@@ -57,6 +57,8 @@ namespace Chat
 
 
         [SerializeField] private PlayerInfoSO _playerInfoSo;
+        
+        [SerializeField] private TMP_Text _chatFrameTitle;
 
         public bool IsReadyForVoiceAndChat = false;
 
@@ -137,6 +139,7 @@ namespace Chat
 
         public async void JoinGlobalChat()
         {
+            _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
             if ( !IsMeJoinedGlobalChat() )
             {
                 await VivoxService.Instance.JoinGroupChannelAsync($"chat_{_playerInfoSo.RoomName}",

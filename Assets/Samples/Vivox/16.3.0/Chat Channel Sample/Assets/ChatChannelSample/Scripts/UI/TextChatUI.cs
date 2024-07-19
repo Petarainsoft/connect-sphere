@@ -3,13 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ConnectSphere;
+using AccountManagement;
 using Unity.Services.Vivox;
-using Unity.Services.Vivox.AudioTaps;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class TextChatUI : MonoBehaviour
@@ -102,6 +98,7 @@ public class TextChatUI : MonoBehaviour
     {
         try
         {
+            Utils.ShowLoading();
             if ( string.IsNullOrEmpty(currentChannelName) )
             {
                 Debug.LogError("Current channel name is empty, cannot get chat history");
@@ -133,6 +130,7 @@ public class TextChatUI : MonoBehaviour
         {
             Debug.LogError($"Tried to fetch chat history and failed with error: {e.Message}");
         }
+        Utils.HideLoading();
     }
 
     void OnDestroy()

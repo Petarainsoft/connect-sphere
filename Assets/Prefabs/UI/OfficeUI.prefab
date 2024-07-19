@@ -15544,7 +15544,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '{room} Office'
+  m_text: Area 02
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
   m_sharedMaterial: {fileID: -7230054837815385662, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
@@ -18521,7 +18521,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '{room} Office'
+  m_text: Area 03
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
   m_sharedMaterial: {fileID: -7230054837815385662, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
@@ -26071,7 +26071,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.95464015}
   m_AnchorMax: {x: 0.9710001, y: 0.9946401}
-  m_AnchoredPosition: {x: 0, y: 3.7902617}
+  m_AnchoredPosition: {x: 0, y: 9.320482}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &8900508771377843631
@@ -34746,7 +34746,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4613907258640208353}
+      - m_Target: {fileID: 4822995394758862582}
         m_TargetAssemblyTypeName: ConnectSphere.Emoticon, Assembly-CSharp
         m_MethodName: OnEmoticonClicked
         m_Mode: 1
@@ -40696,7 +40696,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4613907258640208353}
+      - m_Target: {fileID: 7909101557705984878}
         m_TargetAssemblyTypeName: ConnectSphere.Emoticon, Assembly-CSharp
         m_MethodName: OnEmoticonClicked
         m_Mode: 1
@@ -45145,7 +45145,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '{room} Office'
+  m_text: Area 01
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
   m_sharedMaterial: {fileID: -7230054837815385662, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
@@ -50766,7 +50766,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '{room} Office'
+  m_text: Area 04
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
   m_sharedMaterial: {fileID: -7230054837815385662, guid: b1a21a302ce2e8c4198e75042b21d23a, type: 2}
@@ -58537,7 +58537,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4613907258640208353}
+      - m_Target: {fileID: 1437326328050766328}
         m_TargetAssemblyTypeName: ConnectSphere.Emoticon, Assembly-CSharp
         m_MethodName: OnEmoticonClicked
         m_Mode: 1
@@ -59560,7 +59560,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4613907258640208353}
+      - m_Target: {fileID: 3171728573487190819}
         m_TargetAssemblyTypeName: ConnectSphere.Emoticon, Assembly-CSharp
         m_MethodName: OnEmoticonClicked
         m_Mode: 1
@@ -61196,6 +61196,7 @@ MonoBehaviour:
   ChatToggle: {fileID: 3815536112367509877}
   _loadingScreen: {fileID: 5550333180717799596}
   _playerInfoSo: {fileID: 11400000, guid: 592e4bbe575cc0d418dbf8b8efa31ad3, type: 2}
+  _chatFrameTitle: {fileID: 1965084657568708668}
   IsReadyForVoiceAndChat: 0
 --- !u!1 &8860967175604555767
 GameObject:
