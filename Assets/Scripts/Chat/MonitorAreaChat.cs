@@ -58,6 +58,7 @@ namespace ConnectSphere
                         areaChatItem.gameObject.SetActive(false);
                         areaChatItem.enabled = false;
                         _vivoxHelper.LeaveAreaChat(areaId); // me leave that area}
+                        _vivoxHelper.LeaveAudio(areaId);
                         _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
                     }
                 }

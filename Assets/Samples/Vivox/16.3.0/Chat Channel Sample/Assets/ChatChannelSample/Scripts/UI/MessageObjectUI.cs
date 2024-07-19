@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Services.Vivox;
 using UnityEngine;
 using UnityEngine.UI;
@@ -93,14 +94,14 @@ public class MessageObjectUI : MonoBehaviour
         if (message.FromSelf)
         {
             MessageText.alignment = TextAnchor.MiddleRight;
-            MessageText.text = string.Format($"{message.MessageText} :<color=blue>{message.SenderDisplayName} </color>\n<color=#AAAA5A><size=15>{editedText}{message.ReceivedTime}</size></color>");
+            MessageText.text = string.Format($"{message.MessageText} :<color=blue>{message.SenderDisplayName.Split("_").FirstOrDefault()} </color>\n<color=#AAAA5A><size=15>{editedText}{message.ReceivedTime}</size></color>");
         }
         else
         {
             MessageText.alignment = TextAnchor.MiddleLeft;
             MessageText.text = string.IsNullOrEmpty(message.ChannelName)
-                ? string.Format($"<color=purple>{message.SenderDisplayName} </color>: {message.MessageText}\n<color=#5A5A5A><size=8>{editedText}{message.ReceivedTime}</size></color>") // DM
-                : string.Format($"<color=green>{message.SenderDisplayName} </color>: {message.MessageText}\n<color=#5A5A5A><size=8>{editedText}{message.ReceivedTime}</size></color>"); // Channel Message
+                ? string.Format($"<color=purple>{message.SenderDisplayName.Split("_").FirstOrDefault()} </color>: {message.MessageText}\n<color=#5A5A5A><size=8>{editedText}{message.ReceivedTime}</size></color>") // DM
+                : string.Format($"<color=green>{message.SenderDisplayName.Split("_").FirstOrDefault()} </color>: {message.MessageText}\n<color=#5A5A5A><size=8>{editedText}{message.ReceivedTime}</size></color>"); // Channel Message
         }
 
         // If it's your own message you can edit and delete them so lets show those controls

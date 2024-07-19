@@ -104,6 +104,7 @@ namespace Chat
             }
             else
             {
+                webcamTexture.Stop();
                 _localVideoImage.texture = _black;
                 _trayBarVideoImage.texture = _black;
             }
