@@ -254,8 +254,9 @@ public class TextChatUI : MonoBehaviour
     }
 
     private string currentChannelName = string.Empty;
+    public void ResetChannelName() =>  currentChannelName = string.Empty;
 
-    void OnChannelJoined(string channelName)
+    public void OnChannelJoined(string channelName)
     {
         if ( channelName.Trim() != currentChannelName )
         {

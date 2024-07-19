@@ -62,6 +62,9 @@ namespace Chat
 
         public bool IsReadyForVoiceAndChat = false;
 
+        [SerializeField] private TextChatUI _textChatUI;
+        
+
 
         private void Awake()
         {
@@ -171,6 +174,10 @@ namespace Chat
                 await VivoxService.Instance.JoinGroupChannelAsync($"{_playerInfoSo.RoomName}_chat_{areaId}", ChatCapability.TextOnly);
                 AccountManagement.Utils.HideLoading();
             }
+            else
+            {
+                _textChatUI.OnChannelJoined($"{_playerInfoSo.RoomName}_chat_{areaId}");
+            }
         }
         
         public async UniTask LeaveAreaChat(int areaId)
@@ -179,7 +186,12 @@ namespace Chat
             {
                 AccountManagement.Utils.ShowLoading();
                 VivoxService.Instance.LeaveChannelAsync($"{_playerInfoSo.RoomName}_chat_{areaId}");
+                _textChatUI.ResetChannelName();
                 AccountManagement.Utils.HideLoading();
+            }
+            else
+            {
+                _textChatUI.ResetChannelName();
             }
         }
 
