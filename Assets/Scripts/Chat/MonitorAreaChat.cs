@@ -21,8 +21,6 @@ namespace ConnectSphere
         [SerializeField] private TMP_Text _chatFrameTitle;
 
         [SerializeField] private PlayerInfoSO _playerInfoSo;
-        
-        
 
 
         private void Awake()
@@ -55,12 +53,14 @@ namespace ConnectSphere
             {
                 foreach (var areaChatItem in _areaChatItems)
                 {
-                    areaChatItem.gameObject.SetActive(false);
-                    areaChatItem.enabled = false;
-                    _vivoxHelper.LeaveAreaChat(areaId); // me leave that area
+                    if ( areaChatItem.AreaId == areaId )
+                    {
+                        areaChatItem.gameObject.SetActive(false);
+                        areaChatItem.enabled = false;
+                        _vivoxHelper.LeaveAreaChat(areaId); // me leave that area}
+                        _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
+                    }
                 }
-
-                _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
             }
         }
 
@@ -81,9 +81,9 @@ namespace ConnectSphere
                 {
                     areaChatItem.gameObject.SetActive((areaChatItem.AreaId == areaId));
                     areaChatItem.enabled = areaChatItem.AreaId == areaId;
-                    if (areaChatItem.AreaId == areaId)
+                    if ( areaChatItem.AreaId == areaId )
                     {
-                        _chatFrameTitle.text = $"Area {areaId}";
+                        _chatFrameTitle.text = $"Area {areaId + 1}";
                     }
                 }
             }

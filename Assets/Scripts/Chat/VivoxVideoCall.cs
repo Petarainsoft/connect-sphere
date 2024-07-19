@@ -66,7 +66,7 @@ namespace Chat
         private VivoxVideoCallFsm fsm;
 
         private WebCamTexture webcamTexture;
-        private const float WaitTime = 1f;
+        private const float WaitTime = 2f;
 
         [SerializeField] private Texture2D _black;
 
@@ -322,8 +322,44 @@ namespace Chat
                                 Debug.Log($"<color=red>** DELETE CONNECTION FOR {existingConnection}</color>");
                                 con.singleConnection.DeleteConnection(existingConnection);
                                 con.IsWorking = false;
+                                con.ConnectionID = string.Empty;
                                 con.Release();
                                 _remoteVideoImages[_availableConnectionIndex].transform.parent.gameObject
+                                    .SetActive(false);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                var listOtherConnection = new List<string>();
+                foreach (var no in listPlayers)
+                {
+                    var id = no.GetComponent<Player>().DatabaseId;
+                    if ( id == myId ) continue;
+                    connectionId = areaId.ToString();
+                    var connectionID = MakeConnectionUniqueId(id, myId);
+                    Debug.Log($"<color=red>___conID {connectionID}</color>");
+                    listOtherConnection.Add(connectionID);
+                }
+
+                for (int i = 0; i < _availableConnection.Count; i++)
+                {
+                    var con = _availableConnection[i];
+                    if ( con.IsWorking )
+                    {
+                        if ( !listOtherConnection.Contains(con.ConnectionID) )
+                        {
+                            if ( con.singleConnection != null &&
+                                 con.singleConnection.ExistConnection(con.ConnectionID) )
+                            {
+                                Debug.Log($"<color=red>** DELETE CONNECTION FOR {con.ConnectionID}</color>");
+                                con.singleConnection.DeleteConnection(con.ConnectionID);
+                                con.IsWorking = false;
+                                con.ConnectionID = string.Empty;
+                                con.Release();
+                                _remoteVideoImages[i].transform.parent.gameObject
                                     .SetActive(false);
                             }
                         }
@@ -373,6 +409,7 @@ namespace Chat
                             {
                                 Debug.Log($"<color=red>** CREATE CONNECTION FOR {existingConnection}</color>");
                                 con.singleConnection.CreateConnection(existingConnection);
+                                con.ConnectionID = existingConnection;
                                 con.IsWorking = true;
                                 await UniTask.WaitUntil(() =>
                                     con.IsWorking && con.singleConnection.IsStable(existingConnection));

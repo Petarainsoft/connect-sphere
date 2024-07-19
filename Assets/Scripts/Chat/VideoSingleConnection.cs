@@ -9,6 +9,7 @@ namespace Chat
         [SerializeField] public VideoStreamSender webCamStreamer;
         [SerializeField] public VideoStreamReceiver receiveVideoViewer;
         [SerializeField] public SingleConnection singleConnection;
+        public string ConnectionID;
         public bool IsWorking = false;
 
         private int _index = -1;
