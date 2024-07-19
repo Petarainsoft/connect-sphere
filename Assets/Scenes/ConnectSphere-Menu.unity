@@ -2224,6 +2224,7 @@ MonoBehaviour:
   _selectionCanvasObject: {fileID: 639508849}
   _playerInfoSo: {fileID: 11400000, guid: 592e4bbe575cc0d418dbf8b8efa31ad3, type: 2}
   _gameScenePath: ConnectSphere-Game
+  _timeout: 3
 --- !u!4 &611479360
 Transform:
   m_ObjectHideFlags: 0

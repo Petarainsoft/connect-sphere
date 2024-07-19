@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ConnectSphere;
+using Cysharp.Threading.Tasks;
 using Doozy.Engine.UI;
 using TMPro;
 using Unity.Services.Authentication;
@@ -88,6 +90,63 @@ namespace Chat
             gloablRoomNameInChat.text = $"{_playerInfoSo.RoomName} Office";
             gloablListChatName.text = $"{_playerInfoSo.RoomName} Office";
    
+        }
+
+
+        public async UniTask JoinAudio(int areaId)
+        {
+            if ( !IsMeJoinedAudio(areaId) )
+            {
+                await VivoxService.Instance.JoinGroupChannelAsync($"audio_{areaId}", ChatCapability.AudioOnly);
+            }
+        }
+
+        public async UniTask LeaveAudio(int areaId)
+        {
+            if (IsMeJoinedAudio(areaId))
+            {
+                await VivoxService.Instance.LeaveChannelAsync($"audio_{areaId}");
+            }
+        }
+
+        private bool IsMeJoinedAudio(int areaId)
+        {
+            return VivoxService.Instance.ActiveChannels.ContainsKey($"audio_{areaId}") &&
+                   VivoxService.Instance.ActiveChannels[$"audio_{areaId}"].Count > 0 &&
+                   VivoxService.Instance.ActiveChannels[$"audio_{areaId}"].Any(p => p.IsSelf);
+        }
+        
+        private bool IsMeJoinedChat(int areaId)
+        {
+            return VivoxService.Instance.ActiveChannels.ContainsKey($"chat_{areaId}") &&
+                   VivoxService.Instance.ActiveChannels[$"chat_{areaId}"].Count > 0 &&
+                   VivoxService.Instance.ActiveChannels[$"chat_{areaId}"].Any(p => p.IsSelf);
+        }
+
+        public async UniTask JoinGlobalChat()
+        {
+            await VivoxService.Instance.JoinGroupChannelAsync($"chat_{_playerInfoSo.RoomName}", ChatCapability.TextOnly);
+        }
+        
+        public async UniTask LeaveGlobalChat()
+        {
+            await VivoxService.Instance.LeaveChannelAsync($"chat_{_playerInfoSo.RoomName}");
+        }
+        
+        public async UniTask JoinAreaChat(int areaId)
+        {
+            if ( !IsMeJoinedChat(areaId) )
+            {
+                await VivoxService.Instance.JoinGroupChannelAsync($"chat_{areaId}", ChatCapability.TextOnly);
+            }
+        }
+        
+        public async UniTask LeaveAreaChat(int areaId)
+        {
+            if ( IsMeJoinedChat(areaId) )
+            {
+                VivoxService.Instance.LeaveChannelAsync($"chat_{areaId}");
+            }
         }
 
         private void Update()

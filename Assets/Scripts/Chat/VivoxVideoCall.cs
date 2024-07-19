@@ -219,8 +219,10 @@ namespace Chat
             // me went out
             var myId = PlayerPrefs.GetInt("userId");
             Debug.Log($"<color=red>MyId {myId}</color>");
+            // me not in the area just raise leave-event
             if ( !listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
             {
+                _vivoxHelper.LeaveAudio(areaId);
                 var listOtherConnection = new List<string>();
                 foreach (var no in listPlayers)
                 {
@@ -268,6 +270,8 @@ namespace Chat
             Debug.Log($"<color=red>MyId {myId}</color>");
             if ( listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
             {
+                // join audio for the room
+                _vivoxHelper.JoinAudio(areaId);
                 var listOtherConnection = new List<string>();
                 foreach (var no in listPlayers)
                 {

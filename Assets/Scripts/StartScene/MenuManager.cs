@@ -138,8 +138,6 @@ namespace ConnectSphere
 
             await VivoxService.Instance.LoginAsync(loginOptions);
             Debug.Log($"** Login vivox done!");
-            await VivoxService.Instance.JoinGroupChannelAsync(_playerInfoSo.RoomName, ChatCapability.TextOnly);
-            Debug.Log($"** Join Global Room {_playerInfoSo.RoomName} vivox done!");
             return true;
         }
         
