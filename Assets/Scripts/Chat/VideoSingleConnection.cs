@@ -15,6 +15,22 @@ namespace Chat
         private int _index = -1;
         private Action<Texture, int> cb;
 
+        private void OnEnable()
+        {
+            receiveVideoViewer.OnStoppedStream += StopStream;
+        }
+
+        private void OnDisable()
+        {
+            receiveVideoViewer.OnStoppedStream -= StopStream;
+        }
+
+        private void StopStream(string connectionid)
+        {
+            singleConnection.DeleteConnection(connectionid);
+            ConnectionID = string.Empty;
+        }
+
         public void SetTextureIndex(int index)
         {
             _index = index;

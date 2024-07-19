@@ -92,15 +92,16 @@ namespace Chat
         {
             if ( !isOff )
             {
-                if ( webcamTexture != null )
-                {
-                    _localVideoImage.texture = webcamTexture;
-                    _trayBarVideoImage.texture = webcamTexture;
-                }
-                else
-                {
+                // if ( webcamTexture != null )
+                // {
+                //     webcamTexture.Play();
+                //     _localVideoImage.texture = webcamTexture;
+                //     _trayBarVideoImage.texture = webcamTexture;
+                // }
+                // else
+                // {
                     AskPermissionVideo();
-                }
+                // }
             }
             else
             {
@@ -110,19 +111,19 @@ namespace Chat
             }
         }
 
-        private async UniTask<bool> RequestCameraPermission()
+        private async void RequestCameraPermission()
         {
             if ( _localVideoImage == null || _trayBarVideoImage == null )
             {
                 Debug.LogError("Texture for showing camera is null");
-                return false;
+                return;
             }
 
             await UniTask.WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length >= 1);
 
             if ( WebCamTexture.devices == null || WebCamTexture.devices.Length == 0 )
             {
-                return false;
+                return;
             }
 
             var cameraDevice = WebCamTexture.devices[0];
@@ -138,7 +139,6 @@ namespace Chat
 
             _localVideoImage.texture = webcamTexture;
             _trayBarVideoImage.texture = webcamTexture;
-            return true;
         }
 
 
@@ -168,7 +168,7 @@ namespace Chat
             webcamTexture = new WebCamTexture(cameraDevice.name, 600, 480, (int)20);
             webcamTexture.Play();
 
-            await UniTask.WaitUntil(() => webcamTexture.didUpdateThisFrame);
+            await UniTask.WaitUntil(() => webcamTexture != null && webcamTexture.didUpdateThisFrame);
             Debug.Log($"CameraTexture Size w:{webcamTexture.width} h{webcamTexture.height}");
 
 
