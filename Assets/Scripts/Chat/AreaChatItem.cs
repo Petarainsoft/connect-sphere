@@ -43,7 +43,7 @@ namespace ConnectSphere
 
         private void JoinChatArea()
         {
-            _vivoxHelper.LeaveAreaChat(areaId);
+            _vivoxHelper.JoinAreaChat(areaId);
         }
     }
 }

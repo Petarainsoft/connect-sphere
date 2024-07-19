@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Chat;
+using TMPro;
 using UnityEngine;
 
 namespace ConnectSphere
@@ -16,6 +17,12 @@ namespace ConnectSphere
 
 
         [SerializeField] private VivoxServiceHelper _vivoxHelper;
+
+        [SerializeField] private TMP_Text _chatFrameTitle;
+
+        [SerializeField] private PlayerInfoSO _playerInfoSo;
+        
+        
 
 
         private void Awake()
@@ -52,6 +59,8 @@ namespace ConnectSphere
                     areaChatItem.enabled = false;
                     _vivoxHelper.LeaveAreaChat(areaId); // me leave that area
                 }
+
+                _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
             }
         }
 
@@ -72,6 +81,10 @@ namespace ConnectSphere
                 {
                     areaChatItem.gameObject.SetActive((areaChatItem.AreaId == areaId));
                     areaChatItem.enabled = areaChatItem.AreaId == areaId;
+                    if (areaChatItem.AreaId == areaId)
+                    {
+                        _chatFrameTitle.text = $"Area {areaId}";
+                    }
                 }
             }
         }
