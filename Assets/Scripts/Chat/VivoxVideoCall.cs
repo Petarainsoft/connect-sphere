@@ -295,9 +295,33 @@ namespace Chat
             var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
             if ( area == null ) return;
             var listPlayers = area.PlayersInArea;
+            
+            
             Debug.Log($"<color=red>listPlayers {string.Join(",", listPlayers)}</color>");
             // me went out
             var myId = PlayerPrefs.GetInt("userId");
+            if ( listPlayers.Count == 1 && listPlayers[0].GetComponent<Player>().DatabaseId == myId )
+            {
+                for (int i = 0; i < _availableConnection.Count; i++)
+                {
+                    var con = _availableConnection[i];
+                    if ( con.IsWorking )
+                    {
+                        if ( con.singleConnection != null &&
+                             con.singleConnection.ExistConnection(con.ConnectionID) )
+                        {
+                            Debug.Log($"<color=red>** DELETE CONNECTION FOR {con.ConnectionID}</color>");
+                            con.singleConnection.DeleteConnection(con.ConnectionID);
+                            con.IsWorking = false;
+                            con.ConnectionID = string.Empty;
+                            con.Release();
+                            _remoteVideoImages[i].transform.parent.gameObject
+                                .SetActive(false);
+                        }
+                    }
+                }
+                return;
+            }
             Debug.Log($"<color=red>MyId {myId}</color>");
             // me not in the area just raise leave-event
             if ( !listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
