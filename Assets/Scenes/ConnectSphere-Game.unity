@@ -72024,6 +72024,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7528049980501378430, guid: e2c164c6695bc524a9b6b5aac0171828, type: 3}
+      propertyPath: _gameManager
+      value: 
+      objectReference: {fileID: 613614076}
     - target: {fileID: 7764134238445298030, guid: e2c164c6695bc524a9b6b5aac0171828, type: 3}
       propertyPath: m_SizeDelta.x
       value: 0

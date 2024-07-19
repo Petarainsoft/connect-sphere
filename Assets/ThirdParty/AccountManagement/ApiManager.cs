@@ -30,7 +30,7 @@ namespace AccountManagement
 
         public Action Onlogout;
         
-        public void Logout()
+        public async void Logout()
         {
             PlayerPrefs.DeleteKey("token");
             PlayerPrefs.DeleteKey("username");

@@ -12,6 +12,7 @@ using TMPro;
 using Unity.RenderStreaming;
 using Unity.Services.Vivox;
 using Unity.VisualScripting;
+using UnityEngine.Android;
 using VInspector;
 
 namespace Chat
@@ -66,6 +67,76 @@ namespace Chat
 
         private WebCamTexture webcamTexture;
         private const float WaitTime = 1f;
+
+        [SerializeField] private Texture2D _black;
+        
+        
+        
+        private PermissionHelper _cameraPermissionHelper = new PermissionHelper(Permission.Camera);
+        
+        private void AskPermissionVideo()
+        {
+            _cameraPermissionHelper.OnPermissionResult = AfterRequestPermission;
+            _cameraPermissionHelper.Ask();
+        }
+        
+        private void AfterRequestPermission(bool requestOk)
+        {
+            Debug.Log($"Request Permission with {requestOk}");
+            if ( requestOk )
+            {
+                RequestCameraPermission();
+            }
+        }
+
+        public void ToggleCamera(bool isOff)
+        {
+            if ( !isOff )
+            {
+                AskPermissionVideo();
+            }
+            else
+            {
+                _localVideoImage.texture = _black;
+                _trayBarVideoImage.texture = _black;
+            }
+        }
+
+        private async UniTask<bool> RequestCameraPermission()
+        {
+            if ( _localVideoImage == null || _trayBarVideoImage == null )
+            {
+                Debug.LogError("Texture for showing camera is null");
+                return false;
+            }
+
+            var timeout = UniTask.WaitForSeconds(4f);
+            var waitForCameraAvailable =
+                UniTask.WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length >= 1);
+            await UniTask.WhenAny(timeout, waitForCameraAvailable);
+
+            if ( WebCamTexture.devices == null || WebCamTexture.devices.Length == 0 )
+            {
+                return false;
+            }
+
+
+            var cameraDevice = WebCamTexture.devices[0];
+            if ( WebCamTexture.devices.Length > 1 )
+                cameraDevice = WebCamTexture.devices[1]; // front camera for mobile devices
+
+            webcamTexture = new WebCamTexture(cameraDevice.name, 600, 480, (int)20);
+            webcamTexture.Play();
+
+            await UniTask.WaitUntil(() => webcamTexture != null && webcamTexture.didUpdateThisFrame);
+            Debug.Log($"CameraTexture Size w:{webcamTexture.width} h{webcamTexture.height}");
+
+
+            _localVideoImage.texture = webcamTexture;
+            _trayBarVideoImage.texture = webcamTexture;
+            return true;
+        }
+
 
         private async UniTask<bool> RequestCamera()
         {

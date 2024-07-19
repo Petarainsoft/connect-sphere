@@ -31,6 +31,8 @@ namespace ConnectSphere
             }
         }
 
+        public void Shutdown() => Runner.Shutdown();
+
         public override void Render()
         {
             switch (Phase)

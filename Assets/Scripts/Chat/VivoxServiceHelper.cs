@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AccountManagement;
 using ConnectSphere;
 using Cysharp.Threading.Tasks;
 using Doozy.Engine.UI;
+using Fusion;
 using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Vivox;
@@ -25,6 +27,8 @@ namespace Chat
         [SerializeField] private bool _useDeviceAsName = false;
         [SerializeField] private string _userName;
         [SerializeField] private GameObject _vivoxChatUI;
+
+        [SerializeField] private GameManager _gameManager;
         
 
         [SerializeField] private Button _openChat;
@@ -163,6 +167,42 @@ namespace Chat
             }
         }
 
+        private PermissionHelper _microphoneHelper = new PermissionHelper(Permission.Microphone);
+        
+        private void AskPermissionAudio()
+        {
+            _microphoneHelper.OnPermissionResult = AfterRequestPermission;
+            _microphoneHelper.Ask();
+        }
+        
+        private void AfterRequestPermission(bool requestOk)
+        {
+            Debug.Log($"Request Permission with {requestOk}");
+            if ( requestOk )
+            {
+                if ( VivoxService.Instance != null ) VivoxService.Instance.UnmuteInputDevice();
+            }
+        }
+
+        public void ToggleAudio(bool isOn)
+        {
+            if ( !isOn )
+            {
+                AskPermissionAudio();
+            }
+            else
+            {
+                if ( VivoxService.Instance != null ) VivoxService.Instance.MuteInputDevice();
+            }
+        }
+
+        public async void SignOut()
+        {
+            if ( VivoxService.Instance != null ) await VivoxService.Instance.LeaveAllChannelsAsync();
+            ApiManager.Instance.Logout();
+            _gameManager.Shutdown();
+        }
+        
         private void Update()
         {
 
