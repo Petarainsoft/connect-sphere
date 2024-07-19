@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,14 @@ namespace ConnectSphere
 
         [SerializeField] private VivoxServiceHelper _vivoxHelper;
 
+
+        private void Awake()
+        {
+            foreach (var areaItem in _areaChatItems)
+            {
+                areaItem.gameObject.SetActive(false);
+            }
+        }
 
         // Start is called before the first frame update
         void Start()
