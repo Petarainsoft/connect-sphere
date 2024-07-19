@@ -69,17 +69,16 @@ namespace Chat
         private const float WaitTime = 1f;
 
         [SerializeField] private Texture2D _black;
-        
-        
-        
+
+
         private PermissionHelper _cameraPermissionHelper = new PermissionHelper(Permission.Camera);
-        
+
         private void AskPermissionVideo()
         {
             _cameraPermissionHelper.OnPermissionResult = AfterRequestPermission;
             _cameraPermissionHelper.Ask();
         }
-        
+
         private void AfterRequestPermission(bool requestOk)
         {
             Debug.Log($"Request Permission with {requestOk}");
@@ -93,7 +92,15 @@ namespace Chat
         {
             if ( !isOff )
             {
-                AskPermissionVideo();
+                if ( webcamTexture != null )
+                {
+                    _localVideoImage.texture = webcamTexture;
+                    _trayBarVideoImage.texture = webcamTexture;
+                }
+                else
+                {
+                    AskPermissionVideo();
+                }
             }
             else
             {
@@ -110,16 +117,12 @@ namespace Chat
                 return false;
             }
 
-            var timeout = UniTask.WaitForSeconds(4f);
-            var waitForCameraAvailable =
-                UniTask.WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length >= 1);
-            await UniTask.WhenAny(timeout, waitForCameraAvailable);
+            await UniTask.WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length >= 1);
 
             if ( WebCamTexture.devices == null || WebCamTexture.devices.Length == 0 )
             {
                 return false;
             }
-
 
             var cameraDevice = WebCamTexture.devices[0];
             if ( WebCamTexture.devices.Length > 1 )
@@ -320,7 +323,8 @@ namespace Chat
                                 con.singleConnection.DeleteConnection(existingConnection);
                                 con.IsWorking = false;
                                 con.Release();
-                                _remoteVideoImages[_availableConnectionIndex].transform.parent.gameObject.SetActive(false);
+                                _remoteVideoImages[_availableConnectionIndex].transform.parent.gameObject
+                                    .SetActive(false);
                             }
                         }
                     }
@@ -335,7 +339,8 @@ namespace Chat
             var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
             if ( area == null ) return;
             var listPlayers = area.PlayersInArea;
-            Debug.Log($"<color=red>listPlayers {string.Join(",", listPlayers.Select(e=>e.GetComponent<Player>().DatabaseId))}</color>");
+            Debug.Log(
+                $"<color=red>listPlayers {string.Join(",", listPlayers.Select(e => e.GetComponent<Player>().DatabaseId))}</color>");
             // me went in
             var myId = PlayerPrefs.GetInt("userId");
             Debug.Log($"<color=red>MyId {myId}</color>");
@@ -518,7 +523,7 @@ namespace Chat
             if ( callIndex > i ) connectionUniqueId = $"{connectionId}_{i}_{callIndex}";
             return connectionUniqueId;
         }
-        
+
         private string MakeConnectionUniqueId(int id1, int id2)
         {
             var connectionUniqueId = $"{connectionId}_{id1}_{id2}";

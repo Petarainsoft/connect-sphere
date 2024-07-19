@@ -29,7 +29,7 @@ namespace ConnectSphere
                 await VivoxService.Instance.LogoutAsync();
             }
 
-            if ( ApiManager.Instance != null ) ApiManager.Instance.Logout();
+            // if ( ApiManager.Instance != null ) ApiManager.Instance.Logout();
             if ( AuthenticationService.Instance != null ) AuthenticationService.Instance.SignOut();
 
             SceneManager.LoadScene(_menuSceneName);
