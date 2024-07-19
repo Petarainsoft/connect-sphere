@@ -38660,6 +38660,7 @@ MonoBehaviour:
   ToggleTTS: {fileID: 8179425681018685889}
   ChannelEffectPanel: {fileID: 745270594598624014}
   ChannelEffectDropdown: {fileID: 3248805327147832607}
+  _chatFrameTitle: {fileID: 1965084657568708668}
 --- !u!1 &4737059691077361473
 GameObject:
   m_ObjectHideFlags: 0

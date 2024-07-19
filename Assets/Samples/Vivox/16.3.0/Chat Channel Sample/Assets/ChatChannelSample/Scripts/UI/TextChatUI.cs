@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AccountManagement;
+using TMPro;
 using Unity.Services.Vivox;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,6 +29,8 @@ public class TextChatUI : MonoBehaviour
 
     private Task FetchMessages = null;
     private DateTime? oldestMessage = null;
+
+    public TMP_Text _chatFrameTitle;
 
     public void FireOntypingFalse()
     {
@@ -260,7 +263,25 @@ public class TextChatUI : MonoBehaviour
             ClearMessageObjectPool();
             oldestMessage = null;
             FetchMessages = FetchHistory(true);
+
+            _chatFrameTitle.text = GetDisplayName(currentChannelName);
         }
+    }
+
+    private string GetDisplayName(string chatRoomId)
+    {
+        var splits = chatRoomId.Split("_");
+        if ( splits.Length == 2 )
+        {
+            return $"{splits[1]} Office";
+        }
+
+        if ( splits.Length == 3 )
+        {
+            return  $"Area 0{int.Parse(splits[2]) + 1}";
+        }
+
+        return splits.Last();
     }
 
     void OnChannelMessageReceived(VivoxMessage message)

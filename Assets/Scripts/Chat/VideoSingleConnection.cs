@@ -27,8 +27,11 @@ namespace Chat
 
         private void StopStream(string connectionid)
         {
-            singleConnection.DeleteConnection(connectionid);
-            ConnectionID = string.Empty;
+            if ( singleConnection.ExistConnection(connectionid) )
+            {
+                singleConnection.DeleteConnection(connectionid);
+                ConnectionID = string.Empty;
+            }
         }
 
         public void SetTextureIndex(int index)
@@ -44,6 +47,7 @@ namespace Chat
                 Debug.Log("Invalid texture index");
                 return;
             }
+
             cb?.Invoke(texture, _index);
         }
 
