@@ -177,6 +177,22 @@ namespace Chat
 
             Debug.Log($"Container Size w:{_localVideoImage.texture.width} h{_localVideoImage.texture.height}");
 
+            RegisterImageReceiving();
+
+            await UniTask.WaitForEndOfFrame(this);
+            await UniTask.WaitForSeconds(1f);
+
+            // anhnguyen, for demo, run right after having webcam working
+            // yield return new WaitUntil(() => Runner != null && Runner.ActivePlayers != null);
+            Debug.Log($"<color=yellow>Start calling {_playerSO.RoomName} ___ indexCall {0}</color>");
+            await UniTask.WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
+            // SetUp(_playerSO.RoomName, 1);
+
+            return true;
+        }
+
+        private void RegisterImageReceiving()
+        {
             for (var i = 0; i < _availableConnection.Count; i++)
             {
                 var connection = _availableConnection[i];
@@ -203,17 +219,6 @@ namespace Chat
                 connection.SetTextureIndex(i);
                 connection.SetTextureReceiveCb(OnTextureReceive);
             }
-
-            await UniTask.WaitForEndOfFrame(this);
-            await UniTask.WaitForSeconds(1f);
-
-            // anhnguyen, for demo, run right after having webcam working
-            // yield return new WaitUntil(() => Runner != null && Runner.ActivePlayers != null);
-            Debug.Log($"<color=yellow>Start calling {_playerSO.RoomName} ___ indexCall {0}</color>");
-            await UniTask.WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
-            // SetUp(_playerSO.RoomName, 1);
-
-            return true;
         }
 
         [Button]
@@ -309,10 +314,9 @@ namespace Chat
                     listOtherConnection.Add(connectionID);
                 }
 
-                var _availableConnectionIndex = -1;
                 for (int i = 0; i < _availableConnection.Count; i++)
                 {
-                    var con = _availableConnection[++_availableConnectionIndex];
+                    var con = _availableConnection[i];
                     if ( con.IsWorking )
                     {
                         foreach (var existingConnection in listOtherConnection)
@@ -325,7 +329,7 @@ namespace Chat
                                 con.IsWorking = false;
                                 con.ConnectionID = string.Empty;
                                 con.Release();
-                                _remoteVideoImages[_availableConnectionIndex].transform.parent.gameObject
+                                _remoteVideoImages[i].transform.parent.gameObject
                                     .SetActive(false);
                             }
                         }
@@ -397,10 +401,10 @@ namespace Chat
                     listOtherConnection.Add(connectionID);
                 }
 
-                var _availableConnectionIndex = -1;
+
                 for (int i = 0; i < _availableConnection.Count; i++)
                 {
-                    var con = _availableConnection[++_availableConnectionIndex];
+                    var con = _availableConnection[i];
                     if ( !con.IsWorking )
                     {
                         foreach (var existingConnection in listOtherConnection)
@@ -410,6 +414,8 @@ namespace Chat
                             {
                                 Debug.Log($"<color=red>** CREATE CONNECTION FOR {existingConnection}</color>");
                                 con.singleConnection.CreateConnection(existingConnection);
+                                con.SetTextureIndex(i);
+                                con.SetTextureReceiveCb(OnTextureReceive);
                                 con.ConnectionID = existingConnection;
                                 con.IsWorking = true;
                                 await UniTask.WaitUntil(() =>
