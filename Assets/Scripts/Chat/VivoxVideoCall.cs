@@ -352,9 +352,9 @@ namespace Chat
                     {
                         if ( !listOtherConnection.Contains(con.ConnectionID) )
                         {
-                            if ( con.singleConnection != null &&
-                                 con.singleConnection.ExistConnection(con.ConnectionID) )
-                            {
+                        //     if ( con.singleConnection != null &&
+                        //          con.singleConnection.ExistConnection(con.ConnectionID) )
+                        //     {
                                 Debug.Log($"<color=red>** DELETE CONNECTION FOR {con.ConnectionID}</color>");
                                 con.singleConnection.DeleteConnection(con.ConnectionID);
                                 con.IsWorking = false;
@@ -362,7 +362,7 @@ namespace Chat
                                 con.Release();
                                 _remoteVideoImages[i].transform.parent.gameObject
                                     .SetActive(false);
-                            }
+                            // }
                         }
                     }
                 }

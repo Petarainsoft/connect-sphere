@@ -104,7 +104,9 @@ namespace Chat
         {
             if ( !IsMeJoinedAudio(areaId) )
             {
+                AccountManagement.Utils.ShowLoading();
                 await VivoxService.Instance.JoinGroupChannelAsync($"{_playerInfoSo.RoomName}_audio_{areaId}", ChatCapability.AudioOnly);
+                AccountManagement.Utils.HideLoading();
             }
         }
 
@@ -112,7 +114,9 @@ namespace Chat
         {
             if (IsMeJoinedAudio(areaId))
             {
+                AccountManagement.Utils.ShowLoading();
                 await VivoxService.Instance.LeaveChannelAsync($"{_playerInfoSo.RoomName}_audio_{areaId}");
+                AccountManagement.Utils.HideLoading();
             }
         }
 
@@ -142,8 +146,10 @@ namespace Chat
             _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
             if ( !IsMeJoinedGlobalChat() )
             {
+                AccountManagement.Utils.ShowLoading();
                 await VivoxService.Instance.JoinGroupChannelAsync($"chat_{_playerInfoSo.RoomName}",
                     ChatCapability.TextOnly);
+                AccountManagement.Utils.HideLoading();
             }
         }
         
@@ -151,7 +157,9 @@ namespace Chat
         {
             if ( IsMeJoinedGlobalChat() )
             {
+                AccountManagement.Utils.ShowLoading();
                 await VivoxService.Instance.LeaveChannelAsync($"chat_{_playerInfoSo.RoomName}");
+                AccountManagement.Utils.HideLoading();
             }
         }
         
@@ -159,7 +167,9 @@ namespace Chat
         {
             if ( !IsMeJoinedChat(areaId) )
             {
+                AccountManagement.Utils.ShowLoading();
                 await VivoxService.Instance.JoinGroupChannelAsync($"{_playerInfoSo.RoomName}_chat_{areaId}", ChatCapability.TextOnly);
+                AccountManagement.Utils.HideLoading();
             }
         }
         
@@ -167,7 +177,9 @@ namespace Chat
         {
             if ( IsMeJoinedChat(areaId) )
             {
+                AccountManagement.Utils.ShowLoading();
                 VivoxService.Instance.LeaveChannelAsync($"{_playerInfoSo.RoomName}_chat_{areaId}");
+                AccountManagement.Utils.HideLoading();
             }
         }
 
