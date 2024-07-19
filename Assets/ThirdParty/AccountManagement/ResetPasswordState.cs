@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using Doozy.Engine;
 using Doozy.Engine.UI;
 using TMPro;
 using UnityEngine;
@@ -18,6 +17,7 @@ namespace AccountManagement
 
         [SerializeField] private UIButton _requestCodeButton;
         [SerializeField] private UIButton _resetButton;
+        [SerializeField] private UIButton _backButton;
 
         [SerializeField] private GameObject _loading;
         
@@ -40,15 +40,19 @@ namespace AccountManagement
 
             _requestCodeButton.OnClick.OnTrigger.Event.AddListener(RequestCode);
             _resetButton.OnClick.OnTrigger.Event.AddListener(ResetPassword);
+            _backButton.OnClick.OnTrigger.Event.AddListener(BackToLogin);
 
             SetUI(sendingCode: true);
         }
-        
+
+        private void BackToLogin() => Machine?.ChangeState<LoginState>();
+
         public override void OnExit()
         {
             base.OnExit();
             _requestCodeButton.OnClick.OnTrigger.Event.RemoveListener(RequestCode);
             _resetButton.OnClick.OnTrigger.Event.RemoveListener(ResetPassword);
+            _backButton.OnClick.OnTrigger.Event.RemoveListener(BackToLogin);
         }
 
         private void ResetPassword()
@@ -149,10 +153,5 @@ namespace AccountManagement
             _passwordInput.text = "";
             _resetCodeInput.text = "";
         }
-
-        // protected override void OnGameMessage(GameEventMessage gameEvent)
-        // {
-        //     if ( gameEvent.EventName == _backToLogin ) Machine.ChangeState<LoginState>();
-        // }
     }
 }

@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AccountManagement;
 using ConnectSphere;
+using Cysharp.Threading.Tasks;
 using Doozy.Engine.UI;
+using Fusion;
 using TMPro;
 using Unity.Services.Authentication;
+using Unity.Services.Core;
 using Unity.Services.Vivox;
 using UnityEngine;
 using UnityEngine.Android;
@@ -23,6 +28,8 @@ namespace Chat
         [SerializeField] private bool _useDeviceAsName = false;
         [SerializeField] private string _userName;
         [SerializeField] private GameObject _vivoxChatUI;
+
+        [SerializeField] private GameManager _gameManager;
         
 
         [SerializeField] private Button _openChat;
@@ -75,14 +82,14 @@ namespace Chat
                 _vivoxChatUI.SetActive(!_vivoxChatUI.activeSelf);
             });
 
-            _loadingScreen.SetActive(true);
+            // _loadingScreen.SetActive(true);
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
             
             // auto connect when running, comment this when running the VideoCall-Vivox scene
             Debug.Log($"<color=blue>CALLLING VIXOOOOV {_playerInfoSo.RoomName}</color>");
-            LoginVivoxAndJoinRoom(_playerInfoSo.RoomName);
+            // LoginVivoxAndJoinRoom(_playerInfoSo.RoomName);
             // MenuManager.Instance.RoomName
             gloablRoomName.text = $"{_playerInfoSo.RoomName} Office";
             gloablRoomNameInChat.text = $"{_playerInfoSo.RoomName} Office";
@@ -90,6 +97,119 @@ namespace Chat
    
         }
 
+
+        public async UniTask JoinAudio(int areaId)
+        {
+            if ( !IsMeJoinedAudio(areaId) )
+            {
+                await VivoxService.Instance.JoinGroupChannelAsync($"audio_{areaId}", ChatCapability.AudioOnly);
+            }
+        }
+
+        public async UniTask LeaveAudio(int areaId)
+        {
+            if (IsMeJoinedAudio(areaId))
+            {
+                await VivoxService.Instance.LeaveChannelAsync($"audio_{areaId}");
+            }
+        }
+
+        private bool IsMeJoinedAudio(int areaId)
+        {
+            return VivoxService.Instance.ActiveChannels.ContainsKey($"audio_{areaId}") &&
+                   VivoxService.Instance.ActiveChannels[$"audio_{areaId}"].Count > 0 &&
+                   VivoxService.Instance.ActiveChannels[$"audio_{areaId}"].Any(p => p.IsSelf);
+        }
+        
+        private bool IsMeJoinedChat(int areaId)
+        {
+            return VivoxService.Instance.ActiveChannels.ContainsKey($"chat_{areaId}") &&
+                   VivoxService.Instance.ActiveChannels[$"chat_{areaId}"].Count > 0 &&
+                   VivoxService.Instance.ActiveChannels[$"chat_{areaId}"].Any(p => p.IsSelf);
+        }
+        
+        private bool IsMeJoinedGlobalChat()
+        {
+            return VivoxService.Instance.ActiveChannels.ContainsKey($"chat_{_playerInfoSo.RoomName}") &&
+                   VivoxService.Instance.ActiveChannels[$"chat_{_playerInfoSo.RoomName}"].Count > 0 &&
+                   VivoxService.Instance.ActiveChannels[$"chat_{_playerInfoSo.RoomName}"].Any(p => p.IsSelf);
+        }
+
+        public async void JoinGlobalChat()
+        {
+            if ( !IsMeJoinedGlobalChat() )
+            {
+                await VivoxService.Instance.JoinGroupChannelAsync($"chat_{_playerInfoSo.RoomName}",
+                    ChatCapability.TextOnly);
+            }
+        }
+        
+        public async void LeaveGlobalChat()
+        {
+            if ( IsMeJoinedGlobalChat() )
+            {
+                await VivoxService.Instance.LeaveChannelAsync($"chat_{_playerInfoSo.RoomName}");
+            }
+        }
+        
+        public async UniTask JoinAreaChat(int areaId)
+        {
+            if ( !IsMeJoinedChat(areaId) )
+            {
+                await VivoxService.Instance.JoinGroupChannelAsync($"chat_{areaId}", ChatCapability.TextOnly);
+            }
+        }
+        
+        public async UniTask LeaveAreaChat(int areaId)
+        {
+            if ( IsMeJoinedChat(areaId) )
+            {
+                VivoxService.Instance.LeaveChannelAsync($"chat_{areaId}");
+            }
+        }
+
+        private PermissionHelper _microphoneHelper = new PermissionHelper(Permission.Microphone);
+        
+        private void AskPermissionAudio()
+        {
+            _microphoneHelper.OnPermissionResult = AfterRequestPermission;
+            _microphoneHelper.Ask();
+        }
+        
+        private void AfterRequestPermission(bool requestOk)
+        {
+            Debug.Log($"Request Permission with {requestOk}");
+            if ( requestOk )
+            {
+                if ( VivoxService.Instance != null ) VivoxService.Instance.UnmuteInputDevice();
+            }
+        }
+
+        public void ToggleAudio(bool isOn)
+        {
+            if ( !isOn )
+            {
+                AskPermissionAudio();
+            }
+            else
+            {
+                if ( VivoxService.Instance != null ) VivoxService.Instance.MuteInputDevice();
+            }
+        }
+
+        public async void SignOut()
+        {
+            if ( VivoxService.Instance != null )
+            {
+                await VivoxService.Instance.LeaveAllChannelsAsync();
+                await VivoxService.Instance.LogoutAsync();
+            }
+
+            if ( ApiManager.Instance != null ) ApiManager.Instance.Logout();
+            if ( AuthenticationService.Instance != null ) AuthenticationService.Instance.SignOut();
+            _gameManager.Shutdown();
+        }
+        
         private void Update()
         {
 

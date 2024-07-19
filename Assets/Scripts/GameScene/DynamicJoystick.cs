@@ -24,7 +24,7 @@ namespace Common
             if ( _joystickKnob == null && transform.childCount > 0 )
                 _joystickKnob = transform.GetChild(0).GetComponent<RectTransform>();
 
-            //_joystickArea.gameObject.SetActive(false);
+            _joystickArea.gameObject.SetActive(false);
             _initialPosition = _joystickArea.localPosition;
         }
 

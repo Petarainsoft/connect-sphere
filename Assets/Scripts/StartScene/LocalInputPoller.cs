@@ -17,6 +17,8 @@ namespace ConnectSphere
         // The INetworkRunnerCallbacks of this LocalInputPoller are automatically detected
         // because the script is located on the same object as the NetworkRunner and
         // NetworkRunnerCallbacks scripts.
+        
+        
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {

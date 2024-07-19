@@ -288,7 +288,7 @@ PlayerSettings:
   - m_BuildTarget: Android
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: 7e7b1957c1325944489e186a342066f2, type: 3}
+      m_Icon: {fileID: 0}
       m_Width: 192
       m_Height: 192
       m_Kind: 0
@@ -316,6 +316,13 @@ PlayerSettings:
       m_Icon: {fileID: 0}
       m_Width: 36
       m_Height: 36
+      m_Kind: 0
+  - m_BuildTarget: 
+    m_Icons:
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: 4e757a24e9d28b046b85c2f34f05baba, type: 3}
+      m_Width: 128
+      m_Height: 128
       m_Kind: 0
   m_BuildTargetPlatformIcons:
   - m_BuildTarget: Android
@@ -702,23 +709,23 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: DOTWEEN;FUSION_WEAVER;FUSION2;dUI_MANAGER
-    EmbeddedLinux: DOTWEEN;dUI_MANAGER
-    GameCoreScarlett: DOTWEEN;dUI_MANAGER
-    GameCoreXboxOne: DOTWEEN;dUI_MANAGER
-    LinuxHeadlessSimulation: DOTWEEN;dUI_MANAGER
-    Nintendo Switch: DOTWEEN;dUI_MANAGER
-    PS4: DOTWEEN;dUI_MANAGER
-    PS5: DOTWEEN;dUI_MANAGER
-    QNX: DOTWEEN;dUI_MANAGER
-    Stadia: DOTWEEN;dUI_MANAGER
-    Standalone: DOTWEEN;FUSION_WEAVER;FUSION2;dUI_MANAGER
-    VisionOS: DOTWEEN;dUI_MANAGER
-    WebGL: DOTWEEN;dUI_MANAGER
-    Windows Store Apps: DOTWEEN;dUI_MANAGER
-    XboxOne: DOTWEEN;dUI_MANAGER
-    iPhone: DOTWEEN;dUI_MANAGER
-    tvOS: DOTWEEN;dUI_MANAGER
+    Android: DOTWEEN;FUSION_WEAVER;FUSION2;dUI_MANAGER;dUI_TextMeshPro
+    EmbeddedLinux: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    GameCoreScarlett: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    GameCoreXboxOne: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    LinuxHeadlessSimulation: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    Nintendo Switch: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    PS4: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    PS5: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    QNX: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    Stadia: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    Standalone: DOTWEEN;FUSION_WEAVER;FUSION2;dUI_MANAGER;dUI_TextMeshPro
+    VisionOS: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    WebGL: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    Windows Store Apps: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    XboxOne: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    iPhone: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
+    tvOS: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

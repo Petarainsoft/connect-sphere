@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ConnectSphere;
 using Unity.Services.Vivox;
 using Unity.Services.Vivox.AudioTaps;
 using UnityEngine;
@@ -12,7 +13,9 @@ using UnityEngine.UI;
 
 public class TextChatUI : MonoBehaviour
 {
-    private IList<KeyValuePair<string, MessageObjectUI>> m_MessageObjPool = new List<KeyValuePair<string, MessageObjectUI>>();
+    private IList<KeyValuePair<string, MessageObjectUI>> m_MessageObjPool =
+        new List<KeyValuePair<string, MessageObjectUI>>();
+
     ScrollRect m_TextChatScrollRect;
 
     public GameObject ChatContentObj;
@@ -26,6 +29,7 @@ public class TextChatUI : MonoBehaviour
 
     private Task FetchMessages = null;
     private DateTime? oldestMessage = null;
+
 
     IEnumerator Start()
     {
@@ -62,7 +66,7 @@ public class TextChatUI : MonoBehaviour
 
     private void OnDisable()
     {
-        if (m_MessageObjPool.Count > 0)
+        if ( m_MessageObjPool.Count > 0 )
         {
             ClearMessageObjectPool();
         }
@@ -73,7 +77,8 @@ public class TextChatUI : MonoBehaviour
     private void ScrollRectChange(Vector2 vector)
     {
         // Scrolled near end and check if we are fetching history already
-        if (m_TextChatScrollRect.verticalNormalizedPosition >= 0.95f && FetchMessages != null && (FetchMessages.IsCompleted || FetchMessages.IsFaulted || FetchMessages.IsCanceled))
+        if ( m_TextChatScrollRect.verticalNormalizedPosition >= 0.95f && FetchMessages != null &&
+             (FetchMessages.IsCompleted || FetchMessages.IsFaulted || FetchMessages.IsCanceled) )
         {
             m_TextChatScrollRect.normalizedPosition = new Vector2(0, 0.8f);
             FetchMessages = FetchHistory(false);
@@ -84,12 +89,18 @@ public class TextChatUI : MonoBehaviour
     {
         try
         {
+            if ( string.IsNullOrEmpty(currentChannelName) )
+            {
+                Debug.LogError("Current channel name is empty, cannot get chat history");
+                return;
+            }
+
             var chatHistoryOptions = new ChatHistoryQueryOptions()
             {
                 TimeEnd = oldestMessage
             };
             var historyMessages =
-                await VivoxService.Instance.GetChannelTextMessageHistoryAsync(VivoxVoiceManager.Instance.RoomNameOrDefault, 10,
+                await VivoxService.Instance.GetChannelTextMessageHistoryAsync(currentChannelName, 10,
                     chatHistoryOptions);
             var reversedMessages = historyMessages.Reverse();
             foreach (var historyMessage in reversedMessages)
@@ -102,7 +113,8 @@ public class TextChatUI : MonoBehaviour
         }
         catch (TaskCanceledException e)
         {
-            Debug.Log($"Chat history request was canceled, likely because of a logout or the data is no longer needed: {e.Message}");
+            Debug.Log(
+                $"Chat history request was canceled, likely because of a logout or the data is no longer needed: {e.Message}");
         }
         catch (Exception e)
         {
@@ -129,7 +141,7 @@ public class TextChatUI : MonoBehaviour
 
     void TTSToggleValueChanged(bool toggleTTS)
     {
-        if (!ToggleTTS.isOn)
+        if ( !ToggleTTS.isOn )
         {
             VivoxService.Instance.TextToSpeechCancelMessages(TextToSpeechMessageType.LocalPlayback);
         }
@@ -151,6 +163,7 @@ public class TextChatUI : MonoBehaviour
         {
             Destroy(keyValuePair.Value.gameObject);
         }
+
         m_MessageObjPool.Clear();
     }
 
@@ -163,31 +176,48 @@ public class TextChatUI : MonoBehaviour
 
     void EnterKeyOnTextField()
     {
-        if (!Input.GetKeyDown(KeyCode.Return))
+        if ( !Input.GetKeyDown(KeyCode.Return) )
         {
             return;
         }
+
         SendMessage();
     }
 
     void SendMessage()
     {
-        if (string.IsNullOrEmpty(MessageInputField.text))
+        if ( string.IsNullOrEmpty(MessageInputField.text) )
         {
             return;
         }
 
-        VivoxService.Instance.SendChannelTextMessageAsync(VivoxVoiceManager.Instance.RoomNameOrDefault, MessageInputField.text);
+        if ( string.IsNullOrEmpty(currentChannelName) )
+        {
+            Debug.LogError("CurrentChanel is empty");
+            return;
+        }
+
+        VivoxService.Instance.SendChannelTextMessageAsync(currentChannelName, MessageInputField.text.Trim());
         ClearTextField();
+    }
+
+    private void ClearOldMessage()
+    {
+        foreach (Transform tfChild in ChatContentObj.transform)
+        {
+            Destroy(tfChild.gameObject);
+        }
     }
 
     void SubmitTTSMessageToVivox()
     {
-        if (string.IsNullOrEmpty(MessageInputField.text))
+        if ( string.IsNullOrEmpty(MessageInputField.text) )
         {
             return;
         }
-        VivoxService.Instance.TextToSpeechSendMessage(MessageInputField.text, TextToSpeechMessageType.RemoteTransmissionWithLocalPlayback);
+
+        VivoxService.Instance.TextToSpeechSendMessage(MessageInputField.text,
+            TextToSpeechMessageType.RemoteTransmissionWithLocalPlayback);
         ClearTextField();
     }
 
@@ -206,9 +236,17 @@ public class TextChatUI : MonoBehaviour
         AddMessageToChat(message, false, true);
     }
 
+    private string currentChannelName = string.Empty;
+
     void OnChannelJoined(string channelName)
     {
-        FetchMessages = FetchHistory(true);
+        if ( channelName.Trim() != currentChannelName )
+        {
+            currentChannelName = channelName.Trim();
+            ClearMessageObjectPool();
+            oldestMessage = null;
+            FetchMessages = FetchHistory(true);
+        }
     }
 
     void OnChannelMessageReceived(VivoxMessage message)
@@ -234,9 +272,10 @@ public class TextChatUI : MonoBehaviour
     {
         var newMessageObj = Instantiate(MessageObject, ChatContentObj.transform);
         var newMessageTextObject = newMessageObj.GetComponent<MessageObjectUI>();
-        if (isHistory)
+        if ( isHistory )
         {
-            m_MessageObjPool.Insert(0, new KeyValuePair<string, MessageObjectUI>(message.MessageId, newMessageTextObject));
+            m_MessageObjPool.Insert(0,
+                new KeyValuePair<string, MessageObjectUI>(message.MessageId, newMessageTextObject));
             newMessageObj.transform.SetSiblingIndex(0);
         }
         else
@@ -245,16 +284,17 @@ public class TextChatUI : MonoBehaviour
         }
 
         newMessageTextObject.SetTextMessage(message);
-        if (scrollToBottom)
+        if ( scrollToBottom )
         {
             StartCoroutine(SendScrollRectToBottom());
         }
 
-        if (!message.FromSelf)
+        if ( !message.FromSelf )
         {
-            if (ToggleTTS.isOn)
+            if ( ToggleTTS.isOn )
             {
-                VivoxService.Instance.TextToSpeechSendMessage($"{message.SenderDisplayName} said, {message.MessageText}", TextToSpeechMessageType.LocalPlayback);
+                VivoxService.Instance.TextToSpeechSendMessage(
+                    $"{message.SenderDisplayName} said, {message.MessageText}", TextToSpeechMessageType.LocalPlayback);
             }
         }
     }

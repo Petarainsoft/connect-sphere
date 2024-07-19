@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using AccountManagement;
 using Chat.States;
 using ConnectSphere;
 using Cysharp.Threading.Tasks;
@@ -10,6 +11,8 @@ using ParrelSync;
 using TMPro;
 using Unity.RenderStreaming;
 using Unity.Services.Vivox;
+using Unity.VisualScripting;
+using UnityEngine.Android;
 using VInspector;
 
 namespace Chat
@@ -55,84 +58,164 @@ namespace Chat
         [SerializeField] private RenderStreamingSettings _settings;
 
         [SerializeField] private PlayerInfoSO _playerSO;
-        
+
+        [Header("Gather Areas Handle Connection")] [SerializeField]
+        private List<GatheringArea> _areas;
+
 
         private VivoxVideoCallFsm fsm;
 
-        private WebCamTexture mWebcamTexture;
+        private WebCamTexture webcamTexture;
         private const float WaitTime = 1f;
 
-        private IEnumerator ShowLocalCamera()
+        [SerializeField] private Texture2D _black;
+        
+        
+        
+        private PermissionHelper _cameraPermissionHelper = new PermissionHelper(Permission.Camera);
+        
+        private void AskPermissionVideo()
         {
-#if UNITY_EDITOR
-            yield return new WaitForEndOfFrame();
-            if ( _localVideoImage.texture == null )
+            _cameraPermissionHelper.OnPermissionResult = AfterRequestPermission;
+            _cameraPermissionHelper.Ask();
+        }
+        
+        private void AfterRequestPermission(bool requestOk)
+        {
+            Debug.Log($"Request Permission with {requestOk}");
+            if ( requestOk )
             {
-                Debug.LogError("Please Set texture to the local video image to mimic webcam");
+                RequestCameraPermission();
             }
-#else
-            yield return new WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length > 1);
-            var userCameraDevice = WebCamTexture.devices[1];
+        }
 
-            mWebcamTexture = new WebCamTexture(userCameraDevice.name, 1280, 720, (int)30);
-            mWebcamTexture.Play();
+        public void ToggleCamera(bool isOff)
+        {
+            if ( !isOff )
+            {
+                AskPermissionVideo();
+            }
+            else
+            {
+                _localVideoImage.texture = _black;
+                _trayBarVideoImage.texture = _black;
+            }
+        }
 
-            yield return new WaitUntil(() => mWebcamTexture.didUpdateThisFrame);
-            Debug.Log($"CameraTexture Size w:{mWebcamTexture.width} h{mWebcamTexture.height}");
+        private async UniTask<bool> RequestCameraPermission()
+        {
+            if ( _localVideoImage == null || _trayBarVideoImage == null )
+            {
+                Debug.LogError("Texture for showing camera is null");
+                return false;
+            }
 
-            if ( _localVideoImage == null ) yield break;
+            var timeout = UniTask.WaitForSeconds(4f);
+            var waitForCameraAvailable =
+                UniTask.WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length >= 1);
+            await UniTask.WhenAny(timeout, waitForCameraAvailable);
 
-            _localVideoImage.texture = mWebcamTexture;
-            _trayBarVideoImage.texture = mWebcamTexture;
+            if ( WebCamTexture.devices == null || WebCamTexture.devices.Length == 0 )
+            {
+                return false;
+            }
+
+
+            var cameraDevice = WebCamTexture.devices[0];
+            if ( WebCamTexture.devices.Length > 1 )
+                cameraDevice = WebCamTexture.devices[1]; // front camera for mobile devices
+
+            webcamTexture = new WebCamTexture(cameraDevice.name, 600, 480, (int)20);
+            webcamTexture.Play();
+
+            await UniTask.WaitUntil(() => webcamTexture != null && webcamTexture.didUpdateThisFrame);
+            Debug.Log($"CameraTexture Size w:{webcamTexture.width} h{webcamTexture.height}");
+
+
+            _localVideoImage.texture = webcamTexture;
+            _trayBarVideoImage.texture = webcamTexture;
+            return true;
+        }
+
+
+        private async UniTask<bool> RequestCamera()
+        {
+            if ( _localVideoImage == null || _trayBarVideoImage == null )
+            {
+                Debug.LogError("Texture for showing camera is null");
+                return false;
+            }
+
+            var timeout = UniTask.WaitForSeconds(4f);
+            var waitForCameraAvailable =
+                UniTask.WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length >= 1);
+            await UniTask.WhenAny(timeout, waitForCameraAvailable);
+
+            if ( WebCamTexture.devices == null || WebCamTexture.devices.Length == 0 )
+            {
+                return false;
+            }
+
+
+            var cameraDevice = WebCamTexture.devices[0];
+            if ( WebCamTexture.devices.Length > 1 )
+                cameraDevice = WebCamTexture.devices[1]; // front camera for mobile devices
+
+            webcamTexture = new WebCamTexture(cameraDevice.name, 600, 480, (int)20);
+            webcamTexture.Play();
+
+            await UniTask.WaitUntil(() => webcamTexture.didUpdateThisFrame);
+            Debug.Log($"CameraTexture Size w:{webcamTexture.width} h{webcamTexture.height}");
+
+
+            _localVideoImage.texture = webcamTexture;
+            _trayBarVideoImage.texture = webcamTexture;
+
             Debug.Log($"Container Size w:{_localVideoImage.texture.width} h{_localVideoImage.texture.height}");
-#endif
-
 
             for (var i = 0; i < _availableConnection.Count; i++)
             {
-                var con = _availableConnection[i];
+                var connection = _availableConnection[i];
                 Debug.Log("1");
-                UnityEngine.Debug.Log($"WebcamTexture is null {_localVideoImage.texture == null}");
-                con.webCamStreamer.sourceTexture = _localVideoImage.texture;
+                Debug.Log($"WebcamTexture is null {_localVideoImage.texture == null}");
+                connection.webCamStreamer.sourceTexture = _localVideoImage.texture;
                 Debug.Log("2");
-                con.webCamStreamer.OnStartedStream += id => con.receiveVideoViewer.enabled = true;
-                con.webCamStreamer.OnStartedStream += _ =>
-                {
-                    // if ( _localVideoImage.texture == null )
-                    // {
-                    //     _localVideoImage.texture = con.webCamStreamer.sourceWebCamTexture;
-                    // }
-                    #if !UNITY_EDITOR
-                    _localVideoImage.texture = mWebcamTexture;
-                    #endif
-                };
+                connection.webCamStreamer.OnStartedStream += id => connection.receiveVideoViewer.enabled = true;
+                // connection.webCamStreamer.OnStartedStream += _ =>
+                // {
+                //     #if !UNITY_EDITOR
+                //     _localVideoImage.texture = mWebcamTexture;
+                //     #endif
+                // };
 
                 if ( _settings != null )
                 {
-                    con.webCamStreamer.width = (uint)_settings.StreamSize.x;
-                    con.webCamStreamer.height = (uint)_settings.StreamSize.y;
+                    connection.webCamStreamer.width = (uint)_settings.StreamSize.x;
+                    connection.webCamStreamer.height = (uint)_settings.StreamSize.y;
 
                     _settings.ApplyH264Codec();
                 }
 
-                con.SetTextureIndex(i);
-                con.SetTextureReceiveCb(OnTextureReceive);
+                connection.SetTextureIndex(i);
+                connection.SetTextureReceiveCb(OnTextureReceive);
             }
 
-            yield return new WaitForEndOfFrame();
-            yield return new WaitForSeconds(1f);
-            
+            await UniTask.WaitForEndOfFrame(this);
+            await UniTask.WaitForSeconds(1f);
+
             // anhnguyen, for demo, run right after having webcam working
             // yield return new WaitUntil(() => Runner != null && Runner.ActivePlayers != null);
             Debug.Log($"<color=yellow>Start calling {_playerSO.RoomName} ___ indexCall {0}</color>");
-            yield return new WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
-            // SetUp(_playerSO.RoomName, 2);
+            await UniTask.WaitUntil(() => _vivoxHelper.IsReadyForVoiceAndChat);
+            // SetUp(_playerSO.RoomName, 1);
+
+            return true;
         }
 
         [Button]
         public void DoWebRTC()
         {
-            SetUp(_playerSO.RoomName, 2);
+            // SetUp(_playerSO.RoomName, 2);
         }
 
         private Texture2D RotateTexture90Degrees(WebCamTexture originalTexture)
@@ -178,7 +261,7 @@ namespace Chat
             _hangUpButton.interactable = false;
             _connectionIdInput.interactable = true;
 
-            _setUpButton.onClick.AddListener(SetUp);
+            // _setUpButton.onClick.AddListener(SetUp);
             _hangUpButton.onClick.AddListener(HangUp);
             _connectionIdInput.onValueChanged.AddListener(input => connectionId = input);
             _connectionIdInput.text = $"{Random.Range(0, 99999):D5}";
@@ -186,6 +269,114 @@ namespace Chat
                 _availableConnection.First().webCamStreamer.sourceDeviceIndex = index);
             _webcamSelectDropdown.options = WebCamTexture.devices.Select(x => x.name)
                 .Select(x => new TMP_Dropdown.OptionData(x)).ToList();
+
+            GatheringArea.OnPlayerEnteredArea += HandlePlayerEnter;
+            GatheringArea.OnPlayerExitArea += HandlePlayerExit;
+        }
+
+        private void OnDestroy()
+        {
+            GatheringArea.OnPlayerEnteredArea -= HandlePlayerEnter;
+            GatheringArea.OnPlayerExitArea -= HandlePlayerExit;
+        }
+
+        private void HandlePlayerExit(int areaId)
+        {
+            Debug.Log($"<color=red>PlayerEXIT {areaId}</color>");
+            var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
+            if ( area == null ) return;
+            var listPlayers = area.PlayersInArea;
+            Debug.Log($"<color=red>listPlayers {string.Join(",", listPlayers)}</color>");
+            // me went out
+            var myId = PlayerPrefs.GetInt("userId");
+            Debug.Log($"<color=red>MyId {myId}</color>");
+            // me not in the area just raise leave-event
+            if ( !listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
+            {
+                _vivoxHelper.LeaveAudio(areaId);
+                var listOtherConnection = new List<string>();
+                foreach (var no in listPlayers)
+                {
+                    var id = no.GetComponent<Player>().DatabaseId;
+                    if ( id == myId ) continue;
+                    connectionId = areaId.ToString();
+                    var connectionID = MakeConnectionUniqueId(id, myId);
+                    Debug.Log($"<color=red>___conID {connectionID}</color>");
+                    listOtherConnection.Add(connectionID);
+                }
+
+                var _availableConnectionIndex = -1;
+                for (int i = 0; i < _availableConnection.Count; i++)
+                {
+                    var con = _availableConnection[++_availableConnectionIndex];
+                    if ( con.IsWorking )
+                    {
+                        foreach (var existingConnection in listOtherConnection)
+                        {
+                            if ( con.singleConnection != null &&
+                                 con.singleConnection.ExistConnection(existingConnection) )
+                            {
+                                Debug.Log($"<color=red>** DELETE CONNECTION FOR {existingConnection}</color>");
+                                con.singleConnection.DeleteConnection(existingConnection);
+                                con.IsWorking = false;
+                                con.Release();
+                                _remoteVideoImages[_availableConnectionIndex].transform.parent.gameObject.SetActive(false);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private async void HandlePlayerEnter(int areaId)
+        {
+            Debug.Log($"<color=red>PlayerENTER {areaId}</color>");
+            var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
+            if ( area == null ) return;
+            var listPlayers = area.PlayersInArea;
+            Debug.Log($"<color=red>listPlayers {string.Join(",", listPlayers.Select(e=>e.GetComponent<Player>().DatabaseId))}</color>");
+            // me went in
+            var myId = PlayerPrefs.GetInt("userId");
+            Debug.Log($"<color=red>MyId {myId}</color>");
+            if ( listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
+            {
+                // join audio for the room
+                _vivoxHelper.JoinAudio(areaId);
+                var listOtherConnection = new List<string>();
+                foreach (var no in listPlayers)
+                {
+                    var id = no.GetComponent<Player>().DatabaseId;
+                    if ( id == myId ) continue;
+                    connectionId = areaId.ToString();
+
+                    var connectionID = MakeConnectionUniqueId(id, myId);
+                    Debug.Log($"<color=red>___conID {connectionID}</color>");
+                    listOtherConnection.Add(connectionID);
+                }
+
+                var _availableConnectionIndex = -1;
+                for (int i = 0; i < _availableConnection.Count; i++)
+                {
+                    var con = _availableConnection[++_availableConnectionIndex];
+                    if ( !con.IsWorking )
+                    {
+                        foreach (var existingConnection in listOtherConnection)
+                        {
+                            if ( con.singleConnection != null &&
+                                 !con.singleConnection.ExistConnection(existingConnection) )
+                            {
+                                Debug.Log($"<color=red>** CREATE CONNECTION FOR {existingConnection}</color>");
+                                con.singleConnection.CreateConnection(existingConnection);
+                                con.IsWorking = true;
+                                await UniTask.WaitUntil(() =>
+                                    con.IsWorking && con.singleConnection.IsStable(existingConnection));
+                                await UniTask.WaitForSeconds(WaitTime);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private bool callVivox = false;
@@ -212,12 +403,12 @@ namespace Chat
             // }
         }
 
-        public void StartLocalCamera()
+        public void StartMyCamera()
         {
             _startButton.interactable = false;
             _webcamSelectDropdown.interactable = false;
             _setUpButton.interactable = true;
-            StartCoroutine(ShowLocalCamera());
+            RequestCamera();
         }
 
         private IEnumerator Start()
@@ -246,88 +437,92 @@ namespace Chat
             _setUpButton.interactable = true;
             _hangUpButton.interactable = true;
             _connectionIdInput.interactable = true;
-            
-            
-            
-        }
-        
-        
-        private async void SetUp(string roomName, int inCallIndex)
-        {
-            _setUpButton.interactable = false;
-            _hangUpButton.interactable = true;
-            _connectionIdInput.interactable = false;
-            callIndex = inCallIndex;
-            connectionId = roomName;
-
-            var _availableConnectionIndex = -1;
-
-            for (int i = 0; i <= _availableConnection.Count; i++)
-            {
-                if ( i == callIndex ) continue; //ignore self
-
-                var con = _availableConnection[++_availableConnectionIndex];
-
-                con.receiveVideoViewer.SetCodec(_settings.ReceiverVideoCodec);
-                con.webCamStreamer.SetCodec(_settings.SenderVideoCodec);
-
-                var connectionUniqueId = MakeConnectionUniqueId(i);
-
-                if ( !con.IsWorking )
-                {
-                    Debug.Log($"Start Connecting for {connectionUniqueId}");
-                    con.singleConnection.CreateConnection(connectionUniqueId);
-                    con.IsWorking = true;
-
-                    await UniTask.WaitUntil(() =>
-                        con.IsWorking && con.singleConnection.IsStable(connectionUniqueId));
-
-                    // Debug.Log($"Connected for {connectionUniqueId}");
-                    await UniTask.WaitForSeconds(WaitTime);
-                }
-            }
         }
 
 
-        private async void SetUp()
-        {
-            _setUpButton.interactable = false;
-            _hangUpButton.interactable = true;
-            _connectionIdInput.interactable = false;
-            callIndex = int.Parse(_callIndexInput.text.Trim());
-
-            var _availableConnectionIndex = -1;
-
-            for (int i = 0; i <= _availableConnection.Count; i++)
-            {
-                if ( i == callIndex ) continue; //ignore self
-
-                var con = _availableConnection[++_availableConnectionIndex];
-
-                con.receiveVideoViewer.SetCodec(_settings.ReceiverVideoCodec);
-                con.webCamStreamer.SetCodec(_settings.SenderVideoCodec);
-
-                var connectionUniqueId = MakeConnectionUniqueId(i);
-
-                if ( !con.IsWorking )
-                {
-                    Debug.Log($"Start Connecting for {connectionUniqueId}");
-                    con.singleConnection.CreateConnection(connectionUniqueId);
-                    con.IsWorking = true;
-
-                    await UniTask.WaitUntil(() =>
-                        con.IsWorking && con.singleConnection.IsStable(connectionUniqueId));
-
-                    // Debug.Log($"Connected for {connectionUniqueId}");
-                    await UniTask.WaitForSeconds(WaitTime);
-                }
-            }
-        }
+        // private async void SetUp(string roomName, int inCallIndex)
+        // {
+        //     _setUpButton.interactable = false;
+        //     _hangUpButton.interactable = true;
+        //     _connectionIdInput.interactable = false;
+        //     callIndex = inCallIndex;
+        //     connectionId = roomName;
+        //
+        //     var _availableConnectionIndex = -1;
+        //
+        //     for (int i = 0; i <= _availableConnection.Count; i++)
+        //     {
+        //         if ( i == callIndex ) continue; //ignore self
+        //
+        //         var con = _availableConnection[++_availableConnectionIndex];
+        //
+        //         con.receiveVideoViewer.SetCodec(_settings.ReceiverVideoCodec);
+        //         con.webCamStreamer.SetCodec(_settings.SenderVideoCodec);
+        //
+        //         var connectionUniqueId = MakeConnectionUniqueId(i);
+        //
+        //         if ( !con.IsWorking )
+        //         {
+        //             Debug.Log($"Start Connecting for {connectionUniqueId}");
+        //             con.singleConnection.CreateConnection(connectionUniqueId);
+        //             con.IsWorking = true;
+        //
+        //             await UniTask.WaitUntil(() =>
+        //                 con.IsWorking && con.singleConnection.IsStable(connectionUniqueId));
+        //
+        //             // Debug.Log($"Connected for {connectionUniqueId}");
+        //             await UniTask.WaitForSeconds(WaitTime);
+        //         }
+        //     }
+        // }
+        //
+        //
+        // private async void SetUp()
+        // {
+        //     _setUpButton.interactable = false;
+        //     _hangUpButton.interactable = true;
+        //     _connectionIdInput.interactable = false;
+        //     callIndex = int.Parse(_callIndexInput.text.Trim());
+        //
+        //     var _availableConnectionIndex = -1;
+        //
+        //     for (int i = 0; i <= _availableConnection.Count; i++)
+        //     {
+        //         if ( i == callIndex ) continue; //ignore self
+        //
+        //         var con = _availableConnection[++_availableConnectionIndex];
+        //
+        //         con.receiveVideoViewer.SetCodec(_settings.ReceiverVideoCodec);
+        //         con.webCamStreamer.SetCodec(_settings.SenderVideoCodec);
+        //
+        //         var connectionUniqueId = MakeConnectionUniqueId(i);
+        //
+        //         if ( !con.IsWorking )
+        //         {
+        //             Debug.Log($"Start Connecting for {connectionUniqueId}");
+        //             con.singleConnection.CreateConnection(connectionUniqueId);
+        //             con.IsWorking = true;
+        //
+        //             await UniTask.WaitUntil(() =>
+        //                 con.IsWorking && con.singleConnection.IsStable(connectionUniqueId));
+        //
+        //             // Debug.Log($"Connected for {connectionUniqueId}");
+        //             await UniTask.WaitForSeconds(WaitTime);
+        //         }
+        //     }
+        // }
 
         private string MakeConnectionUniqueId(int i)
         {
             var connectionUniqueId = $"{connectionId}_{callIndex}_{i}";
             if ( callIndex > i ) connectionUniqueId = $"{connectionId}_{i}_{callIndex}";
+            return connectionUniqueId;
+        }
+        
+        private string MakeConnectionUniqueId(int id1, int id2)
+        {
+            var connectionUniqueId = $"{connectionId}_{id1}_{id2}";
+            if ( id1 > id2 ) connectionUniqueId = $"{connectionId}_{id2}_{id1}";
             return connectionUniqueId;
         }
 
@@ -344,11 +539,12 @@ namespace Chat
                     var con = _availableConnection[i];
                     if ( con.IsWorking )
                     {
-                        if ( con.singleConnection != null && con.singleConnection.ExistConnection(connectionUniqueId))
+                        if ( con.singleConnection != null && con.singleConnection.ExistConnection(connectionUniqueId) )
                         {
                             con.singleConnection.DeleteConnection(connectionUniqueId);
                         }
                     }
+
                     con.IsWorking = false;
                     con.Release();
                 }

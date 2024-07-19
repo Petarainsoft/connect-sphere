@@ -43,6 +43,7 @@ namespace ConnectSphere
 
         public override void Spawned()
         {
+            SetDBIdAndEmail();
             _controller.SetupComponents();
             if (Object.HasStateAuthority)
             {
@@ -59,6 +60,12 @@ namespace ConnectSphere
         private void ShowBubbleChat(int spriteIndex)
         {
             _bubbleChat.SetBubbleSprite(spriteIndex);
+        }
+
+        private void SetDBIdAndEmail()
+        {
+            _playerInfoSo.Email = PlayerPrefs.GetString("username");
+            _playerInfoSo.DatabaseId = PlayerPrefs.GetInt("userId");
         }
     }
 }

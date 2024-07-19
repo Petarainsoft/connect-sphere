@@ -24,18 +24,23 @@ namespace AccountManagement
         [SerializeField] private Toggle _agreementTosToggle;
         [SerializeField] private Toggle _agreementDataPolicyToggle;
 
+        [SerializeField] private  UIButton _toLoginBtn;
+        
+
         public override void OnEnter()
         {
             base.OnEnter();
             ClearInputs();
             
             _createAccountButton.OnClick.OnTrigger.Event.AddListener(CreateAccount);
+            _toLoginBtn.OnClick.OnTrigger.Event.AddListener(ToLogin);
         }
         
         public override void OnExit()
         {
             base.OnExit();
             _createAccountButton.OnClick.OnTrigger.Event.RemoveListener(CreateAccount);
+            _toLoginBtn.OnClick.OnTrigger.Event.RemoveListener(ToLogin);
         }
 
 
@@ -43,6 +48,8 @@ namespace AccountManagement
         {
             _ = CreateAccountAsync();
         }
+
+        private void ToLogin() => Machine?.ChangeState<LoginState>();
 
         private async UniTaskVoid CreateAccountAsync()
         {

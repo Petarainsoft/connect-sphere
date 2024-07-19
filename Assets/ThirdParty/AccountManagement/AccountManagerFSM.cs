@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using AccountManagement;
 using RobustFSM.Base;
-using UnityEngine;
 
 namespace ConnectSphere
 {
@@ -10,9 +7,12 @@ namespace ConnectSphere
     {
         public override void AddStates()
         {
+            AddState<CheckingAuth>();
+            AddState<CreateAccountState>();
             AddState<LoginState>();
             AddState<ResetPasswordState>();
-            SetInitialState<LoginState>();
+            AddState<Empty>();
+            SetInitialState<CheckingAuth>();
         }
     }
 }

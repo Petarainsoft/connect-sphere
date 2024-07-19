@@ -24,10 +24,18 @@ namespace ConnectSphere
 
         private List<NetworkObject> _playersInThisArea = new List<NetworkObject>();
 
+
+        public List<NetworkObject> PlayersInArea => _playersInThisArea;
+
+        public int AreaId => areaId;
+
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
             {
+                _playersInThisArea.Add(playerObject);
+                OnPlayerEnteredArea?.Invoke(areaId);
+                
                 if (!playerObject.HasStateAuthority)
                     return;
             }
@@ -36,8 +44,6 @@ namespace ConnectSphere
                 return;
             }
 
-            OnPlayerEnteredArea?.Invoke(areaId);
-            _playersInThisArea.Add(playerObject);
             if (FadeTexture != null)
             {
                 foreach (Transform child in FadeTexture)
@@ -57,6 +63,9 @@ namespace ConnectSphere
         {
             if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
             {
+                _playersInThisArea.Remove(playerObject);
+                OnPlayerExitArea?.Invoke(areaId);
+                
                 if (!playerObject.HasStateAuthority)
                     return;
             }
@@ -64,9 +73,7 @@ namespace ConnectSphere
             {
                 return;
             }
-
-            OnPlayerExitArea?.Invoke(areaId);
-            _playersInThisArea.Remove(playerObject);
+            
             if (FadeTexture != null)
             {
                 foreach (Transform child in FadeTexture)

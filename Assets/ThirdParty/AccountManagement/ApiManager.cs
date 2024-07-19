@@ -1,11 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using ConnectSphere;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace AccountManagement
 {
-    public class ApiManager : Singleton<ApiManager>
+    public class ApiManager : ConnectSphere.Singleton<ApiManager>
     {
         [Header("Base URL for all handlers")]
         [SerializeField] private string _baseUrl;
@@ -25,8 +27,10 @@ namespace AccountManagement
             if ( handlers == null || handlers.Length == 0 ) return;
             foreach (var handler in handlers) if ( handler != null ) handler.SetBaseUrl(_baseUrl);
         }
+
+        public Action Onlogout;
         
-        public void Logout()
+        public async void Logout()
         {
             PlayerPrefs.DeleteKey("token");
             PlayerPrefs.DeleteKey("username");
@@ -34,6 +38,12 @@ namespace AccountManagement
 
             if ( AuthApi != null ) AuthApi.ClearToken();
             Debug.Log("Logged out");
+            Onlogout?.Invoke();
+        }
+
+        public async UniTask<bool> CheckAuthen()
+        {
+            return await AuthApi.CheckAccessToken();
         }
     }
 }

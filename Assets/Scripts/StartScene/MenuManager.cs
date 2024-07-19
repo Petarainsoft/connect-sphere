@@ -5,6 +5,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System;
 using Cysharp.Threading.Tasks;
+using Doozy.Engine.UI;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using Unity.Services.Vivox;
 
 namespace ConnectSphere
 {
@@ -30,6 +34,12 @@ namespace ConnectSphere
         [SerializeField] GameObject _selectionCanvasObject;
         [SerializeField] private PlayerInfoSO _playerInfoSo;
         [SerializeField] private string _gameScenePath;
+        
+        
+        [Header("Vivox")] [SerializeField]
+        private float _timeout = 3f;
+
+        
 
         private NetworkRunner _runnerInstance;
         private string _tempRoomName;
@@ -95,10 +105,42 @@ namespace ConnectSphere
             _playerInfoSo.PlayerName = _tempPlayerName;
             _playerInfoSo.AvatarIndex = _selectedAvatarIndex;
             _playerInfoSo.RoomName = _tempRoomName;
+            _playerInfoSo.Email = PlayerPrefs.GetString("username");
+            _playerInfoSo.DatabaseId = PlayerPrefs.GetInt("userId");
 
             StartGame(GameMode.Shared, _tempRoomName, _gameScenePath);
         }
 
+        private async UniTask<bool> JoinVivox(string playerEmail)
+        {
+            Debug.Log("** Initialize Unity Service");
+            await UnityServices.InitializeAsync( new InitializationOptions());
+            var validName = playerEmail.Replace("@","_").Replace(".","_");
+            AuthenticationService.Instance.SwitchProfile(validName);
+            Debug.Log("** Sign In AuthenticationService");
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            var checkNull = UniTask.WaitUntil(() => VivoxService.Instance != null);
+            var timeout = UniTask.WaitForSeconds(_timeout);
+            await UniTask.WhenAny(checkNull, timeout);
+            if ( VivoxService.Instance == null )
+            {
+                Debug.LogWarning("** Cannot start Vivox service");
+                return false;
+            }
+            await VivoxService.Instance.InitializeAsync();
+            Debug.Log($"** Initialize Vivox done!");
+            
+            var loginOptions = new LoginOptions()
+            {
+                DisplayName = validName,
+                ParticipantUpdateFrequency = ParticipantPropertyUpdateFrequency.OnePerSecond
+            };
+
+            await VivoxService.Instance.LoginAsync(loginOptions);
+            Debug.Log($"** Login vivox done!");
+            return true;
+        }
+        
         private async void StartGame(GameMode mode, string roomName, string sceneName)
         {
             _runnerInstance = FindObjectOfType<NetworkRunner>();
@@ -119,6 +161,15 @@ namespace ConnectSphere
                 SessionName = roomName,
                 Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath(_gameScenePath)),
             };
+
+            if (!await JoinVivox(_playerInfoSo.Email.Trim()))
+            {
+                var warningPopup = UIPopupManager.GetPopup("ActionPopup");
+                warningPopup.Data.SetButtonsLabels("Ok");
+                warningPopup.Data.SetLabelsTexts("Chat Service", "Currently Chat feature isn't available!");
+                warningPopup.Show();
+                await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
+            }
             // GameMode.Host = Start a session with a specific name
             // GameMode.Client = Join a session with a specific name
             await _runnerInstance.StartGame(startGameArgs);
