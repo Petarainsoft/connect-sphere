@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ConnectSphere;
 using Unity.Services.Vivox;
 using Unity.Services.Vivox.AudioTaps;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -15,6 +16,8 @@ public class TextChatUI : MonoBehaviour
 {
     private IList<KeyValuePair<string, MessageObjectUI>> m_MessageObjPool =
         new List<KeyValuePair<string, MessageObjectUI>>();
+
+    public static Action<bool> OnTyping;
 
     ScrollRect m_TextChatScrollRect;
 
@@ -30,6 +33,10 @@ public class TextChatUI : MonoBehaviour
     private Task FetchMessages = null;
     private DateTime? oldestMessage = null;
 
+    public void FireOntypingFalse()
+    {
+        OnTyping?.Invoke(false);
+    }
 
     IEnumerator Start()
     {
@@ -48,6 +55,7 @@ public class TextChatUI : MonoBehaviour
         SendTTSMessageButton.gameObject.SetActive(false);
 #else
         EnterButton.onClick.AddListener(SendMessage);
+        MessageInputField.onValueChanged.AddListener(OnvalueChange);
         MessageInputField.onEndEdit.AddListener((string text) => { EnterKeyOnTextField(); });
         SendTTSMessageButton.onClick.AddListener(SubmitTTSMessageToVivox);
         ToggleTTS.onValueChanged.AddListener(TTSToggleValueChanged);
@@ -57,6 +65,11 @@ public class TextChatUI : MonoBehaviour
         ChannelEffectPanel.gameObject.SetActive(AudioTapsManager.Instance.IsFeatureEnabled);
 #endif
         m_TextChatScrollRect.onValueChanged.AddListener(ScrollRectChange);
+    }
+
+    private void OnvalueChange(string arg0)
+    {
+        OnTyping?.Invoke(true);
     }
 
     private void OnEnable()
@@ -70,7 +83,7 @@ public class TextChatUI : MonoBehaviour
         {
             ClearMessageObjectPool();
         }
-
+        OnTyping?.Invoke(false);
         oldestMessage = null;
     }
 
@@ -132,6 +145,7 @@ public class TextChatUI : MonoBehaviour
 
 #if UNITY_STANDALONE || UNITY_IOS || UNITY_ANDROID
         EnterButton.onClick.RemoveAllListeners();
+        MessageInputField.onValueChanged.RemoveAllListeners();
         MessageInputField.onEndEdit.RemoveAllListeners();
         SendTTSMessageButton.onClick.RemoveAllListeners();
         ToggleTTS.onValueChanged.RemoveAllListeners();
@@ -176,11 +190,13 @@ public class TextChatUI : MonoBehaviour
 
     void EnterKeyOnTextField()
     {
+        OnTyping?.Invoke(false);
         if ( !Input.GetKeyDown(KeyCode.Return) )
         {
             return;
         }
 
+        
         SendMessage();
     }
 
