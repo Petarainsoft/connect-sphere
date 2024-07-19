@@ -122,15 +122,29 @@ namespace Chat
                    VivoxService.Instance.ActiveChannels[$"chat_{areaId}"].Count > 0 &&
                    VivoxService.Instance.ActiveChannels[$"chat_{areaId}"].Any(p => p.IsSelf);
         }
-
-        public async UniTask JoinGlobalChat()
+        
+        private bool IsMeJoinedGlobalChat()
         {
-            await VivoxService.Instance.JoinGroupChannelAsync($"chat_{_playerInfoSo.RoomName}", ChatCapability.TextOnly);
+            return VivoxService.Instance.ActiveChannels.ContainsKey($"chat_{_playerInfoSo.RoomName}") &&
+                   VivoxService.Instance.ActiveChannels[$"chat_{_playerInfoSo.RoomName}"].Count > 0 &&
+                   VivoxService.Instance.ActiveChannels[$"chat_{_playerInfoSo.RoomName}"].Any(p => p.IsSelf);
+        }
+
+        public async void JoinGlobalChat()
+        {
+            if ( !IsMeJoinedGlobalChat() )
+            {
+                await VivoxService.Instance.JoinGroupChannelAsync($"chat_{_playerInfoSo.RoomName}",
+                    ChatCapability.TextOnly);
+            }
         }
         
-        public async UniTask LeaveGlobalChat()
+        public async void LeaveGlobalChat()
         {
-            await VivoxService.Instance.LeaveChannelAsync($"chat_{_playerInfoSo.RoomName}");
+            if ( IsMeJoinedGlobalChat() )
+            {
+                await VivoxService.Instance.LeaveChannelAsync($"chat_{_playerInfoSo.RoomName}");
+            }
         }
         
         public async UniTask JoinAreaChat(int areaId)
