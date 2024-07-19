@@ -11,6 +11,7 @@ using Doozy.Engine.UI;
 using Fusion;
 using TMPro;
 using Unity.Services.Authentication;
+using Unity.Services.Core;
 using Unity.Services.Vivox;
 using UnityEngine;
 using UnityEngine.Android;
@@ -198,8 +199,14 @@ namespace Chat
 
         public async void SignOut()
         {
-            if ( VivoxService.Instance != null ) await VivoxService.Instance.LeaveAllChannelsAsync();
-            ApiManager.Instance.Logout();
+            if ( VivoxService.Instance != null )
+            {
+                await VivoxService.Instance.LeaveAllChannelsAsync();
+                await VivoxService.Instance.LogoutAsync();
+            }
+
+            if ( ApiManager.Instance != null ) ApiManager.Instance.Logout();
+            if ( AuthenticationService.Instance != null ) AuthenticationService.Instance.SignOut();
             _gameManager.Shutdown();
         }
         

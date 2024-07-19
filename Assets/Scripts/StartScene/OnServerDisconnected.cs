@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AccountManagement;
 using Fusion;
 using Fusion.Sockets;
+using Unity.Services.Authentication;
+using Unity.Services.Vivox;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,7 +18,20 @@ namespace ConnectSphere
 
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
-            // When the local NetworkRunner has shut down, the menu scene is loaded.
+            SignServicesOutAsync();
+        }
+
+        private async void SignServicesOutAsync()
+        {
+            if ( VivoxService.Instance != null )
+            {
+                await VivoxService.Instance.LeaveAllChannelsAsync();
+                await VivoxService.Instance.LogoutAsync();
+            }
+
+            if ( ApiManager.Instance != null ) ApiManager.Instance.Logout();
+            if ( AuthenticationService.Instance != null ) AuthenticationService.Instance.SignOut();
+
             SceneManager.LoadScene(_menuSceneName);
         }
 
