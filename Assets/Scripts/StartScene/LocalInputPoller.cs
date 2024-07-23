@@ -11,8 +11,7 @@ namespace ConnectSphere
     {
         private const string AXIS_HORIZONTAL = "Horizontal";
         private const string AXIS_VERTICAL = "Vertical";
-        private const string BUTTON_FIRE1 = "Fire1";
-        private const string BUTTON_JUMP = "Jump"; // Can be used as an alternative fire button to shoot with SPACE
+        private const string BUTTON_INTERACT = "Interact";
 
         // The INetworkRunnerCallbacks of this LocalInputPoller are automatically detected
         // because the script is located on the same object as the NetworkRunner and
@@ -26,7 +25,7 @@ namespace ConnectSphere
 
             localInput.HorizontalInput = Input.GetAxisRaw(AXIS_HORIZONTAL);
             localInput.VerticalInput = Input.GetAxisRaw(AXIS_VERTICAL);
-            //localInput.Buttons.Set(PlayerButtons.Fire, Input.GetButton(BUTTON_FIRE1));
+            localInput.Buttons.Set(PlayerButtons.Interact, Input.GetButton(BUTTON_INTERACT));
 
             input.Set(localInput);
         }

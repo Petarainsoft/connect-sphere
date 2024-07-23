@@ -10,8 +10,9 @@ namespace ConnectSphere
         public TMP_InputField _inputName;
 
         // Array of predefined names
-        private string[] names = { "Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank", "John", 
-            "Stephanie", "Taylor", "Janet", "Rose", "Jenny", "Maya", "Riley", "Farkle", "Long", "Sol" };
+        private string[] names = { "Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank", "John",
+            "Stephanie", "Taylor", "Janet", "Rose", "Jenny", "Maya", "Riley", "Farkle", "Long", "Sol", "Lisa",
+            "Gweny", "Harold", "Emily", "Felicity", "Lizzie", "Gary", "Matty", "Robert", "Winnie", "Wendy", "Eddy"};
 
         // Method to get a random name
         public string GetRandomName()
