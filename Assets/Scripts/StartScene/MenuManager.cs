@@ -9,6 +9,7 @@ using Doozy.Engine.UI;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Vivox;
+using System.Reflection;
 
 namespace ConnectSphere
 {
@@ -73,6 +74,14 @@ namespace ConnectSphere
 
             _networkCanvasObject.SetActive(false);
             _selectionCanvasObject.SetActive(true);
+        }
+
+        public void OnBackToNetworkClicked()
+        {
+            _tempRoomName = string.Empty;
+            _networkCanvasObject.SetActive(true);
+            _selectionCanvasObject.SetActive(false);
+            OnAvatarImageClicked?.Invoke(0);
         }
 
         private void HandleSelectedAvatar(int index)
@@ -178,6 +187,11 @@ namespace ConnectSphere
             {
                 await _runnerInstance.LoadScene(sceneName);
             }
+        }
+
+        public void ExitGame()
+        {
+            Application.Quit();
         }
 
         private async UniTask ShowLoadingScreen()
