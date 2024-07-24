@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2490516754864532918}
   - component: {fileID: 5117658884291769972}
   - component: {fileID: 2727306753747236954}
+  - component: {fileID: 2522934013794528725}
   m_Layer: 0
   m_Name: Interactable
   m_TagString: Untagged
@@ -91,6 +92,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InteractionCode: 3
+--- !u!114 &2522934013794528725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4873622107151156637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 0
+  ObjectInterest: 1
+  Flags: 262144
+  NestedObjects: []
+  NetworkedBehaviours: []
 --- !u!1 &5224418713408521730
 GameObject:
   m_ObjectHideFlags: 0

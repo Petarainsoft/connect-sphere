@@ -20,6 +20,7 @@ namespace ConnectSphere
         public bool CanInteract { get; set; }
         private bool _isInInteraction;
         private Vector2 _interactPosition;
+        private GameObject _interactionTarget;
         private bool _blockMoving;
 
         [Networked, OnChangedRender(nameof(OnHorizontalChanged))] public float horizontalParam { get; set; }
@@ -93,11 +94,12 @@ namespace ConnectSphere
             _movementDirection = new Vector2(movement.x, movement.y);
         }
 
-        public void SetInteractionCode(int code, Vector2 interactPosition = default)  
+        public void SetInteractionData(int code, Vector2 interactPosition = default, GameObject interactionTarget = null)  
         {
             CanInteract = code != -1 ? true : false;
             InteractionCode = code;
-            _interactPosition = interactPosition; // new Vector2(interactPosition.x, interactPosition.y + 0.25f);
+            _interactPosition = interactPosition;
+            _interactionTarget = code != -1 ? interactionTarget : null;
         }
 
         private void Animate()
@@ -118,7 +120,18 @@ namespace ConnectSphere
         {
             if (input.Buttons.WasPressed(previousButton, PlayerButtons.Interact) && CanInteract)
             {
-                HandleSitting();                
+                if (InteractionCode >= 0 && InteractionCode <= 3)
+                {
+                    HandleSitting();
+                }
+                else if (InteractionCode == 4)
+                {
+                    if (_interactionTarget != null)
+                    {
+                        var targetDoor = _interactionTarget.GetComponent<SlidingDoorInteractable>();
+                        targetDoor.ActivateDoorpc();
+                    }
+                }
             }
             previousButton = input.Buttons;
         }

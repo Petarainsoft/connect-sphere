@@ -162,14 +162,14 @@ namespace ConnectSphere
                 Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath(_gameScenePath)),
             };
 
-            if (!await JoinVivox(_playerInfoSo.Email.Trim()))
-            {
-                var warningPopup = UIPopupManager.GetPopup("ActionPopup");
-                warningPopup.Data.SetButtonsLabels("Ok");
-                warningPopup.Data.SetLabelsTexts("Chat Service", "Currently Chat feature isn't available!");
-                warningPopup.Show();
-                await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
-            }
+            //if (!await JoinVivox(_playerInfoSo.Email.Trim()))
+            //{
+            //    var warningPopup = UIPopupManager.GetPopup("ActionPopup");
+            //    warningPopup.Data.SetButtonsLabels("Ok");
+            //    warningPopup.Data.SetLabelsTexts("Chat Service", "Currently Chat feature isn't available!");
+            //    warningPopup.Show();
+            //    await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
+            //}
             // GameMode.Host = Start a session with a specific name
             // GameMode.Client = Join a session with a specific name
             await _runnerInstance.StartGame(startGameArgs);
