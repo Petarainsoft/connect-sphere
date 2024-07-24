@@ -7,7 +7,7 @@ namespace ConnectSphere
 {
     enum PlayerButtons
     {
-        Fire = 0,
+        Interact = 0,
     }
 
     public struct PlayerInput : INetworkInput
