@@ -9,10 +9,30 @@ namespace Chat
         [SerializeField] public VideoStreamSender webCamStreamer;
         [SerializeField] public VideoStreamReceiver receiveVideoViewer;
         [SerializeField] public SingleConnection singleConnection;
+        public string ConnectionID;
         public bool IsWorking = false;
 
         private int _index = -1;
         private Action<Texture, int> cb;
+
+        // private void OnEnable()
+        // {
+        //     receiveVideoViewer.OnStoppedStream += StopStream;
+        // }
+        //
+        // private void OnDisable()
+        // {
+        //     receiveVideoViewer.OnStoppedStream -= StopStream;
+        // }
+
+        private void StopStream(string connectionid)
+        {
+            if ( singleConnection.ExistConnection(connectionid) )
+            {
+                singleConnection.DeleteConnection(connectionid);
+                ConnectionID = string.Empty;
+            }
+        }
 
         public void SetTextureIndex(int index)
         {
@@ -27,6 +47,7 @@ namespace Chat
                 Debug.Log("Invalid texture index");
                 return;
             }
+
             cb?.Invoke(texture, _index);
         }
 

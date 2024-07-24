@@ -45,7 +45,7 @@ public class RosterItem : MonoBehaviour
     public void SetupRosterItem(VivoxParticipant participant)
     {
         Participant = participant;
-        PlayerNameText.text = Participant.DisplayName;
+        PlayerNameText.text = Participant.DisplayName.Split("_").FirstOrDefault();
         UpdateChatStateImage();
         Participant.ParticipantMuteStateChanged += UpdateChatStateImage;
         Participant.ParticipantSpeechDetected += UpdateChatStateImage;

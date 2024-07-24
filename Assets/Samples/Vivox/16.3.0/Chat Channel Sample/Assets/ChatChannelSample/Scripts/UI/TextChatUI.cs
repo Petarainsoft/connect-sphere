@@ -3,18 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ConnectSphere;
+using AccountManagement;
+using TMPro;
 using Unity.Services.Vivox;
-using Unity.Services.Vivox.AudioTaps;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class TextChatUI : MonoBehaviour
 {
     private IList<KeyValuePair<string, MessageObjectUI>> m_MessageObjPool =
         new List<KeyValuePair<string, MessageObjectUI>>();
+
+    public static Action<bool> OnTyping;
 
     ScrollRect m_TextChatScrollRect;
 
@@ -30,6 +30,12 @@ public class TextChatUI : MonoBehaviour
     private Task FetchMessages = null;
     private DateTime? oldestMessage = null;
 
+    public TMP_Text _chatFrameTitle;
+
+    public void FireOntypingFalse()
+    {
+        OnTyping?.Invoke(false);
+    }
 
     IEnumerator Start()
     {
@@ -48,6 +54,7 @@ public class TextChatUI : MonoBehaviour
         SendTTSMessageButton.gameObject.SetActive(false);
 #else
         EnterButton.onClick.AddListener(SendMessage);
+        MessageInputField.onValueChanged.AddListener(OnvalueChange);
         MessageInputField.onEndEdit.AddListener((string text) => { EnterKeyOnTextField(); });
         SendTTSMessageButton.onClick.AddListener(SubmitTTSMessageToVivox);
         ToggleTTS.onValueChanged.AddListener(TTSToggleValueChanged);
@@ -57,6 +64,11 @@ public class TextChatUI : MonoBehaviour
         ChannelEffectPanel.gameObject.SetActive(AudioTapsManager.Instance.IsFeatureEnabled);
 #endif
         m_TextChatScrollRect.onValueChanged.AddListener(ScrollRectChange);
+    }
+
+    private void OnvalueChange(string arg0)
+    {
+        OnTyping?.Invoke(true);
     }
 
     private void OnEnable()
@@ -70,7 +82,7 @@ public class TextChatUI : MonoBehaviour
         {
             ClearMessageObjectPool();
         }
-
+        OnTyping?.Invoke(false);
         oldestMessage = null;
     }
 
@@ -89,6 +101,7 @@ public class TextChatUI : MonoBehaviour
     {
         try
         {
+            Utils.ShowLoading();
             if ( string.IsNullOrEmpty(currentChannelName) )
             {
                 Debug.LogError("Current channel name is empty, cannot get chat history");
@@ -120,6 +133,7 @@ public class TextChatUI : MonoBehaviour
         {
             Debug.LogError($"Tried to fetch chat history and failed with error: {e.Message}");
         }
+        Utils.HideLoading();
     }
 
     void OnDestroy()
@@ -132,6 +146,7 @@ public class TextChatUI : MonoBehaviour
 
 #if UNITY_STANDALONE || UNITY_IOS || UNITY_ANDROID
         EnterButton.onClick.RemoveAllListeners();
+        MessageInputField.onValueChanged.RemoveAllListeners();
         MessageInputField.onEndEdit.RemoveAllListeners();
         SendTTSMessageButton.onClick.RemoveAllListeners();
         ToggleTTS.onValueChanged.RemoveAllListeners();
@@ -176,11 +191,13 @@ public class TextChatUI : MonoBehaviour
 
     void EnterKeyOnTextField()
     {
+        OnTyping?.Invoke(false);
         if ( !Input.GetKeyDown(KeyCode.Return) )
         {
             return;
         }
 
+        
         SendMessage();
     }
 
@@ -237,16 +254,35 @@ public class TextChatUI : MonoBehaviour
     }
 
     private string currentChannelName = string.Empty;
+    public void ResetChannelName() =>  currentChannelName = string.Empty;
 
-    void OnChannelJoined(string channelName)
+    public void OnChannelJoined(string channelName)
     {
         if ( channelName.Trim() != currentChannelName )
         {
             currentChannelName = channelName.Trim();
-            ClearMessageObjectPool();
-            oldestMessage = null;
-            FetchMessages = FetchHistory(true);
+      
         }
+        ClearMessageObjectPool();
+        oldestMessage = null;
+        _chatFrameTitle.text = GetDisplayName(currentChannelName);
+        FetchMessages = FetchHistory(true);
+    }
+
+    private string GetDisplayName(string chatRoomId)
+    {
+        var splits = chatRoomId.Split("_");
+        if ( splits.Length == 2 )
+        {
+            return $"{splits[1]} Office";
+        }
+
+        if ( splits.Length == 3 )
+        {
+            return  $"Area 0{int.Parse(splits[2]) + 1}";
+        }
+
+        return splits.Last();
     }
 
     void OnChannelMessageReceived(VivoxMessage message)

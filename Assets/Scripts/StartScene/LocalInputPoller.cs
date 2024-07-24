@@ -16,11 +16,25 @@ namespace ConnectSphere
         // The INetworkRunnerCallbacks of this LocalInputPoller are automatically detected
         // because the script is located on the same object as the NetworkRunner and
         // NetworkRunnerCallbacks scripts.
-        
-        
+
+        private bool blockInput = false;
+        private void Awake()
+        {
+            TextChatUI.OnTyping += MustBlockInput;
+        }
+
+        void MustBlockInput(bool blocked)
+        {
+            blockInput = blocked;
+        }
+        private void OnDestroy()
+        {
+            TextChatUI.OnTyping -= MustBlockInput;
+        }
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
+            if ( blockInput ) return;
             PlayerInput localInput = new PlayerInput();
 
             localInput.HorizontalInput = Input.GetAxisRaw(AXIS_HORIZONTAL);

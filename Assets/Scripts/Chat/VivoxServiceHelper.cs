@@ -57,8 +57,13 @@ namespace Chat
 
 
         [SerializeField] private PlayerInfoSO _playerInfoSo;
+        
+        [SerializeField] private TMP_Text _chatFrameTitle;
 
         public bool IsReadyForVoiceAndChat = false;
+
+        [SerializeField] private TextChatUI _textChatUI;
+        
 
 
         private void Awake()
@@ -102,7 +107,9 @@ namespace Chat
         {
             if ( !IsMeJoinedAudio(areaId) )
             {
-                await VivoxService.Instance.JoinGroupChannelAsync($"audio_{areaId}", ChatCapability.AudioOnly);
+                AccountManagement.Utils.ShowLoading();
+                await VivoxService.Instance.JoinGroupChannelAsync($"{_playerInfoSo.RoomName}_audio_{areaId}", ChatCapability.AudioOnly);
+                AccountManagement.Utils.HideLoading();
             }
         }
 
@@ -110,22 +117,24 @@ namespace Chat
         {
             if (IsMeJoinedAudio(areaId))
             {
-                await VivoxService.Instance.LeaveChannelAsync($"audio_{areaId}");
+                AccountManagement.Utils.ShowLoading();
+                await VivoxService.Instance.LeaveChannelAsync($"{_playerInfoSo.RoomName}_audio_{areaId}");
+                AccountManagement.Utils.HideLoading();
             }
         }
 
         private bool IsMeJoinedAudio(int areaId)
         {
-            return VivoxService.Instance.ActiveChannels.ContainsKey($"audio_{areaId}") &&
-                   VivoxService.Instance.ActiveChannels[$"audio_{areaId}"].Count > 0 &&
-                   VivoxService.Instance.ActiveChannels[$"audio_{areaId}"].Any(p => p.IsSelf);
+            return VivoxService.Instance.ActiveChannels.ContainsKey($"{_playerInfoSo.RoomName}_audio_{areaId}") &&
+                   VivoxService.Instance.ActiveChannels[$"{_playerInfoSo.RoomName}_audio_{areaId}"].Count > 0 &&
+                   VivoxService.Instance.ActiveChannels[$"{_playerInfoSo.RoomName}_audio_{areaId}"].Any(p => p.IsSelf);
         }
         
         private bool IsMeJoinedChat(int areaId)
         {
-            return VivoxService.Instance.ActiveChannels.ContainsKey($"chat_{areaId}") &&
-                   VivoxService.Instance.ActiveChannels[$"chat_{areaId}"].Count > 0 &&
-                   VivoxService.Instance.ActiveChannels[$"chat_{areaId}"].Any(p => p.IsSelf);
+            return VivoxService.Instance.ActiveChannels.ContainsKey($"{_playerInfoSo.RoomName}_chat_{areaId}") &&
+                   VivoxService.Instance.ActiveChannels[$"{_playerInfoSo.RoomName}_chat_{areaId}"].Count > 0 &&
+                   VivoxService.Instance.ActiveChannels[$"{_playerInfoSo.RoomName}_chat_{areaId}"].Any(p => p.IsSelf);
         }
         
         private bool IsMeJoinedGlobalChat()
@@ -137,10 +146,17 @@ namespace Chat
 
         public async void JoinGlobalChat()
         {
+            _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
             if ( !IsMeJoinedGlobalChat() )
             {
+                AccountManagement.Utils.ShowLoading();
                 await VivoxService.Instance.JoinGroupChannelAsync($"chat_{_playerInfoSo.RoomName}",
                     ChatCapability.TextOnly);
+                AccountManagement.Utils.HideLoading();
+            } 
+            else
+            {
+                _textChatUI.OnChannelJoined($"chat_{_playerInfoSo.RoomName}");
             }
         }
         
@@ -148,7 +164,13 @@ namespace Chat
         {
             if ( IsMeJoinedGlobalChat() )
             {
+                AccountManagement.Utils.ShowLoading();
                 await VivoxService.Instance.LeaveChannelAsync($"chat_{_playerInfoSo.RoomName}");
+                AccountManagement.Utils.HideLoading();
+            }
+            else
+            {
+                _textChatUI.ResetChannelName();
             }
         }
         
@@ -156,7 +178,13 @@ namespace Chat
         {
             if ( !IsMeJoinedChat(areaId) )
             {
-                await VivoxService.Instance.JoinGroupChannelAsync($"chat_{areaId}", ChatCapability.TextOnly);
+                AccountManagement.Utils.ShowLoading();
+                await VivoxService.Instance.JoinGroupChannelAsync($"{_playerInfoSo.RoomName}_chat_{areaId}", ChatCapability.TextOnly);
+                AccountManagement.Utils.HideLoading();
+            }
+            else
+            {
+                _textChatUI.OnChannelJoined($"{_playerInfoSo.RoomName}_chat_{areaId}");
             }
         }
         
@@ -164,7 +192,14 @@ namespace Chat
         {
             if ( IsMeJoinedChat(areaId) )
             {
-                VivoxService.Instance.LeaveChannelAsync($"chat_{areaId}");
+                AccountManagement.Utils.ShowLoading();
+                VivoxService.Instance.LeaveChannelAsync($"{_playerInfoSo.RoomName}_chat_{areaId}");
+                _textChatUI.ResetChannelName();
+                AccountManagement.Utils.HideLoading();
+            }
+            else
+            {
+                _textChatUI.ResetChannelName();
             }
         }
 

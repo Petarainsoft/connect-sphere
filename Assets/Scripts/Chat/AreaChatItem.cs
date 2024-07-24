@@ -28,7 +28,7 @@ namespace ConnectSphere
 
         private void Start()
         {
-            _areaNameText.text = $"Area {areaId}";
+            _areaNameText.text = $"Area {areaId + 1}";
         }
 
         private void OnEnable()
