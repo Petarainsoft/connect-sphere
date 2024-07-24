@@ -553,11 +553,16 @@ MonoBehaviour:
   - {fileID: 9100000, guid: 0ddb48fc868c48f44b225ae84f94e2ec, type: 2}
   - {fileID: 9100000, guid: eb0522e15b7074a488fea7663931b7da, type: 2}
   - {fileID: 9100000, guid: 08e596f2002f2924e962e64043bfa7c2, type: 2}
-  _AvatarIndex: -1
   _NickName:
     _length: 0
     _data:
       Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  _AvatarIndex: -1
+  _Email:
+    _length: 0
+    _data:
+      Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  _DatabaseId: -1
 --- !u!114 &3725942119853658236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -574,6 +579,7 @@ MonoBehaviour:
   _horizontalParam: 0
   _verticalPararm: 0
   _speedParam: 0
+  _sittingParam: 0
 --- !u!114 &1152695145174730606
 MonoBehaviour:
   m_ObjectHideFlags: 0
