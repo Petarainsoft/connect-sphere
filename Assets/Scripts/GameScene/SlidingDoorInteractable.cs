@@ -36,16 +36,6 @@ namespace ConnectSphere
             SetStartingPosition();
         }
 
-        protected override void OnTriggerEnter2D(Collider2D collision)
-        {
-            base.OnTriggerEnter2D(collision);
-        }
-
-        protected override void OnTriggerExit2D(Collider2D collision)
-        {
-            base.OnTriggerExit2D(collision);
-        }
-
         private void SetStartingPosition()
         {
             if (!_verticalDirection)
@@ -81,30 +71,26 @@ namespace ConnectSphere
         {
             if (!_verticalDirection)
             {
-                if (!IsActivated)
+                if (IsActivated)
                 {
-                    IsActivated = true;
                     _leftDoor.DOLocalMoveX(-3.275f, _moveDuration).SetEase(Ease.Linear);
                     _rightDoor.DOLocalMoveX(1.525f, _moveDuration).SetEase(Ease.Linear);
                 }
                 else
                 {
-                    IsActivated = false;
                     _leftDoor.DOLocalMoveX(_initialLeft, _moveDuration).SetEase(Ease.Linear);
                     _rightDoor.DOLocalMoveX(_initialRight, _moveDuration).SetEase(Ease.Linear);
                 }
             }
             else
             {
-                if (!IsActivated)
+                if (IsActivated)
                 {
-                    IsActivated = true;
                     _leftDoor.DOLocalMoveY(2.815f, _moveDuration).SetEase(Ease.Linear);
                     _rightDoor.DOLocalMoveY(-1.31f, _moveDuration).SetEase(Ease.Linear);
                 }
                 else
                 {
-                    IsActivated = false;
                     _leftDoor.DOLocalMoveY(_initialLeft, _moveDuration).SetEase(Ease.Linear);
                     _rightDoor.DOLocalMoveY(_initialRight, _moveDuration).SetEase(Ease.Linear);
                 }
