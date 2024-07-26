@@ -102,15 +102,20 @@ namespace Chat
    
         }
 
+        private bool isJoiningAudio = false;
 
         public async UniTask JoinAudio(int areaId)
         {
+            if ( isJoiningAudio ) return;
+            isJoiningAudio = true;
             if ( !IsMeJoinedAudio(areaId) )
             {
                 AccountManagement.Utils.ShowLoading();
                 await VivoxService.Instance.JoinGroupChannelAsync($"{_playerInfoSo.RoomName}_audio_{areaId}", ChatCapability.AudioOnly);
                 AccountManagement.Utils.HideLoading();
             }
+
+            isJoiningAudio = false;
         }
 
         public async UniTask LeaveAudio(int areaId)
