@@ -30,7 +30,7 @@ namespace Chat
         [SerializeField] private GameObject _vivoxChatUI;
 
         [SerializeField] private GameManager _gameManager;
-        
+
 
         [SerializeField] private Button _openChat;
 
@@ -38,32 +38,27 @@ namespace Chat
         public bool IsReady { get; private set; }
 
         public string UserName => _userName;
-        
-        
-        // REGION: ADAPT MULTIPLAYER
-        [SerializeField]
-        private TMP_Text gloablRoomName;
-        [SerializeField]
-        private TMP_Text gloablRoomNameInChat;
-        
-        [SerializeField]
-        private TMP_Text gloablListChatName;
 
-        [SerializeField]
-        private UIToggle ChatToggle;
+
+        // REGION: ADAPT MULTIPLAYER
+        [SerializeField] private TMP_Text gloablRoomName;
+        [SerializeField] private TMP_Text gloablRoomNameInChat;
+
+        [SerializeField] private TMP_Text gloablListChatName;
+
+        [SerializeField] private UIToggle ChatToggle;
 
 
         [SerializeField] private GameObject _loadingScreen;
 
 
         [SerializeField] private PlayerInfoSO _playerInfoSo;
-        
+
         [SerializeField] private TMP_Text _chatFrameTitle;
 
         public bool IsReadyForVoiceAndChat = false;
 
         [SerializeField] private TextChatUI _textChatUI;
-        
 
 
         private void Awake()
@@ -73,7 +68,7 @@ namespace Chat
 
         private IEnumerator Start()
         {
-            yield return new WaitUntil(()=>VivoxService.Instance != null);
+            yield return new WaitUntil(() => VivoxService.Instance != null);
             VivoxService.Instance.LoggedIn += OnUserLoggedIn;
             VivoxService.Instance.LoggedOut += OnUserLoggedOut;
 
@@ -81,17 +76,14 @@ namespace Chat
             VivoxService.Instance.ConnectionRecovered += OnConnectionRecovered;
             VivoxService.Instance.ConnectionRecovering += OnConnectionRecovering;
             VivoxService.Instance.ConnectionFailedToRecover += OnConnectionFailedToRecover;
-            
-            _openChat.onClick.AddListener(() =>
-            {
-                _vivoxChatUI.SetActive(!_vivoxChatUI.activeSelf);
-            });
+
+            _openChat.onClick.AddListener(() => { _vivoxChatUI.SetActive(!_vivoxChatUI.activeSelf); });
 
             // _loadingScreen.SetActive(true);
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
-            
+
             // auto connect when running, comment this when running the VideoCall-Vivox scene
             Debug.Log($"<color=blue>CALLLING VIXOOOOV {_playerInfoSo.RoomName}</color>");
             // LoginVivoxAndJoinRoom(_playerInfoSo.RoomName);
@@ -99,7 +91,6 @@ namespace Chat
             gloablRoomName.text = $"{_playerInfoSo.RoomName} Office";
             gloablRoomNameInChat.text = $"{_playerInfoSo.RoomName} Office";
             gloablListChatName.text = $"{_playerInfoSo.RoomName} Office";
-   
         }
 
         private bool isJoiningAudio = false;
@@ -111,7 +102,18 @@ namespace Chat
             if ( !IsMeJoinedAudio(areaId) )
             {
                 AccountManagement.Utils.ShowLoading();
-                await VivoxService.Instance.JoinGroupChannelAsync($"{_playerInfoSo.RoomName}_audio_{areaId}", ChatCapability.AudioOnly);
+                try
+                {
+                    await VivoxService.Instance.JoinGroupChannelAsync($"{_playerInfoSo.RoomName}_audio_{areaId}",
+                        ChatCapability.AudioOnly);
+                }
+                catch (Exception e)
+                {
+                    await LeaveAudio(areaId);
+                    await VivoxService.Instance.JoinGroupChannelAsync($"{_playerInfoSo.RoomName}_audio_{areaId}",
+                        ChatCapability.AudioOnly);
+                }
+
                 AccountManagement.Utils.HideLoading();
             }
 
@@ -120,7 +122,7 @@ namespace Chat
 
         public async UniTask LeaveAudio(int areaId)
         {
-            if (IsMeJoinedAudio(areaId))
+            if ( IsMeJoinedAudio(areaId) )
             {
                 AccountManagement.Utils.ShowLoading();
                 await VivoxService.Instance.LeaveChannelAsync($"{_playerInfoSo.RoomName}_audio_{areaId}");
@@ -134,14 +136,14 @@ namespace Chat
                    VivoxService.Instance.ActiveChannels[$"{_playerInfoSo.RoomName}_audio_{areaId}"].Count > 0 &&
                    VivoxService.Instance.ActiveChannels[$"{_playerInfoSo.RoomName}_audio_{areaId}"].Any(p => p.IsSelf);
         }
-        
+
         private bool IsMeJoinedChat(int areaId)
         {
             return VivoxService.Instance.ActiveChannels.ContainsKey($"{_playerInfoSo.RoomName}_chat_{areaId}") &&
                    VivoxService.Instance.ActiveChannels[$"{_playerInfoSo.RoomName}_chat_{areaId}"].Count > 0 &&
                    VivoxService.Instance.ActiveChannels[$"{_playerInfoSo.RoomName}_chat_{areaId}"].Any(p => p.IsSelf);
         }
-        
+
         private bool IsMeJoinedGlobalChat()
         {
             return VivoxService.Instance.ActiveChannels.ContainsKey($"chat_{_playerInfoSo.RoomName}") &&
@@ -158,13 +160,13 @@ namespace Chat
                 await VivoxService.Instance.JoinGroupChannelAsync($"chat_{_playerInfoSo.RoomName}",
                     ChatCapability.TextOnly);
                 AccountManagement.Utils.HideLoading();
-            } 
+            }
             else
             {
                 _textChatUI.OnChannelJoined($"chat_{_playerInfoSo.RoomName}");
             }
         }
-        
+
         public async void LeaveGlobalChat()
         {
             if ( IsMeJoinedGlobalChat() )
@@ -180,6 +182,7 @@ namespace Chat
         }
 
         private bool isJoiningChat = false;
+
         public async UniTask JoinAreaChat(int areaId)
         {
             if ( isJoiningChat ) return;
@@ -187,7 +190,8 @@ namespace Chat
             if ( !IsMeJoinedChat(areaId) )
             {
                 AccountManagement.Utils.ShowLoading();
-                await VivoxService.Instance.JoinGroupChannelAsync($"{_playerInfoSo.RoomName}_chat_{areaId}", ChatCapability.TextOnly);
+                await VivoxService.Instance.JoinGroupChannelAsync($"{_playerInfoSo.RoomName}_chat_{areaId}",
+                    ChatCapability.TextOnly);
                 AccountManagement.Utils.HideLoading();
             }
             else
@@ -197,7 +201,7 @@ namespace Chat
 
             isJoiningChat = false;
         }
-        
+
         public async UniTask LeaveAreaChat(int areaId)
         {
             if ( IsMeJoinedChat(areaId) )
@@ -214,13 +218,13 @@ namespace Chat
         }
 
         private PermissionHelper _microphoneHelper = new PermissionHelper(Permission.Microphone);
-        
+
         private void AskPermissionAudio()
         {
             _microphoneHelper.OnPermissionResult = AfterRequestPermission;
             _microphoneHelper.Ask();
         }
-        
+
         private void AfterRequestPermission(bool requestOk)
         {
             Debug.Log($"Request Permission with {requestOk}");
@@ -254,22 +258,20 @@ namespace Chat
             if ( AuthenticationService.Instance != null ) AuthenticationService.Instance.SignOut();
             _gameManager.Shutdown();
         }
-        
+
         private void Update()
         {
-
 #if !(UNITY_STANDALONE || UNITY_IOS || UNITY_ANDROID)
             IsReady = false;
             return;
 #endif
             if ( IsReady ) return;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             // var callerId = ParrelSync.ClonesManager.GetArgument();
             // if (string.IsNullOrWhiteSpace(callerId)) callerId = "0";
             // _userName = $"Caller {callerId}";
             _userName = _playerInfoSo.PlayerName;
-            #else
-
+#else
             if ( _useDeviceAsName )
             {
                 var deviceName = string.IsNullOrWhiteSpace(SystemInfo.deviceName) == false
@@ -282,7 +284,7 @@ namespace Chat
             else {
                _userName = _playerInfoSo.PlayerName;
             }
-            #endif
+#endif
 
             IsReady = true;
         }
@@ -295,7 +297,7 @@ namespace Chat
             VivoxService.Instance.ConnectionRecovered -= OnConnectionRecovered;
             VivoxService.Instance.ConnectionRecovering -= OnConnectionRecovering;
             VivoxService.Instance.ConnectionFailedToRecover -= OnConnectionFailedToRecover;
-            
+
             _openChat.onClick.RemoveAllListeners();
         }
 
