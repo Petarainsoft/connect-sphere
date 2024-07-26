@@ -171,13 +171,25 @@ namespace ConnectSphere
                 Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath(_gameScenePath)),
             };
 
-            if (!await JoinVivox(_playerInfoSo.Email.Trim()))
+            try
+            {
+                if ( !await JoinVivox(_playerInfoSo.Email.Trim()) )
+                {
+                    var warningPopup = UIPopupManager.GetPopup("ActionPopup");
+                    warningPopup.Data.SetButtonsLabels("Ok");
+                    warningPopup.Data.SetLabelsTexts("Chat Service", "Currently Chat feature isn't available!");
+                    warningPopup.Show();
+                    await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
+                }
+            }
+            catch (Exception e)
             {
                 var warningPopup = UIPopupManager.GetPopup("ActionPopup");
                 warningPopup.Data.SetButtonsLabels("Ok");
-                warningPopup.Data.SetLabelsTexts("Chat Service", "Currently Chat feature isn't available!");
+                warningPopup.Data.SetLabelsTexts("Services Error", "Currently voice/chat isn't available!\nRetry again!");
                 warningPopup.Show();
                 await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
             // GameMode.Host = Start a session with a specific name
             // GameMode.Client = Join a session with a specific name
