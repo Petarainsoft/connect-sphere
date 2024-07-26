@@ -20,7 +20,6 @@ namespace ConnectSphere
         private bool _isInInteraction;
         private Vector2 _interactPosition;
         private GameObject _interactionTarget;
-        private bool _blockMoving;
 
         [Networked, OnChangedRender(nameof(OnHorizontalChanged))] public float horizontalParam { get; set; }
         [Networked, OnChangedRender(nameof(OnVerticalChanged))] public float verticalPararm { get; set; }
@@ -54,6 +53,11 @@ namespace ConnectSphere
             _animator = GetComponentInChildren<Animator>();
         }
 
+        public void SetInteractionStatus(bool value)
+        {
+            _isInInteraction = value;
+        }
+
         private bool CheckRunOnMobile()
         {
             bool isMobile = false;
@@ -68,7 +72,7 @@ namespace ConnectSphere
         
         private void MovementHandler(PlayerInput input)
         {
-            if (_blockMoving)
+            if (_isInInteraction)
                 return;
 
             if (!_isMobile)
@@ -128,7 +132,20 @@ namespace ConnectSphere
                     if (_interactionTarget != null)
                     {
                         var targetDoor = _interactionTarget.GetComponent<SlidingDoorInteractable>();
+                        targetDoor.IsActivated = !targetDoor.IsActivated;
                         targetDoor.ActivateDoorpc();
+                    }
+                }
+                else if (InteractionCode == 5)
+                {
+                    if (_isInInteraction)
+                        return;
+
+                    if (_interactionTarget != null)
+                    {
+                        _isInInteraction = !_isInInteraction;
+                        var target = _interactionTarget.GetComponent<StickerBoardInteractable>();
+                        target.ActivateLocalCanvas(this);
                     }
                 }
             }
@@ -143,13 +160,11 @@ namespace ConnectSphere
                 horizontalParam = 0;
                 sittingParam = false;
                 _isInInteraction = false;
-                _blockMoving = false;
             }
             else
             {
                 _rigidbody.velocity = Vector2.zero;
                 _isInInteraction = true;
-                _blockMoving = true;
                 transform.position = _interactPosition;
 
                 switch (InteractionCode)
