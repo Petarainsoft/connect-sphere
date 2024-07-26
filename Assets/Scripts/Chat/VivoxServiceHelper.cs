@@ -178,9 +178,12 @@ namespace Chat
                 _textChatUI.ResetChannelName();
             }
         }
-        
+
+        private bool isJoiningChat = false;
         public async UniTask JoinAreaChat(int areaId)
         {
+            if ( isJoiningChat ) return;
+            isJoiningChat = true;
             if ( !IsMeJoinedChat(areaId) )
             {
                 AccountManagement.Utils.ShowLoading();
@@ -191,6 +194,8 @@ namespace Chat
             {
                 _textChatUI.OnChannelJoined($"{_playerInfoSo.RoomName}_chat_{areaId}");
             }
+
+            isJoiningChat = false;
         }
         
         public async UniTask LeaveAreaChat(int areaId)
