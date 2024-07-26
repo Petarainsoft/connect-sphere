@@ -200,7 +200,7 @@ namespace Chat
                 Debug.Log($"WebcamTexture is null {_localVideoImage.texture == null}");
                 connection.webCamStreamer.sourceTexture = _localVideoImage.texture;
                 Debug.Log("2");
-                connection.webCamStreamer.OnStartedStream += id => connection.receiveVideoViewer.enabled = true;
+                // connection.webCamStreamer.OnStartedStream += id => connection.receiveVideoViewer.enabled = true;
                 // connection.webCamStreamer.OnStartedStream += _ =>
                 // {
                 //     #if !UNITY_EDITOR
@@ -425,6 +425,10 @@ namespace Chat
                     listOtherConnection.Add(connectionID);
                 }
 
+                if (_availableConnection.Any(e => e.webCamStreamer.sourceTexture == null))
+                {
+                    RegisterImageReceiving();
+                }
 
                 for (int i = 0; i < _availableConnection.Count; i++)
                 {
@@ -437,6 +441,7 @@ namespace Chat
                                  !con.singleConnection.ExistConnection(existingConnection) )
                             {
                                 Debug.Log($"<color=red>** CREATE CONNECTION FOR {existingConnection}</color>");
+                                await UniTask.WaitUntil(() => con.webCamStreamer.sourceTexture != null);
                                 con.singleConnection.CreateConnection(existingConnection);
                                 con.SetTextureIndex(i);
                                 con.SetTextureReceiveCb(OnTextureReceive);
