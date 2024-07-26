@@ -258,6 +258,7 @@ public class TextChatUI : MonoBehaviour
 
     public void OnChannelJoined(string channelName)
     {
+        if ( channelName.Contains("audio") ) return;
         if ( channelName.Trim() != currentChannelName )
         {
             currentChannelName = channelName.Trim();

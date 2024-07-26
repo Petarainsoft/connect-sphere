@@ -2235,7 +2235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 644d596fe02ce674b828d8b183f50305, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _serverUrl: http://35.213.190.37:5000/
+  _serverUrl: http://35.213.142.140:5000/
   _registerEndpoint: auth/v2/register
   _loginEndpoint: auth/v2/login
   _testEndpoint: auth/verify_token

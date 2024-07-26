@@ -320,7 +320,7 @@ namespace Chat
                         }
                     }
                 }
-                return;
+                // return;
             }
             Debug.Log($"<color=red>MyId {myId}</color>");
             // me not in the area just raise leave-event
