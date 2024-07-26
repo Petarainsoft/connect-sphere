@@ -100,7 +100,7 @@ namespace Chat
                 // }
                 // else
                 // {
-                    AskPermissionVideo();
+                AskPermissionVideo();
                 // }
             }
             else
@@ -295,8 +295,8 @@ namespace Chat
             var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
             if ( area == null ) return;
             var listPlayers = area.PlayersInArea;
-            
-            
+
+
             Debug.Log($"<color=red>listPlayers {string.Join(",", listPlayers)}</color>");
             // me went out
             var myId = PlayerPrefs.GetInt("userId");
@@ -322,6 +322,7 @@ namespace Chat
                 }
                 // return;
             }
+
             Debug.Log($"<color=red>MyId {myId}</color>");
             // me not in the area just raise leave-event
             if ( !listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
@@ -380,17 +381,18 @@ namespace Chat
                     {
                         if ( !listOtherConnection.Contains(con.ConnectionID) )
                         {
-                        //     if ( con.singleConnection != null &&
-                        //          con.singleConnection.ExistConnection(con.ConnectionID) )
-                        //     {
+                            if ( con.singleConnection != null &&
+                                 con.singleConnection.ExistConnection(con.ConnectionID) )
+                            {
                                 Debug.Log($"<color=red>** DELETE CONNECTION FOR {con.ConnectionID}</color>");
                                 con.singleConnection.DeleteConnection(con.ConnectionID);
-                                con.IsWorking = false;
-                                con.ConnectionID = string.Empty;
-                                con.Release();
-                                _remoteVideoImages[i].transform.parent.gameObject
-                                    .SetActive(false);
-                            // }
+                            }
+
+                            con.IsWorking = false;
+                            con.ConnectionID = string.Empty;
+                            con.Release();
+                            _remoteVideoImages[i].transform.parent.gameObject
+                                .SetActive(false);
                         }
                     }
                 }
@@ -425,7 +427,7 @@ namespace Chat
                     listOtherConnection.Add(connectionID);
                 }
 
-                if (_availableConnection.Any(e => e.webCamStreamer.sourceTexture == null))
+                if ( _availableConnection.Any(e => e.webCamStreamer.sourceTexture == null) )
                 {
                     RegisterImageReceiving();
                 }
