@@ -132,8 +132,7 @@ namespace ConnectSphere
                     if (_interactionTarget != null)
                     {
                         var targetDoor = _interactionTarget.GetComponent<SlidingDoorInteractable>();
-                        targetDoor.IsActivated = !targetDoor.IsActivated;
-                        targetDoor.ActivateDoorpc();
+                        targetDoor.ToggleDoor(!targetDoor.IsActivated);
                     }
                 }
                 else if (InteractionCode == 5)

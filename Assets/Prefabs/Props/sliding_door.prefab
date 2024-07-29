@@ -95,8 +95,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InteractionCode: 4
   _leftDoor: {fileID: 5271676385070684624}
-  _IsActivated: 0
   _rightDoor: {fileID: 6255090543812964371}
+  _verticalDirection: 0
+  _IsActivated: 0
 --- !u!114 &8811165602180565714
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,7 +112,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 3458329611
   ObjectInterest: 1
-  Flags: 262145
+  Flags: 786433
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 2576514579188188828}
