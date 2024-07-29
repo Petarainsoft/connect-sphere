@@ -11,7 +11,7 @@ namespace ConnectSphere
         [SerializeField] private Transform _leftDoor;
         [SerializeField] private Transform _rightDoor;
         [SerializeField] private bool _verticalDirection;
-        [HideInInspector] [Networked] public bool IsActivated { get; set; }
+        [Networked, OnChangedRender(nameof(OnActivationChanged))] public bool IsActivated { get; set; }
 
         private float _initialLeft;
         private float _initialRight;
@@ -33,7 +33,40 @@ namespace ConnectSphere
 
         public override void Spawned()
         {
+            Object.ReleaseStateAuthority();
             SetStartingPosition();
+        }
+
+        protected override void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (collision.transform.parent.TryGetComponent<NetworkObject>(out var networkObject))
+            {
+                if (!networkObject.HasStateAuthority)
+                    return;
+                Object.RequestStateAuthority();
+            }
+
+            if (collision.transform.parent.TryGetComponent<PlayerController>(out var playerObject))
+            {
+                playerObject.SetInteractionData(InteractionCode, transform.position, gameObject);
+                LocalUi.OnTriggerInteraction?.Invoke();
+            }
+        }
+
+        protected override void OnTriggerExit2D(Collider2D collision)
+        {
+            if (collision.transform.parent.TryGetComponent<NetworkObject>(out var networkObject))
+            {
+                if (!networkObject.HasStateAuthority)
+                    return;
+                Object.ReleaseStateAuthority();
+            }
+
+            if (collision.transform.parent.TryGetComponent<PlayerController>(out var playerObject))
+            {
+                playerObject.SetInteractionData(-1);
+                LocalUi.OnTriggerInteraction?.Invoke();
+            }
         }
 
         private void SetStartingPosition()
@@ -66,8 +99,19 @@ namespace ConnectSphere
             }
         }
 
-        [Rpc(RpcSources.All, RpcTargets.All)]
-        public void ActivateDoorpc()
+        public void ToggleDoor(bool isActivated)
+        {
+            if (isActivated)
+            {
+                IsActivated = isActivated;
+            }
+            else
+            {
+                IsActivated = isActivated;
+            }
+        }
+
+        private void OnActivationChanged()
         {
             if (!_verticalDirection)
             {
@@ -80,6 +124,7 @@ namespace ConnectSphere
                 {
                     _leftDoor.DOLocalMoveX(_initialLeft, _moveDuration).SetEase(Ease.Linear);
                     _rightDoor.DOLocalMoveX(_initialRight, _moveDuration).SetEase(Ease.Linear);
+                    
                 }
             }
             else
