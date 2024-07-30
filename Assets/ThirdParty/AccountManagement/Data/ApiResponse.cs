@@ -205,4 +205,59 @@ namespace AccountManagement
     public class UpdatePasswordResult : BaseResult
     {
     }
+
+    [Serializable]
+    public class Profile
+    {
+        public int avatar_id { get; set; }
+        public string biography { get; set; }
+        public string display_name { get; set; }
+        public string gender { get; set; }
+        public int id { get; set; }
+        public string occupation { get; set; }
+        public string title { get; set; }
+    }
+    
+    [Serializable]
+    public class ProfileResult : BaseResult
+    {
+        public Profile data { get; set; }
+    }
+    
+    [Serializable]
+    public class NoteResult : BaseResult
+    {
+        public Note data { get; set; }
+    }
+    
+    [Serializable]
+    public class Note
+    {
+        public int id { get; set; }
+        public int client_note_id { get; set; }
+        
+        public int user_id { get; set; }
+        public string title { get; set; }
+        
+        public NoteVersion last_version { get; set; }
+    }
+    
+    [Serializable]
+    public class GetNoteResult : BaseResult
+    {
+        public NoteVersion data { get; set; }
+    }
+
+    [Serializable]
+    public class NoteVersion
+    {
+        public int note_id { get; set; }
+        public int client_note_id { get; set; }
+        
+        public int id { get; set; } // version
+        
+        public int user_id { get; set; }
+        public string content { get; set; }
+        public DateTime timestamp { get; set; }
+    }
 }

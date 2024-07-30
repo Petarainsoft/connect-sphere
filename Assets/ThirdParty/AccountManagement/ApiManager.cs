@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ConnectSphere;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -16,6 +17,14 @@ namespace AccountManagement
         [SerializeField]
         private AuthApiHandler _authApiHandler;
         public AuthApiHandler AuthApi => _authApiHandler;
+        
+        [SerializeField]
+        private NoteApiHandler _noteApiHandler;
+        public NoteApiHandler NoteApi => _noteApiHandler;
+        
+        [SerializeField]
+        private ProfileApiHandler _profileApiHandler;
+        public ProfileApiHandler ProfileApi => _profileApiHandler;
 
         public int UserId => PlayerPrefs.GetInt("userId");
 
