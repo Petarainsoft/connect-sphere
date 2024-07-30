@@ -12,24 +12,14 @@ namespace ConnectSphere
         [SerializeField] private GameObject _linkedCanvas;
         [SerializeField] private TMP_InputField _inputField;
 
-        [Networked] public string InputContent { get; set; }
+        [Networked] public NetworkString<_16> InputContent { get; set; }
         public bool IsActivated { get; set; }
 
         private PlayerController _playerController;
 
         public override void Spawned()
         {
-            _inputField.text = InputContent;
-        }
-
-        protected override void OnTriggerEnter2D(Collider2D collision)
-        {
-            base.OnTriggerEnter2D(collision);
-        }
-
-        protected override void OnTriggerExit2D(Collider2D collision)
-        {
-            base.OnTriggerExit2D(collision);
+            _inputField.text = $"{InputContent}";
         }
 
         public void ActivateLocalCanvas(PlayerController playerController)
@@ -45,10 +35,8 @@ namespace ConnectSphere
 
         public void TurnOffSticker()
         {
-            Debug.Log("DO SOMETHING");
             InputContent = _inputField.text;
-            SyncronizeInputFieldRpc(Runner.LocalPlayer);
-
+            SyncRpc(_inputField.text);
             IsActivated = false;
             _linkedCanvas.GetComponent<CanvasGroup>().DOFade(0, 0.15f).OnComplete(() => _linkedCanvas.SetActive(false));
             _playerController.SetInteractionStatus(false);
@@ -56,12 +44,10 @@ namespace ConnectSphere
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
-        private void SyncronizeInputFieldRpc(PlayerRef player)
+        private void SyncRpc(string text)
         {
-            if (Runner.LocalPlayer != player)
-            {
-                _inputField.text = InputContent;
-            }
+            _inputField.text = text;
+            InputContent = text;
         }
     }
 }
