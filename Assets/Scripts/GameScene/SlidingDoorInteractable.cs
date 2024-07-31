@@ -49,7 +49,7 @@ namespace ConnectSphere
             if (collision.transform.parent.TryGetComponent<PlayerController>(out var playerObject))
             {
                 playerObject.SetInteractionData(InteractionCode, transform.position, gameObject);
-                LocalUi.OnTriggerInteraction?.Invoke();
+                _onInteractionTriggered.RaiseEvent();
             }
         }
 
@@ -65,7 +65,7 @@ namespace ConnectSphere
             if (collision.transform.parent.TryGetComponent<PlayerController>(out var playerObject))
             {
                 playerObject.SetInteractionData(-1);
-                LocalUi.OnTriggerInteraction?.Invoke();
+                _onInteractionTriggered.RaiseEvent();
             }
         }
 

@@ -19,12 +19,14 @@ namespace ConnectSphere
         [SerializeField] private Animator _animator;
         [SerializeField] private BubbleChat _bubbleChat;
         [SerializeField] private TMP_Text _textPlayerName;
+        [SerializeField] private TMP_Text _textTitle;
 
         [Header("Data")]
         [SerializeField] private PlayerInfoSO _playerInfoSo;
         [SerializeField] private List<RuntimeAnimatorController> _animatorControllers;
 
         [Networked] public NetworkString<_16> NickName { get; private set; }
+        [Networked] public NetworkString<_16> Title { get; private set; }
         [Networked] public int AvatarIndex { get; set; } = -1;
         [Networked] public NetworkString<_16> Email { get; private set; }
         [Networked] public int DatabaseId { get; private set; } = -1;
@@ -48,12 +50,14 @@ namespace ConnectSphere
             if (Object.HasStateAuthority)
             {
                 NickName = _playerInfoSo.PlayerName;
+                Title = _playerInfoSo.Title;
                 AvatarIndex = _playerInfoSo.AvatarIndex;
                 Email = _playerInfoSo.Email;
                 DatabaseId = _playerInfoSo.DatabaseId;
             }
             FindObjectOfType<GameManager>().TrackNewPlayer(this);
             _textPlayerName.text = $"{NickName}";
+            _textTitle.text = $"{Title}";
             _animator.runtimeAnimatorController = _animatorControllers[AvatarIndex];
         }
 

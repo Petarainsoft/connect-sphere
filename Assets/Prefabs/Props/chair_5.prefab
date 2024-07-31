@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InteractionCode: 3
+  _onInteractionTriggered: {fileID: 11400000, guid: 53f0cb6ed7b0f914dbab89c403e4113f, type: 2}
 --- !u!61 &7113039374138298077
 BoxCollider2D:
   m_ObjectHideFlags: 0

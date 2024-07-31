@@ -428,6 +428,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c46174b65b88943b96c063f65628ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _onAvatarImageClicked: {fileID: 11400000, guid: 1661d43874320d84086b26d160e52d10, type: 2}
 --- !u!114 &239892936
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1060,6 +1061,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c46174b65b88943b96c063f65628ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _onAvatarImageClicked: {fileID: 11400000, guid: 1661d43874320d84086b26d160e52d10, type: 2}
 --- !u!114 &378495554
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1291,7 +1293,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &462657867
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1706,6 +1708,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _inputName: {fileID: 539174471}
+  _onAvatarImageClicked: {fileID: 11400000, guid: 1661d43874320d84086b26d160e52d10, type: 2}
 --- !u!114 &539174469
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2225,6 +2228,7 @@ MonoBehaviour:
   _selectionCanvasObject: {fileID: 639508849}
   _playerInfoSo: {fileID: 11400000, guid: 592e4bbe575cc0d418dbf8b8efa31ad3, type: 2}
   _gameScenePath: ConnectSphere-Game
+  _onAvatarImageClicked: {fileID: 11400000, guid: 1661d43874320d84086b26d160e52d10, type: 2}
   _timeout: 3
 --- !u!4 &611479360
 Transform:
@@ -2998,6 +3002,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c46174b65b88943b96c063f65628ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _onAvatarImageClicked: {fileID: 11400000, guid: 1661d43874320d84086b26d160e52d10, type: 2}
 --- !u!114 &796093241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3162,6 +3167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c46174b65b88943b96c063f65628ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _onAvatarImageClicked: {fileID: 11400000, guid: 1661d43874320d84086b26d160e52d10, type: 2}
 --- !u!114 &942497525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3401,6 +3407,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c46174b65b88943b96c063f65628ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _onAvatarImageClicked: {fileID: 11400000, guid: 1661d43874320d84086b26d160e52d10, type: 2}
 --- !u!114 &1198260533
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5092,6 +5099,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c46174b65b88943b96c063f65628ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _onAvatarImageClicked: {fileID: 11400000, guid: 1661d43874320d84086b26d160e52d10, type: 2}
 --- !u!114 &2068131406
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -9,6 +9,8 @@ namespace ConnectSphere
 {
     public class StickerBoardInteractable : Interactable
     {
+        [SerializeField] private BooleanEventHandlerSO _onUiInteracting;
+        [SerializeField] private int _stickyNoteId;
         [SerializeField] private GameObject _linkedCanvas;
         [SerializeField] private TMP_InputField _inputField;
 
@@ -39,7 +41,7 @@ namespace ConnectSphere
             SyncRpc(_inputField.text);
             IsActivated = false;
             _linkedCanvas.GetComponent<CanvasGroup>().DOFade(0, 0.15f).OnComplete(() => _linkedCanvas.SetActive(false));
-            _playerController.SetInteractionStatus(false);
+            _onUiInteracting.RaiseEvent(false);
             _playerController = null;
         }
 

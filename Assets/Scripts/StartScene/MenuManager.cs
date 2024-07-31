@@ -35,8 +35,8 @@ namespace ConnectSphere
         [SerializeField] GameObject _selectionCanvasObject;
         [SerializeField] private PlayerInfoSO _playerInfoSo;
         [SerializeField] private string _gameScenePath;
-        
-        
+        [SerializeField] private IntegerEventHandlerSO _onAvatarImageClicked;
+
         [Header("Vivox")] [SerializeField]
         private float _timeout = 3f;
 
@@ -47,18 +47,16 @@ namespace ConnectSphere
         private string _tempPlayerName;
         private int _selectedAvatarIndex = 0;
 
-        public static Action<int> OnAvatarImageClicked;
-
         public string RoomName => _tempRoomName;
 
         private void OnEnable()
         {
-            OnAvatarImageClicked += HandleSelectedAvatar;
+            _onAvatarImageClicked.OnEventRaised += HandleSelectedAvatar;
         }
 
         private void OnDisable()
         {
-            OnAvatarImageClicked -= HandleSelectedAvatar;
+            _onAvatarImageClicked.OnEventRaised -= HandleSelectedAvatar;
         }
 
         public void OnJoinButtonClicked()
@@ -81,7 +79,7 @@ namespace ConnectSphere
             _tempRoomName = string.Empty;
             _networkCanvasObject.SetActive(true);
             _selectionCanvasObject.SetActive(false);
-            OnAvatarImageClicked?.Invoke(0);
+            _onAvatarImageClicked.RaiseEvent(0);
         }
 
         private void HandleSelectedAvatar(int index)

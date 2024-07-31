@@ -8,6 +8,7 @@ namespace ConnectSphere
     public class RandomNameGenerator : MonoBehaviour
     {
         public TMP_InputField _inputName;
+        [SerializeField] private IntegerEventHandlerSO _onAvatarImageClicked;
 
         // Array of predefined names
         private readonly string[] maleNames = { "Alex", "Bob", "Charlie", "Frank", "Hank", "John", "Farkle", "Long", "Harold", "Gary", 
@@ -20,12 +21,12 @@ namespace ConnectSphere
 
         private void OnEnable()
         {
-            MenuManager.OnAvatarImageClicked += GenerateName;
+            _onAvatarImageClicked.OnEventRaised += GenerateName;
         }
 
         private void OnDisable()
         {
-            MenuManager.OnAvatarImageClicked -= GenerateName;
+            _onAvatarImageClicked.OnEventRaised -= GenerateName;
         }
 
         private void GenerateName(int index)
