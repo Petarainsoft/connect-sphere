@@ -17,6 +17,7 @@ namespace ConnectSphere
         [SerializeField] private Transform _avatarsContainer;
         [SerializeField] private Button _buttonCloseAvatarPicker;
         [SerializeField] private Button _buttonCloseTitlePicker;
+        [SerializeField] private TMP_InputField _inputName;
         [SerializeField] private TMP_Dropdown _dropdownTitles;
 
         [Header("References")]
@@ -29,9 +30,10 @@ namespace ConnectSphere
 
         [Header("Events")]
         [SerializeField] private IntegerEventHandlerSO _onAvatarImageClicked;
+        [SerializeField] private DoubleStringEventHandlerSO _onLongNameChanged;
+        [SerializeField] private IntegerEventHandlerSO _onAvatarChanged;
 
         private int _selectedAvatarIndex = 0;
-        private string _selectedTitle;
 
         private void Awake()
         {
@@ -57,6 +59,7 @@ namespace ConnectSphere
 
             // name & bio
             _textLongName.text = $"{_playerInfo.PlayerName} {_playerInfo.Title}".Trim();
+            _inputName.text = _playerInfo.PlayerName;
             _inputBiography.text = _playerInfo.Biography;
 
             // avatar
@@ -110,7 +113,7 @@ namespace ConnectSphere
         private void OnTitlePickerClosed()
         {
             _titlePickerPanel.SetActive(false);
-            SaveTitle();
+            SaveLongName();
         }
 
         // TODO: USE APIs TO SAVE PLAYERINFO TO DATABASE
@@ -119,13 +122,17 @@ namespace ConnectSphere
         {
             _playerInfo.AvatarIndex = _selectedAvatarIndex;
             _imageChosenAvatar.sprite = _avatarSprites[_selectedAvatarIndex];
+            _onAvatarChanged.RaiseEvent(_selectedAvatarIndex);
         }
 
-        private void SaveTitle()
+        private void SaveLongName()
         {
-            _selectedTitle = _dropdownTitles.captionText.text != "None" ? _dropdownTitles.captionText.text : string.Empty;
-            _playerInfo.Title = _selectedTitle;
-            _textLongName.text = $"{_playerInfo.PlayerName} {_selectedTitle}".Trim();
+            string edittedName = _inputName.text.Trim();
+            string selectedTitle;
+            selectedTitle = _dropdownTitles.captionText.text != "None" ? _dropdownTitles.captionText.text : string.Empty;
+            _playerInfo.Title = selectedTitle;
+            _textLongName.text = $"{_playerInfo.PlayerName} {selectedTitle}".Trim();
+            _onLongNameChanged.RaiseEvent(edittedName, selectedTitle);
         }
 
         private void SaveBiography(string text)

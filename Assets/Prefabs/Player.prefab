@@ -324,7 +324,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.25}
+  m_AnchoredPosition: {x: 0, y: 0.345}
   m_SizeDelta: {x: 2.5, y: 0.497}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2339769151879083542
@@ -364,8 +364,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281466746
-  m_fontColor: {r: 0.47709084, g: 1, b: 0.19215685, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -476,7 +476,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.1939}
+  m_AnchoredPosition: {x: 0, y: 0.219}
   m_SizeDelta: {x: 2.5, y: 0.3878}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4960175999368951732
@@ -509,15 +509,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 9583c9f67255f7c499de808bd98e125d, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 6adc2489572662648b287ff855fffb78, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: dec9d08da4e397a4f988eafd62d3b94e, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: e3e2c88917b05e243bc43b32902de507, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281460735
-  m_fontColor: {r: 1, g: 0.9042445, b: 0.19182372, a: 1}
+    rgba: 4283170559
+  m_fontColor: {r: 1, g: 0.99607843, b: 0.29411766, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -707,6 +707,9 @@ MonoBehaviour:
   - {fileID: 9100000, guid: 0ddb48fc868c48f44b225ae84f94e2ec, type: 2}
   - {fileID: 9100000, guid: eb0522e15b7074a488fea7663931b7da, type: 2}
   - {fileID: 9100000, guid: 08e596f2002f2924e962e64043bfa7c2, type: 2}
+  _onEmoticonClicked: {fileID: 11400000, guid: 35bf9a4ce42237441a416663efca0142, type: 2}
+  _onLongNameChanged: {fileID: 11400000, guid: bade7523cb92e0f48aedb67d4487a0a5, type: 2}
+  _onAvatarChanged: {fileID: 11400000, guid: 2a4db7970ba240c4689401617f3eba6b, type: 2}
   _NickName:
     _length: 0
     _data:

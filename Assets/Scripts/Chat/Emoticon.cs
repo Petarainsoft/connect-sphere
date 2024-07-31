@@ -8,9 +8,11 @@ namespace ConnectSphere
 {
     public class Emoticon : MonoBehaviour
     {
+        [SerializeField] private IntegerEventHandlerSO _onEmoticonClicked;
+
         public void OnEmoticonClicked()
         {
-            Player.OnEmoticonClicked?.Invoke(transform.GetSiblingIndex());
+            _onEmoticonClicked.RaiseEvent(transform.GetSiblingIndex());
         }
     }
 }
