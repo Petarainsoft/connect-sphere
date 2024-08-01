@@ -8,6 +8,7 @@ namespace ConnectSphere
     enum PlayerButtons
     {
         Interact = 0,
+        OpenUserInfo = 1
     }
 
     public struct PlayerInput : INetworkInput

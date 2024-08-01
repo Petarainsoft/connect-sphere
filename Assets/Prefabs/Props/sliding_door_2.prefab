@@ -112,6 +112,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InteractionCode: 4
+  _onInteractionTriggered: {fileID: 11400000, guid: 53f0cb6ed7b0f914dbab89c403e4113f, type: 2}
   _leftDoor: {fileID: 7348666783948084642}
   _rightDoor: {fileID: 2479712518273908332}
   _verticalDirection: 1

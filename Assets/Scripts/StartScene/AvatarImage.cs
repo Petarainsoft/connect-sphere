@@ -7,6 +7,8 @@ namespace ConnectSphere
 {
     public class AvatarImage : MonoBehaviour, IPointerClickHandler
     {
+        [SerializeField] private IntegerEventHandlerSO _onAvatarImageClicked;
+
         private int _index = 0;
         private void Start()
         {
@@ -15,7 +17,7 @@ namespace ConnectSphere
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            MenuManager.OnAvatarImageClicked?.Invoke(_index);
+            _onAvatarImageClicked.RaiseEvent(_index);
         }
     }
 }

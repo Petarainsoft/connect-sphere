@@ -7,23 +7,36 @@ namespace ConnectSphere
 {
     public class LocalUi : MonoBehaviour
     {
+        [Header("UI")]
         public GameObject InteractPrompt;
+        public GameObject UserInformation;
 
-        public static Action OnTriggerInteraction;
+        [Header("Events")]
+        [SerializeField] private VoidEventHandlerSO _onInteractionTriggered;
+        [SerializeField] private VoidEventHandlerSO _onOpenUserInfoButtonPressed;
+        [SerializeField] private BooleanEventHandlerSO _onUiInteracting;
 
         private void OnEnable()
         {
-            OnTriggerInteraction += TogglePrompt;
+            _onInteractionTriggered.OnEventRaised += TogglePrompt;
+            _onOpenUserInfoButtonPressed.OnEventRaised += ToggleUserInfo;
         }
 
         private void OnDisable()
         {
-            OnTriggerInteraction -= TogglePrompt;
+            _onInteractionTriggered.OnEventRaised -= TogglePrompt;
+            _onOpenUserInfoButtonPressed.OnEventRaised -= ToggleUserInfo;
         }
 
         private void TogglePrompt()
         {
             InteractPrompt.SetActive(!InteractPrompt.activeSelf);
+        }
+
+        public void ToggleUserInfo()
+        {
+            UserInformation.SetActive(!UserInformation.activeSelf);
+            _onUiInteracting.RaiseEvent(UserInformation.activeSelf);
         }
     }
 }

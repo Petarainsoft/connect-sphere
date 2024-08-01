@@ -10,6 +10,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Vivox;
 using System.Reflection;
+using AccountManagement;
 
 namespace ConnectSphere
 {
@@ -35,8 +36,8 @@ namespace ConnectSphere
         [SerializeField] GameObject _selectionCanvasObject;
         [SerializeField] private PlayerInfoSO _playerInfoSo;
         [SerializeField] private string _gameScenePath;
-        
-        
+        [SerializeField] private IntegerEventHandlerSO _onAvatarImageClicked;
+
         [Header("Vivox")] [SerializeField]
         private float _timeout = 3f;
 
@@ -47,18 +48,27 @@ namespace ConnectSphere
         private string _tempPlayerName;
         private int _selectedAvatarIndex = 0;
 
-        public static Action<int> OnAvatarImageClicked;
-
         public string RoomName => _tempRoomName;
 
         private void OnEnable()
         {
-            OnAvatarImageClicked += HandleSelectedAvatar;
+            _onAvatarImageClicked.OnEventRaised += HandleSelectedAvatar;
         }
 
         private void OnDisable()
         {
-            OnAvatarImageClicked -= HandleSelectedAvatar;
+            _onAvatarImageClicked.OnEventRaised -= HandleSelectedAvatar;
+        }
+
+        private async void Start()
+        {
+            Profile userProfile = await GetUserProfileFromDb();
+            if (userProfile != null)
+            {
+                _playerInfoSo.MapData(userProfile);
+                _inputPlayerName.text = _playerInfoSo.PlayerName.Equals(string.Empty) ? RandomNameGenerator.GetRandomName(false) : _playerInfoSo.PlayerName;
+                HandleSelectedAvatar(_playerInfoSo.AvatarIndex == -1 ? 0 : _playerInfoSo.AvatarIndex);
+            }
         }
 
         public void OnJoinButtonClicked()
@@ -81,7 +91,7 @@ namespace ConnectSphere
             _tempRoomName = string.Empty;
             _networkCanvasObject.SetActive(true);
             _selectionCanvasObject.SetActive(false);
-            OnAvatarImageClicked?.Invoke(0);
+            _onAvatarImageClicked.RaiseEvent(0);
         }
 
         private void HandleSelectedAvatar(int index)
@@ -116,7 +126,7 @@ namespace ConnectSphere
             _playerInfoSo.RoomName = _tempRoomName;
             _playerInfoSo.Email = PlayerPrefs.GetString("username");
             _playerInfoSo.DatabaseId = PlayerPrefs.GetInt("userId");
-
+            SaveUserProfileToDb();
             StartGame(GameMode.Shared, _tempRoomName, _gameScenePath);
         }
 
@@ -210,6 +220,18 @@ namespace ConnectSphere
         {
             await UniTask.Delay(TimeSpan.FromSeconds(0.25f));
             _loadingCanvas.SetActive(true);
+        }
+
+        private async UniTask<Profile> GetUserProfileFromDb()
+        {
+            int userId = PlayerPrefs.GetInt("userId");
+            var userProfile = await ApiManager.Instance.ProfileApi.GetUserProfile(userId);
+            return userProfile;
+        }
+
+        private async void SaveUserProfileToDb()
+        {
+            await ApiManager.Instance.ProfileApi.UpdateUserProfile(_playerInfoSo.AvatarIndex, _playerInfoSo.PlayerName);
         }
     }
 }
