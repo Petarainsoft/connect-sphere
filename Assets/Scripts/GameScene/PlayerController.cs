@@ -155,7 +155,7 @@ namespace ConnectSphere
                     {
                         ToggleControl(true);
                         var target = _interactionTarget.GetComponent<StickerBoardInteractable>();
-                        target.ActivateLocalCanvas(this);
+                        target.ActivateLocalCanvas();
                     }
                 }
             }

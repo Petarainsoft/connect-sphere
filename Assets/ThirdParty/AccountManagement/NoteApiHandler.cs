@@ -93,7 +93,7 @@ namespace ConnectSphere
             var parameters = new Dictionary<string, object>();
 
             if ( clientNoteId > 0 ) parameters.Add("client_note_id", clientNoteId);
-            if ( newContent != null ) parameters.Add("newContent", newContent);
+            if ( newContent != null ) parameters.Add("content", newContent);
 
             var apiResponse =
                 await CreatePostRequestInternal<NoteResult>($"{_serverUrl}{_updateNote}", parameters, true);
