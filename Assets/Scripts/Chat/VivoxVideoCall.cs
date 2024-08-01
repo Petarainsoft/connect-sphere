@@ -33,12 +33,6 @@ namespace Chat
         [SerializeField] private RawImage _trayBarVideoImage;
         [SerializeField] private List<RawImage> _remoteVideoImages;
 
-        [SerializeField] private GameObject _videoSinglePrefab;
-
-        [SerializeField] private List<VideoSingleConnection> _availableConnection = new List<VideoSingleConnection>();
-
-
-        // anhnguyen tempo comment
         [SerializeField] private VivoxServiceHelper _vivoxHelper;
 
         [SerializeField] private TMP_Text _screenText;
@@ -172,8 +166,6 @@ namespace Chat
 
             Debug.Log($"Container Size w:{_localVideoImage.texture.width} h{_localVideoImage.texture.height}");
 
-            RegisterImageReceiving();
-
             await UniTask.WaitForEndOfFrame(this);
             await UniTask.WaitForSeconds(1f);
 
@@ -186,25 +178,6 @@ namespace Chat
             return true;
         }
 
-        private void RegisterImageReceiving()
-        {
-            for (var i = 0; i < _availableConnection.Count; i++)
-            {
-                var connection = _availableConnection[i];
-                Debug.Log($"WebcamTexture is null {_localVideoImage.texture == null}");
-                connection.webCamStreamer.sourceTexture = _localVideoImage.texture;
-                if ( _settings != null )
-                {
-                    connection.webCamStreamer.width = (uint)_settings.StreamSize.x;
-                    connection.webCamStreamer.height = (uint)_settings.StreamSize.y;
-
-                    _settings.ApplyH264Codec();
-                }
-                // connection.SetTextureIndex(i);
-                // connection.SetTextureReceiveCb(OnTextureReceive);
-            }
-        }
-        
         private void Awake()
         {
             fsm = GetComponent<VivoxVideoCallFsm>();
@@ -233,8 +206,8 @@ namespace Chat
             _hangUpButton.onClick.AddListener(HangUp);
             _connectionIdInput.onValueChanged.AddListener(input => connectionId = input);
             _connectionIdInput.text = $"{Random.Range(0, 99999):D5}";
-            _webcamSelectDropdown.onValueChanged.AddListener(index =>
-                _availableConnection.First().webCamStreamer.sourceDeviceIndex = index);
+            // _webcamSelectDropdown.onValueChanged.AddListener(index =>
+            //     _availableConnection.First().webCamStreamer.sourceDeviceIndex = index);
             _webcamSelectDropdown.options = WebCamTexture.devices.Select(x => x.name)
                 .Select(x => new TMP_Dropdown.OptionData(x)).ToList();
 
@@ -250,179 +223,179 @@ namespace Chat
 
         private void HandlePlayerExit(int areaId)
         {
-            Debug.Log($"<color=red>PlayerEXIT {areaId}</color>");
-            var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
-            if ( area == null ) return;
-            var listPlayers = area.PlayersInArea;
-
-
-            Debug.Log($"<color=red>listPlayers {string.Join(",", listPlayers)}</color>");
-            // me went out
-            var myId = PlayerPrefs.GetInt("userId");
-            if ( listPlayers.Count == 1 && listPlayers[0].GetComponent<Player>().DatabaseId == myId )
-            {
-                for (int i = 0; i < _availableConnection.Count; i++)
-                {
-                    var con = _availableConnection[i];
-                    if ( con.IsWorking )
-                    {
-                        if ( con.singleConnection != null &&
-                             con.singleConnection.ExistConnection(con.ConnectionID) )
-                        {
-                            Debug.Log($"<color=red>** DELETE CONNECTION FOR {con.ConnectionID}</color>");
-                            con.singleConnection.DeleteConnection(con.ConnectionID);
-                            con.IsWorking = false;
-                            con.ConnectionID = string.Empty;
-                            con.Release();
-                            _remoteVideoImages[i].transform.parent.gameObject
-                                .SetActive(false);
-                        }
-                    }
-                }
-                // return;
-            }
-
-            Debug.Log($"<color=red>MyId {myId}</color>");
-            // me not in the area just raise leave-event
-            if ( !listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
-            {
-                _vivoxHelper.LeaveAudio(areaId);
-                var listOtherConnection = new List<string>();
-                foreach (var no in listPlayers)
-                {
-                    var id = no.GetComponent<Player>().DatabaseId;
-                    if ( id == myId ) continue;
-                    connectionId = areaId.ToString();
-                    var connectionID = MakeConnectionUniqueId(id, myId);
-                    Debug.Log($"<color=red>____ conID {connectionID}</color>");
-                    listOtherConnection.Add(connectionID);
-                }
-
-                for (int i = 0; i < _availableConnection.Count; i++)
-                {
-                    var con = _availableConnection[i];
-                    if ( con.IsWorking )
-                    {
-                        foreach (var existingConnection in listOtherConnection)
-                        {
-                            if ( con.singleConnection != null &&
-                                 con.singleConnection.ExistConnection(existingConnection) )
-                            {
-                                Debug.Log($"<color=red>** DELETE CONNECTION FOR {existingConnection}</color>");
-                                con.singleConnection.DeleteConnection(existingConnection);
-                                con.IsWorking = false;
-                                con.ConnectionID = string.Empty;
-                                con.Release();
-                                _remoteVideoImages[i].transform.parent.gameObject
-                                    .SetActive(false);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                var listOtherConnection = new List<string>();
-                foreach (var no in listPlayers)
-                {
-                    var id = no.GetComponent<Player>().DatabaseId;
-                    if ( id == myId ) continue;
-                    connectionId = areaId.ToString();
-                    var connectionID = MakeConnectionUniqueId(id, myId);
-                    Debug.Log($"<color=red>___conID {connectionID}</color>");
-                    listOtherConnection.Add(connectionID);
-                }
-
-                for (int i = 0; i < _availableConnection.Count; i++)
-                {
-                    var con = _availableConnection[i];
-                    if ( con.IsWorking )
-                    {
-                        if ( !listOtherConnection.Contains(con.ConnectionID) )
-                        {
-                            if ( con.singleConnection != null &&
-                                 con.singleConnection.ExistConnection(con.ConnectionID) )
-                            {
-                                Debug.Log($"<color=red>** DELETE CONNECTION FOR {con.ConnectionID}</color>");
-                                con.singleConnection.DeleteConnection(con.ConnectionID);
-                            }
-
-                            con.IsWorking = false;
-                            con.ConnectionID = string.Empty;
-                            con.Release();
-                            _remoteVideoImages[i].transform.parent.gameObject
-                                .SetActive(false);
-                        }
-                    }
-                }
-            }
+            // Debug.Log($"<color=red>PlayerEXIT {areaId}</color>");
+            // var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
+            // if ( area == null ) return;
+            // var listPlayers = area.PlayersInArea;
+            //
+            //
+            // Debug.Log($"<color=red>listPlayers {string.Join(",", listPlayers)}</color>");
+            // // me went out
+            // var myId = PlayerPrefs.GetInt("userId");
+            // if ( listPlayers.Count == 1 && listPlayers[0].GetComponent<Player>().DatabaseId == myId )
+            // {
+            //     for (int i = 0; i < _availableConnection.Count; i++)
+            //     {
+            //         var con = _availableConnection[i];
+            //         if ( con.IsWorking )
+            //         {
+            //             if ( con.singleConnection != null &&
+            //                  con.singleConnection.ExistConnection(con.ConnectionID) )
+            //             {
+            //                 Debug.Log($"<color=red>** DELETE CONNECTION FOR {con.ConnectionID}</color>");
+            //                 con.singleConnection.DeleteConnection(con.ConnectionID);
+            //                 con.IsWorking = false;
+            //                 con.ConnectionID = string.Empty;
+            //                 con.Release();
+            //                 _remoteVideoImages[i].transform.parent.gameObject
+            //                     .SetActive(false);
+            //             }
+            //         }
+            //     }
+            //     // return;
+            // }
+            //
+            // Debug.Log($"<color=red>MyId {myId}</color>");
+            // // me not in the area just raise leave-event
+            // if ( !listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
+            // {
+            //     _vivoxHelper.LeaveAudio(areaId);
+            //     var listOtherConnection = new List<string>();
+            //     foreach (var no in listPlayers)
+            //     {
+            //         var id = no.GetComponent<Player>().DatabaseId;
+            //         if ( id == myId ) continue;
+            //         connectionId = areaId.ToString();
+            //         var connectionID = MakeConnectionUniqueId(id, myId);
+            //         Debug.Log($"<color=red>____ conID {connectionID}</color>");
+            //         listOtherConnection.Add(connectionID);
+            //     }
+            //
+            //     for (int i = 0; i < _availableConnection.Count; i++)
+            //     {
+            //         var con = _availableConnection[i];
+            //         if ( con.IsWorking )
+            //         {
+            //             foreach (var existingConnection in listOtherConnection)
+            //             {
+            //                 if ( con.singleConnection != null &&
+            //                      con.singleConnection.ExistConnection(existingConnection) )
+            //                 {
+            //                     Debug.Log($"<color=red>** DELETE CONNECTION FOR {existingConnection}</color>");
+            //                     con.singleConnection.DeleteConnection(existingConnection);
+            //                     con.IsWorking = false;
+            //                     con.ConnectionID = string.Empty;
+            //                     con.Release();
+            //                     _remoteVideoImages[i].transform.parent.gameObject
+            //                         .SetActive(false);
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+            // else
+            // {
+            //     var listOtherConnection = new List<string>();
+            //     foreach (var no in listPlayers)
+            //     {
+            //         var id = no.GetComponent<Player>().DatabaseId;
+            //         if ( id == myId ) continue;
+            //         connectionId = areaId.ToString();
+            //         var connectionID = MakeConnectionUniqueId(id, myId);
+            //         Debug.Log($"<color=red>___conID {connectionID}</color>");
+            //         listOtherConnection.Add(connectionID);
+            //     }
+            //
+            //     for (int i = 0; i < _availableConnection.Count; i++)
+            //     {
+            //         var con = _availableConnection[i];
+            //         if ( con.IsWorking )
+            //         {
+            //             if ( !listOtherConnection.Contains(con.ConnectionID) )
+            //             {
+            //                 if ( con.singleConnection != null &&
+            //                      con.singleConnection.ExistConnection(con.ConnectionID) )
+            //                 {
+            //                     Debug.Log($"<color=red>** DELETE CONNECTION FOR {con.ConnectionID}</color>");
+            //                     con.singleConnection.DeleteConnection(con.ConnectionID);
+            //                 }
+            //
+            //                 con.IsWorking = false;
+            //                 con.ConnectionID = string.Empty;
+            //                 con.Release();
+            //                 _remoteVideoImages[i].transform.parent.gameObject
+            //                     .SetActive(false);
+            //             }
+            //         }
+            //     }
+            // }
         }
 
 
         private async void HandlePlayerEnter(int areaId)
         {
-            Debug.Log($"<color=yellow>Player ENTER {areaId}:</color>");
-            var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
-            if ( area == null ) return;
-            var listPlayers = area.PlayersInArea;
-            Debug.Log(
-                $"<color=yellow>___ listPlayers {string.Join(",", listPlayers.Select(e => e.GetComponent<Player>().DatabaseId))}</color>");
-            // me went in
-            var myId = PlayerPrefs.GetInt("userId");
-            Debug.Log($"<color=yellow>___ MyId is {myId}</color>");
-            if ( !listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
-            {
-                Debug.Log("<color=yellow>___ Me not in the area</color>");
-                return;
-            }
-
-            Debug.Log($"<color=yellow>___ Me is in the area {areaId}</color>");
-            _vivoxHelper.JoinAudio(areaId);
-            Debug.Log($"<color=yellow>___ Connect me to the audio channel for {areaId}</color>");
-            var listOtherConnection = new List<string>();
-            foreach (var no in listPlayers)
-            {
-                var id = no.GetComponent<Player>().DatabaseId;
-                if ( id == myId ) continue;
-                connectionId = areaId.ToString();
-
-                var connectionID = MakeConnectionUniqueId(id, myId);
-                Debug.Log($"<color=red>____ conID {connectionID}</color>");
-                listOtherConnection.Add(connectionID);
-            }
-
-            Debug.Log($"<color=yellow>___ listOtherConnection {string.Join(",", listOtherConnection)}</color>");
-
-            if ( _availableConnection.Any(e => e.webCamStreamer.sourceTexture == null) )
-            {
-                Debug.Log("<color=yellow>___ assign local camera texture to the webCameStreammer</color>");
-                RegisterImageReceiving();
-            }
-
-            for (int i = 0; i < _availableConnection.Count; i++)
-            {
-                var con = _availableConnection[i];
-                if ( !con.IsWorking )
-                {
-                    foreach (var existingConnection in listOtherConnection)
-                    {
-                        if ( con.singleConnection != null &&
-                             !con.singleConnection.ExistConnection(existingConnection) )
-                        {
-                            Debug.Log($"<color=red>** CREATE CONNECTION FOR {existingConnection}</color>");
-                            await UniTask.WaitUntil(() => con.webCamStreamer.sourceTexture != null);
-                            con.singleConnection.CreateConnection(existingConnection);
-                            con.SetTextureIndex(i);
-                            con.SetTextureReceiveCb(OnTextureReceive);
-                            con.ConnectionID = existingConnection;
-                            con.IsWorking = true;
-                            await UniTask.WaitUntil(() =>
-                                con.IsWorking && con.singleConnection.IsStable(existingConnection));
-                            await UniTask.WaitForSeconds(WaitTime);
-                        }
-                    }
-                }
-            }
+            // Debug.Log($"<color=yellow>Player ENTER {areaId}:</color>");
+            // var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
+            // if ( area == null ) return;
+            // var listPlayers = area.PlayersInArea;
+            // Debug.Log(
+            //     $"<color=yellow>___ listPlayers {string.Join(",", listPlayers.Select(e => e.GetComponent<Player>().DatabaseId))}</color>");
+            // // me went in
+            // var myId = PlayerPrefs.GetInt("userId");
+            // Debug.Log($"<color=yellow>___ MyId is {myId}</color>");
+            // if ( !listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
+            // {
+            //     Debug.Log("<color=yellow>___ Me not in the area</color>");
+            //     return;
+            // }
+            //
+            // Debug.Log($"<color=yellow>___ Me is in the area {areaId}</color>");
+            // _vivoxHelper.JoinAudio(areaId);
+            // Debug.Log($"<color=yellow>___ Connect me to the audio channel for {areaId}</color>");
+            // var listOtherConnection = new List<string>();
+            // foreach (var no in listPlayers)
+            // {
+            //     var id = no.GetComponent<Player>().DatabaseId;
+            //     if ( id == myId ) continue;
+            //     connectionId = areaId.ToString();
+            //
+            //     var connectionID = MakeConnectionUniqueId(id, myId);
+            //     Debug.Log($"<color=red>____ conID {connectionID}</color>");
+            //     listOtherConnection.Add(connectionID);
+            // }
+            //
+            // Debug.Log($"<color=yellow>___ listOtherConnection {string.Join(",", listOtherConnection)}</color>");
+            //
+            // if ( _availableConnection.Any(e => e.webCamStreamer.sourceTexture == null) )
+            // {
+            //     Debug.Log("<color=yellow>___ assign local camera texture to the webCameStreammer</color>");
+            //     RegisterImageReceiving();
+            // }
+            //
+            // for (int i = 0; i < _availableConnection.Count; i++)
+            // {
+            //     var con = _availableConnection[i];
+            //     if ( !con.IsWorking )
+            //     {
+            //         foreach (var existingConnection in listOtherConnection)
+            //         {
+            //             if ( con.singleConnection != null &&
+            //                  !con.singleConnection.ExistConnection(existingConnection) )
+            //             {
+            //                 Debug.Log($"<color=red>** CREATE CONNECTION FOR {existingConnection}</color>");
+            //                 await UniTask.WaitUntil(() => con.webCamStreamer.sourceTexture != null);
+            //                 con.singleConnection.CreateConnection(existingConnection);
+            //                 con.SetTextureIndex(i);
+            //                 con.SetTextureReceiveCb(OnTextureReceive);
+            //                 con.ConnectionID = existingConnection;
+            //                 con.IsWorking = true;
+            //                 await UniTask.WaitUntil(() =>
+            //                     con.IsWorking && con.singleConnection.IsStable(existingConnection));
+            //                 await UniTask.WaitForSeconds(WaitTime);
+            //             }
+            //         }
+            //     }
+            // }
         }
 
         private bool callVivox = false;
@@ -483,6 +456,51 @@ namespace Chat
             _setUpButton.interactable = true;
             _hangUpButton.interactable = true;
             _connectionIdInput.interactable = true;
+        }
+
+        [SerializeField] private VideoCallListMonitor _callListMonitor;
+        [SerializeField] private ConnectionPool _callPool;
+
+
+        private Dictionary<Ordered2Peers, VideoSingleConnection> _currentCalls =
+            new Dictionary<Ordered2Peers, VideoSingleConnection>();
+        
+        
+
+
+        private void OnEnable()
+        {
+            _callListMonitor.OnShouldStartSession += ShouldStart;
+            _callListMonitor.OnShouldEndSession += ShouldEnd;
+        }
+
+        private void ShouldStart(List<VideoCallSession> listSession)
+        {
+            foreach (var videoCallSession in listSession)
+            {
+                if (!videoCallSession.RelateTo(PlayerPrefs.GetInt("userId"))) continue;
+                
+                var connection = _callPool.Pool.Get();
+                connection.SetReceiveCodec(_settings.ReceiverVideoCodec);
+                connection.SetSenderCodec(_settings.SenderVideoCodec);
+                connection.SetCameraStreamerSource(_localVideoImage.texture);
+                connection.SetCameraStreamerSize((uint)_settings.StreamSize.x, (uint)_settings.StreamSize.y);
+                connection.CreateConnection(videoCallSession._peers.ConnectionId);
+                _currentCalls.TryAdd(videoCallSession._peers, connection);
+            }
+        }
+
+        private void ShouldEnd(List<VideoCallSession> listSession)
+        {
+            foreach (var videoCallSession in listSession)
+            {
+                if (!videoCallSession.RelateTo(PlayerPrefs.GetInt("userId"))) continue;
+                
+                if (_currentCalls.TryGetValue(videoCallSession._peers, out var connection))
+                {
+                    connection.DeleteConnection(videoCallSession._peers.ConnectionId);
+                }
+            }
         }
 
 
@@ -577,23 +595,23 @@ namespace Chat
         {
             try
             {
-                // singleConnection.DeleteConnection(connectionId);
-                for (int i = 0; i < _availableConnection.Count; i++)
-                {
-                    if ( i == callIndex ) continue; //ignore self
-                    var connectionUniqueId = MakeConnectionUniqueId(i);
-                    var con = _availableConnection[i];
-                    if ( con.IsWorking )
-                    {
-                        if ( con.singleConnection != null && con.singleConnection.ExistConnection(connectionUniqueId) )
-                        {
-                            con.singleConnection.DeleteConnection(connectionUniqueId);
-                        }
-                    }
-
-                    con.IsWorking = false;
-                    con.Release();
-                }
+                // // singleConnection.DeleteConnection(connectionId);
+                // for (int i = 0; i < _availableConnection.Count; i++)
+                // {
+                //     if ( i == callIndex ) continue; //ignore self
+                //     var connectionUniqueId = MakeConnectionUniqueId(i);
+                //     var con = _availableConnection[i];
+                //     if ( con.IsWorking )
+                //     {
+                //         if ( con.singleConnection != null && con.singleConnection.ExistConnection(connectionUniqueId) )
+                //         {
+                //             con.singleConnection.DeleteConnection(connectionUniqueId);
+                //         }
+                //     }
+                //
+                //     con.IsWorking = false;
+                //     con.Release();
+                // }
             }
             catch (Exception e)
             {

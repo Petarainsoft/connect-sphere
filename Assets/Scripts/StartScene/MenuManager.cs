@@ -15,32 +15,30 @@ namespace ConnectSphere
 {
     public class MenuManager : MonoBehaviour
     {
-        [Header("Prefabs")]
-        [SerializeField] private NetworkRunner _networkRunnerPrefab;
+        [Header("Prefabs")] [SerializeField] private NetworkRunner _networkRunnerPrefab;
 
-        [Header("Network Canvas")]
-        [SerializeField] private TMP_InputField _inputRoomName;
+        [Header("Network Canvas")] [SerializeField]
+        private TMP_InputField _inputRoomName;
+
         [SerializeField] private TextMeshProUGUI _roomNamePlaceholder;
 
-        [Header("Selection Canvas")]
-        [SerializeField] private TMP_InputField _inputPlayerName;
+        [Header("Selection Canvas")] [SerializeField]
+        private TMP_InputField _inputPlayerName;
+
         [SerializeField] private TextMeshProUGUI _playerNamePlaceholder;
         [SerializeField] private Transform _avatarsContainer;
         [SerializeField] private TextMeshProUGUI _textConnectionStatus;
         [SerializeField] private Button _buttonStart;
 
-        [Header("Others")]
-        [SerializeField] GameObject _loadingCanvas;
+        [Header("Others")] [SerializeField] GameObject _loadingCanvas;
         [SerializeField] GameObject _networkCanvasObject;
         [SerializeField] GameObject _selectionCanvasObject;
         [SerializeField] private PlayerInfoSO _playerInfoSo;
         [SerializeField] private string _gameScenePath;
-        
-        
-        [Header("Vivox")] [SerializeField]
-        private float _timeout = 3f;
 
-        
+
+        [Header("Vivox")] [SerializeField] private float _timeout = 3f;
+
 
         private NetworkRunner _runnerInstance;
         private string _tempRoomName;
@@ -63,7 +61,7 @@ namespace ConnectSphere
 
         public void OnJoinButtonClicked()
         {
-            if (string.IsNullOrEmpty(_inputRoomName.text.Trim()))
+            if ( string.IsNullOrEmpty(_inputRoomName.text.Trim()) )
             {
                 _tempRoomName = _roomNamePlaceholder.text;
             }
@@ -88,7 +86,7 @@ namespace ConnectSphere
         {
             foreach (Transform child in _avatarsContainer)
             {
-                if (child.GetSiblingIndex() == index)
+                if ( child.GetSiblingIndex() == index )
                 {
                     child.GetComponent<Image>().enabled = true;
                     _selectedAvatarIndex = index;
@@ -102,7 +100,7 @@ namespace ConnectSphere
 
         public void OnStartButtonClicked()
         {
-            if (string.IsNullOrEmpty(_inputPlayerName.text.Trim()))
+            if ( string.IsNullOrEmpty(_inputPlayerName.text.Trim()) )
             {
                 _tempPlayerName = _playerNamePlaceholder.text;
             }
@@ -136,9 +134,10 @@ namespace ConnectSphere
                 Debug.LogWarning("** Cannot start Vivox service");
                 return false;
             }
+
             await VivoxService.Instance.InitializeAsync();
             Debug.Log($"** Initialize Vivox done!");
-            
+
             var loginOptions = new LoginOptions()
             {
                 DisplayName = validName,
@@ -149,11 +148,11 @@ namespace ConnectSphere
             Debug.Log($"** Login vivox done!");
             return true;
         }
-        
+
         private async void StartGame(GameMode mode, string roomName, string sceneName)
         {
             _runnerInstance = FindObjectOfType<NetworkRunner>();
-            if (_runnerInstance == null)
+            if ( _runnerInstance == null )
             {
                 _runnerInstance = Instantiate(_networkRunnerPrefab);
             }
@@ -171,31 +170,33 @@ namespace ConnectSphere
                 Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath(_gameScenePath)),
             };
 
-            try
-            {
-                if ( !await JoinVivox(_playerInfoSo.Email.Trim()) )
-                {
-                    var warningPopup = UIPopupManager.GetPopup("ActionPopup");
-                    warningPopup.Data.SetButtonsLabels("Ok");
-                    warningPopup.Data.SetLabelsTexts("Chat Service", "Currently Chat feature isn't available!");
-                    warningPopup.Show();
-                    await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
-                }
-            }
-            catch (Exception e)
-            {
-                var warningPopup = UIPopupManager.GetPopup("ActionPopup");
-                warningPopup.Data.SetButtonsLabels("Ok");
-                warningPopup.Data.SetLabelsTexts("Services Error", "Currently voice/chat isn't available!\nRetry again!");
-                warningPopup.Show();
-                await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            }
+            // try
+            // {
+            //     if ( !await JoinVivox(_playerInfoSo.Email.Trim()) )
+            //     {
+            //         var warningPopup = UIPopupManager.GetPopup("ActionPopup");
+            //         warningPopup.Data.SetButtonsLabels("Ok");
+            //         warningPopup.Data.SetLabelsTexts("Chat Service", "Currently Chat feature isn't available!");
+            //         warningPopup.Show();
+            //         await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
+            //     }
+            // }
+            // catch (Exception e)
+            // {
+            //     var warningPopup = UIPopupManager.GetPopup("ActionPopup");
+            //     warningPopup.Data.SetButtonsLabels("Ok");
+            //     warningPopup.Data.SetLabelsTexts("Services Error",
+            //         "Currently voice/chat isn't available!\nRetry again!");
+            //     warningPopup.Show();
+            //     await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
+            //     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            // }
+
             // GameMode.Host = Start a session with a specific name
             // GameMode.Client = Join a session with a specific name
             await _runnerInstance.StartGame(startGameArgs);
 
-            if (_runnerInstance.IsServer)
+            if ( _runnerInstance.IsServer )
             {
                 await _runnerInstance.LoadScene(sceneName);
             }

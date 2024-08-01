@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
+  companyName: Petarain
   productName: connect-sphere
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -140,7 +140,9 @@ PlayerSettings:
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
   bundleVersion: 1.0
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 11400000, guid: 41374dc567db9364b837107bdca60f6d, type: 2}
+  - {fileID: 11400000, guid: 71fa5929b27c2d542b6eb4e07c452acc, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -162,13 +164,13 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: com.DefaultCompany.connectsphere
-    Standalone: com.DefaultCompany.connect-sphere
+    Standalone: com.Petarain.connect-sphere
   buildNumber:
     Standalone: 0
     VisionOS: 0
     iPhone: 0
     tvOS: 0
-  overrideDefaultApplicationIdentifier: 0
+  overrideDefaultApplicationIdentifier: 1
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 24
   AndroidTargetSdkVersion: 0
@@ -719,7 +721,7 @@ PlayerSettings:
     PS5: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
     QNX: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
     Stadia: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
-    Standalone: DOTWEEN;FUSION_WEAVER;FUSION2;dUI_MANAGER;dUI_TextMeshPro
+    Standalone: DOTWEEN;FUSION_WEAVER;FUSION2;dUI_MANAGER;dUI_TextMeshPro;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3;ODIN_INSPECTOR_EDITOR_ONLY;ANH_LOCAL
     VisionOS: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
     WebGL: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro
     Windows Store Apps: DOTWEEN;dUI_MANAGER;dUI_TextMeshPro

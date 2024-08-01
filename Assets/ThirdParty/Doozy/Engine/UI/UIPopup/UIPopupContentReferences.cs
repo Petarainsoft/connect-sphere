@@ -176,7 +176,7 @@ namespace Doozy.Engine.UI
         ///     ...
         ///     <para />
         ///     Images[n].sprite = sprites[n]
-        /// </summary>
+        /// </summary> 
         /// <param name="sprites"> List of Sprites </param>
         public void SetImagesSprites(params Sprite[] sprites)
         {

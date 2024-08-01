@@ -53,7 +53,6 @@ namespace AccountManagement
     
             request.AddHeader("Authorization", _bearerAccessToken);
             
-
             Debug.Log(request.CurrentUri);
 
             try

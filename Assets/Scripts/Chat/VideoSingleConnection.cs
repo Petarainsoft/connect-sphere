@@ -1,4 +1,5 @@
 ﻿using System;
+using ConnectSphere;
 using Unity.RenderStreaming;
 using UnityEngine;
 
@@ -6,9 +7,9 @@ namespace Chat
 {
     public class VideoSingleConnection : MonoBehaviour
     {
-        [SerializeField] public VideoStreamSender webCamStreamer;
-        [SerializeField] public VideoStreamReceiver receiveVideoViewer;
-        [SerializeField] public SingleConnection singleConnection;
+        [SerializeField] public VideoStreamSender _webCamStreamer;
+        [SerializeField] public VideoStreamReceiver _receiveVideoViewer;
+        [SerializeField] public SingleConnection _singleWebRtcConnection;
         public string ConnectionID;
         public bool IsWorking = false;
 
@@ -25,11 +26,32 @@ namespace Chat
         //     receiveVideoViewer.OnStoppedStream -= StopStream;
         // }
 
+        public void SetCameraStreamerSource(Texture sourceTexture)
+        {
+            _webCamStreamer.sourceTexture = sourceTexture;
+        }
+
+        public void SetSenderCodec(VideoCodecInfo sendCodec)
+        {
+            _webCamStreamer.SetCodec(sendCodec);
+        }
+
+        public void SetReceiveCodec(VideoCodecInfo receiveCodec)
+        {
+            _receiveVideoViewer.SetCodec(receiveCodec);
+        }
+
+        public void SetCameraStreamerSize(uint width, uint height)
+        {
+            _webCamStreamer.width = width;
+            _webCamStreamer.height = height;
+        }
+
         private void StopStream(string connectionid)
         {
-            if ( singleConnection.ExistConnection(connectionid) )
+            if ( _singleWebRtcConnection.ExistConnection(connectionid) )
             {
-                singleConnection.DeleteConnection(connectionid);
+                _singleWebRtcConnection.DeleteConnection(connectionid);
                 ConnectionID = string.Empty;
             }
         }
@@ -37,7 +59,7 @@ namespace Chat
         public void SetTextureIndex(int index)
         {
             _index = index;
-            if ( receiveVideoViewer != null ) receiveVideoViewer.OnUpdateReceiveTexture += OnUpdateReceiveTexture;
+            if ( _receiveVideoViewer != null ) _receiveVideoViewer.OnUpdateReceiveTexture += OnUpdateReceiveTexture;
         }
 
         private void OnUpdateReceiveTexture(Texture texture)
@@ -59,7 +81,22 @@ namespace Chat
         public void Release()
         {
             cb = null;
-            if ( receiveVideoViewer != null ) receiveVideoViewer.OnUpdateReceiveTexture -= OnUpdateReceiveTexture;
+            if ( _receiveVideoViewer != null ) _receiveVideoViewer.OnUpdateReceiveTexture -= OnUpdateReceiveTexture;
+            GetComponent<ReturnToPool>().Return();
+        }
+
+        public void CreateConnection(string connectionUniqueId)
+        {
+            _singleWebRtcConnection.CreateConnection(connectionUniqueId);
+            IsWorking = true;
+        }
+
+        public void DeleteConnection(string peersConnectionId)
+        {
+            _singleWebRtcConnection.DeleteConnection(peersConnectionId);
+            IsWorking = false;
+            ConnectionID = string.Empty;
+            Release();
         }
     }
 }
