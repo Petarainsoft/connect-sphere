@@ -42,7 +42,6 @@ namespace ConnectSphere
         private void OnReturnedToPool(VideoSingleConnection connection)
         {
             if ( connection == null ) return;
-            connection.Release();
             connection.gameObject.SetActive(false);
         }
       

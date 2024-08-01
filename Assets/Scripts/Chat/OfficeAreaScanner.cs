@@ -9,7 +9,7 @@ namespace ConnectSphere.Chat
         [Header("Gather Areas")] [SerializeField]
         private List<GatheringArea> _areas;
 
-        private Dictionary<int, HashSet<Ordered2Peers>> _areaPeers;
+        private Dictionary<int, HashSet<OrderedPeersInfo>> _areaPeers;
 
         protected override void Awake()
         {
@@ -19,7 +19,7 @@ namespace ConnectSphere.Chat
                 Debug.LogWarning($"{GetType()} does not work because it has no {typeof(GatheringArea)}");
             }
 
-            _areaPeers = new Dictionary<int, HashSet<Ordered2Peers>>();
+            _areaPeers = new Dictionary<int, HashSet<OrderedPeersInfo>>();
         }
 
         private void OnEnable()
@@ -55,7 +55,7 @@ namespace ConnectSphere.Chat
             Debug.Log($"<color=yellow>{string.Join(",", playersId)}</color>");
 
             var currentPeersInArea = ToOrderedPeers(playersId);
-            _areaPeers.TryAdd(areaId, new HashSet<Ordered2Peers>());
+            _areaPeers.TryAdd(areaId, new HashSet<OrderedPeersInfo>());
             if ( !_areaPeers.TryGetValue(areaId, out var existingPeers) ) return;
             foreach (var p in currentPeersInArea)
             {

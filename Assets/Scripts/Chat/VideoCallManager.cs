@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using Best.HTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
-using Chat.States;
 using ConnectSphere;
 using Cysharp.Threading.Tasks;
-#if UNITY_EDITOR
-using ParrelSync;
-#endif
-using TMPro;
 using Unity.RenderStreaming;
 using UnityEngine.Android;
 
@@ -31,8 +24,8 @@ namespace Chat
         [SerializeField] private VideoCallListMonitor _callListMonitor;
         [SerializeField] private ConnectionPool _callPool;
 
-        private Dictionary<Ordered2Peers, VideoSingleConnection> _currentCalls =
-            new Dictionary<Ordered2Peers, VideoSingleConnection>();
+        private Dictionary<OrderedPeersInfo, VideoSingleConnection> _currentCalls =
+            new Dictionary<OrderedPeersInfo, VideoSingleConnection>();
 
         [SerializeField] private RenderStreamingSettings _settings;
 
@@ -158,8 +151,7 @@ namespace Chat
                 _renderStreaming.useDefaultSettings = _settings.UseDefaultSettings;
             if ( _settings?.SignalingSettings != null )
                 _renderStreaming.SetSignalingSettings(_settings.SignalingSettings);
-            // _renderStreaming.Run();
-
+            _renderStreaming.Configure();
             RequestCamera();
             Debug.Log("RenderingStreaming is running");
         }
@@ -179,42 +171,39 @@ namespace Chat
 
         private void ShouldStart(List<VideoCallSession> listSession)
         {
-            var logs = string.Join("," , listSession);
-            // Debug.Log($"<color=green>{logs}</color>");
-            foreach (var videoCallSession in listSession)
+            if ( listSession == null ) return;
+            var mySessions = listSession.Where(videoCallSession => videoCallSession.InvolveUser(_playerSO.DatabaseId));
+            foreach (var videoCallSession in mySessions)
             {
-                if ( !videoCallSession.RelateTo(1) ) continue;
-
-                // _currentCalls.TryAdd(videoCallSession._peers, _callPool.Pool.Get());
-                // if ( _currentCalls.TryGetValue(videoCallSession._peers, out var connection) )
-                // {
-                //     connection.SetReceiveCodec(_settings.ReceiverVideoCodec);
-                //     connection.SetSenderCodec(_settings.SenderVideoCodec);
-                //     connection.SetCameraStreamerSource(_trayBarVideoImage.texture);
-                //     connection.SetCameraStreamerSize((uint)_settings.StreamSize.x, (uint)_settings.StreamSize.y);
-                //     connection.CreateConnection(videoCallSession._peers.ConnectionId);
-                // }
-
-                Debug.Log($"<color=green>Start Call {videoCallSession._peers}</color>");
-                _callListMonitor.SetPeerStarted(videoCallSession._peers);
+                _currentCalls.TryAdd(videoCallSession._peersInfo, _callPool.Pool.Get());
+                if ( !_currentCalls.TryGetValue(videoCallSession._peersInfo, out var connection) ) continue;
+                _renderStreaming.AddHandler(connection._singleWebRtcConnection);
+                connection.SetCameraStreamerSource(_trayBarVideoImage.texture);
+                connection.SetReceiveCodec(_settings.ReceiverVideoCodec);
+                connection.SetSenderCodec(_settings.SenderVideoCodec);
+                connection.SetCameraStreamerSize((uint)_settings.StreamSize.x, (uint)_settings.StreamSize.y);
+                connection.CreateConnection(videoCallSession._peersInfo.ConnectionId);
+                connection.RegisterReceivedTexture(ShowFriendTexture);
+                _callListMonitor.SetSessionStatus(videoCallSession._peersInfo, VideoCallStatus.Started);
             }
+        }
+
+        private void ShowFriendTexture(Texture obj)
+        {
+            
         }
 
         private void ShouldEnd(List<VideoCallSession> listSession)
         {
-            var logs = string.Join("," , listSession);
-            // Debug.Log($"<color=red>{logs}</color>");
-            foreach (var videoCallSession in listSession)
+            if ( listSession == null ) return;
+            var mySessions = listSession.Where(videoCallSession => videoCallSession.InvolveUser(_playerSO.DatabaseId));
+            foreach (var videoCallSession in mySessions)
             {
-                if ( !videoCallSession.RelateTo(1) ) continue;
-
-                // if ( _currentCalls.TryGetValue(videoCallSession._peers, out var connection) )
-                // {
-                //     connection.DeleteConnection(videoCallSession._peers.ConnectionId);
-                // }
-                
-                Debug.Log($"<color=red>End Call {videoCallSession._peers}</color>");
-                _callListMonitor.SetPeerEnded(videoCallSession._peers);
+                if ( !_currentCalls.TryGetValue(videoCallSession._peersInfo, out var videoSingleCon) ) continue;
+                videoSingleCon.DeleteConnection(videoCallSession._peersInfo.ConnectionId);
+                _renderStreaming.RemoveHandler(videoSingleCon._singleWebRtcConnection);
+                Debug.Log($"<color=red>End Call {videoCallSession._peersInfo}</color>");
+                _callListMonitor.SetSessionStatus(videoCallSession._peersInfo, VideoCallStatus.Ended);
             }
         }
     }

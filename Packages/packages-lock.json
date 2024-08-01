@@ -195,7 +195,7 @@
     },
     "com.unity.inputsystem": {
       "version": "1.7.0",
-      "depth": 1,
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.uielements": "1.0.0"
@@ -298,18 +298,6 @@
       "dependencies": {
         "com.unity.render-pipelines.core": "14.0.10"
       }
-    },
-    "com.unity.renderstreaming": {
-      "version": "3.1.0-exp.7",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.webrtc": "3.0.0-pre.6",
-        "com.unity.inputsystem": "1.5.1",
-        "com.unity.ugui": "1.0.0",
-        "com.unity.modules.screencapture": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
     },
     "com.unity.searcher": {
       "version": "4.9.2",

@@ -8,47 +8,37 @@ namespace ConnectSphere
     public class VideoCallListMonitor : MonoBehaviour
     {
         private List<PeerScanner> scanners;
-        [SerializeField] private Dictionary<Ordered2Peers, VideoCallSession> allSessions;
+        private Dictionary<OrderedPeersInfo, VideoCallSession> allSessions;
 
         public Action<List<VideoCallSession>> OnShouldStartSession;
         public Action<List<VideoCallSession>> OnShouldEndSession;
 
         private void Awake()
         {
-            scanners = new List<PeerScanner>(GetComponents<PeerScanner>());
-            if ( scanners.Count < 1 )
-            {
-                Debug.LogWarning($"{GetType()} has no {typeof(PeerScanner)}");
-                return;
-            }
+            scanners = new List<PeerScanner>(GetComponents<PeerScanner>() ?? Array.Empty<PeerScanner>());
+            if ( scanners.Count >= 1 ) return;
+            Debug.LogWarning($"{GetType()} has no {typeof(PeerScanner)}");
         }
 
         private void OnEnable()
         {
+            if ( scanners == null ) return;
             foreach (var scanner in scanners)
             {
-                scanner._onPeersChanged += HandlePeerList;
+                if ( scanner != null ) scanner._onPeersChanged += HandlePeerList;
             }
         }
 
-        public void SetPeerStarted(Ordered2Peers inCallPeer)
+        public void SetSessionStatus(OrderedPeersInfo peersInfo, VideoCallStatus newStatus)
         {
-            if ( allSessions.TryGetValue(inCallPeer, out var inCall) )
-            {
-                inCall._status = VideoCallStatus.Started;
-                Debug.Log($"<color=green>\t{inCall} started </color>");
-            }
+            if ( peersInfo == null || allSessions == null ||
+                 !allSessions.TryGetValue(peersInfo, out var session) ) return;
+            if ( session == null ) return;
+            session._status = newStatus;
+            Debug.Log($"<color=green>\t{session}</color>");
         }
 
-        public void SetPeerEnded(Ordered2Peers endedPeers)
-        {
-            if ( allSessions.ContainsKey(endedPeers) )
-            {
-                allSessions[endedPeers]._status = VideoCallStatus.Ended;
-            }
-        }
-
-        private void HandlePeerList(HashSet<Ordered2Peers> currentPeers)
+        private void HandlePeerList(HashSet<OrderedPeersInfo> currentPeers)
         {
             if ( currentPeers == null || currentPeers.Count < 1 ) return;
             var logPeers = string.Join(",", currentPeers);
@@ -63,10 +53,10 @@ namespace ConnectSphere
 
             var currentWorkingPeers = allSessions
                 .Where(e => e.Value._status == VideoCallStatus.Started || e.Value._status == VideoCallStatus.ShouldEnd)
-                .Select(e => e.Value._peers).ToHashSet();
+                .Select(e => e.Value._peersInfo).ToHashSet();
             var endedPeers = allSessions
                 .Where(e => e.Value._status == VideoCallStatus.Ended)
-                .Select(e => e.Value._peers).ToHashSet();
+                .Select(e => e.Value._peersInfo).ToHashSet();
 
             var newPeers = currentPeers.Except(currentWorkingPeers);
             var shouldEndPeers = currentWorkingPeers.Except(currentPeers);
@@ -75,7 +65,7 @@ namespace ConnectSphere
             {
                 var videoCallSession = new VideoCallSession()
                 {
-                    _peers = newPeer,
+                    _peersInfo = newPeer,
                     _status = VideoCallStatus.ShouldStart
                 };
                 allSessions.TryAdd(newPeer, videoCallSession);
@@ -108,14 +98,14 @@ namespace ConnectSphere
         }
 
 
-        private void InitSession(HashSet<Ordered2Peers> initSet)
+        private void InitSession(HashSet<OrderedPeersInfo> initSet)
         {
             foreach (var peersPeer in initSet)
             {
-                allSessions ??= new Dictionary<Ordered2Peers, VideoCallSession>();
+                allSessions ??= new Dictionary<OrderedPeersInfo, VideoCallSession>();
                 allSessions.TryAdd(peersPeer, new VideoCallSession()
                 {
-                    _peers = peersPeer,
+                    _peersInfo = peersPeer,
                     _status = VideoCallStatus.ShouldStart
                 });
             }
@@ -140,14 +130,14 @@ namespace ConnectSphere
 
     public class VideoCallSession
     {
-        public Ordered2Peers _peers;
+        public OrderedPeersInfo _peersInfo;
         public VideoCallStatus _status;
 
         public override bool Equals(object obj)
         {
             if ( obj is VideoCallSession other )
             {
-                return _peers == other._peers;
+                return _peersInfo == other._peersInfo;
             }
 
             return false;
@@ -155,14 +145,14 @@ namespace ConnectSphere
 
         public override int GetHashCode()
         {
-            return _peers.GetHashCode();
+            return _peersInfo.GetHashCode();
         }
 
         public override string ToString()
         {
-            return _peers + "(" + _status + ")";
+            return _peersInfo + "(" + _status + ")";
         }
 
-        public bool RelateTo(int userId) => _peers.RelateTo(userId);
+        public bool InvolveUser(int userId) => _peersInfo.HasUser(userId);
     }
 }

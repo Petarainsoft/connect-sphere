@@ -10,21 +10,8 @@ namespace Chat
         [SerializeField] public VideoStreamSender _webCamStreamer;
         [SerializeField] public VideoStreamReceiver _receiveVideoViewer;
         [SerializeField] public SingleConnection _singleWebRtcConnection;
-        public string ConnectionID;
-        public bool IsWorking = false;
 
-        private int _index = -1;
-        private Action<Texture, int> cb;
-
-        // private void OnEnable()
-        // {
-        //     receiveVideoViewer.OnStoppedStream += StopStream;
-        // }
-        //
-        // private void OnDisable()
-        // {
-        //     receiveVideoViewer.OnStoppedStream -= StopStream;
-        // }
+        private OrderedPeersInfo myPeersInfo;
 
         public void SetCameraStreamerSource(Texture sourceTexture)
         {
@@ -47,55 +34,35 @@ namespace Chat
             _webCamStreamer.height = height;
         }
 
-        private void StopStream(string connectionid)
+        public void SetOrderedPeersInfo(OrderedPeersInfo peersInfoInfo)
         {
-            if ( _singleWebRtcConnection.ExistConnection(connectionid) )
-            {
-                _singleWebRtcConnection.DeleteConnection(connectionid);
-                ConnectionID = string.Empty;
-            }
+            myPeersInfo = peersInfoInfo;
+        }
+        
+        public void RegisterReceivedTexture(Action<Texture> OnReceiveVideoTexture)
+        {
+            if ( _receiveVideoViewer != null )
+                _receiveVideoViewer.OnUpdateReceiveTexture = (receivetexture) =>
+                {
+                    OnReceiveVideoTexture?.Invoke(receivetexture);
+                };
         }
 
-        public void SetTextureIndex(int index)
+        private void Release()
         {
-            _index = index;
-            if ( _receiveVideoViewer != null ) _receiveVideoViewer.OnUpdateReceiveTexture += OnUpdateReceiveTexture;
-        }
-
-        private void OnUpdateReceiveTexture(Texture texture)
-        {
-            if ( _index == -1 )
-            {
-                Debug.Log("Invalid texture index");
-                return;
-            }
-
-            cb?.Invoke(texture, _index);
-        }
-
-        public void SetTextureReceiveCb(Action<Texture, int> onTextureReceive)
-        {
-            cb = onTextureReceive;
-        }
-
-        public void Release()
-        {
-            cb = null;
-            if ( _receiveVideoViewer != null ) _receiveVideoViewer.OnUpdateReceiveTexture -= OnUpdateReceiveTexture;
-            GetComponent<ReturnToPool>().Return();
+            if ( _receiveVideoViewer != null ) _receiveVideoViewer.OnUpdateReceiveTexture = null;
+            myPeersInfo = null;
+            GetComponent<ReturnToPool>()?.Return();
         }
 
         public void CreateConnection(string connectionUniqueId)
         {
             _singleWebRtcConnection.CreateConnection(connectionUniqueId);
-            IsWorking = true;
         }
 
         public void DeleteConnection(string peersConnectionId)
         {
             _singleWebRtcConnection.DeleteConnection(peersConnectionId);
-            IsWorking = false;
-            ConnectionID = string.Empty;
             Release();
         }
     }

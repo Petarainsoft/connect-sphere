@@ -32,13 +32,13 @@ namespace ConnectSphere
             if ( apiResponse == null ) return null;
             if ( !apiResponse.IsSuccess )
             {
-                Debug.LogError($"{apiResponse.ResponseCode} | {apiResponse.ResponseMessage}");
+                Debug.LogWarning($"{apiResponse.ResponseCode} | {apiResponse.ResponseMessage}");
             }
 
             if ( apiResponse.ReturnData == null ) return null;
             if ( apiResponse.ReturnData.error != null )
             {
-                Debug.LogError(apiResponse.ReturnData.error.details);
+                Debug.LogWarning(apiResponse.ReturnData.error.details);
                 return null;
             }
 
@@ -66,13 +66,13 @@ namespace ConnectSphere
             if ( apiResponse == null ) return null;
             if ( !apiResponse.IsSuccess )
             {
-                Debug.LogError($"{apiResponse.ResponseCode} | {apiResponse.ResponseMessage}");
+                Debug.LogWarning($"{apiResponse.ResponseCode} | {apiResponse.ResponseMessage}");
             }
 
             if ( apiResponse.ReturnData == null ) return null;
             if ( apiResponse.ReturnData.error != null )
             {
-                Debug.LogError(apiResponse.ReturnData.error.details);
+                Debug.LogWarning(apiResponse.ReturnData.error.details);
                 return null;
             }
 
@@ -101,13 +101,13 @@ namespace ConnectSphere
             if ( apiResponse == null ) return null;
             if ( !apiResponse.IsSuccess )
             {
-                Debug.LogError($"{apiResponse.ResponseCode} | {apiResponse.ResponseMessage}");
+                Debug.LogWarning($"{apiResponse.ResponseCode} | {apiResponse.ResponseMessage}");
             }
 
             if ( apiResponse.ReturnData == null ) return null;
             if ( apiResponse.ReturnData.error != null )
             {
-                Debug.LogError(apiResponse.ReturnData.error.details);
+                Debug.LogWarning(apiResponse.ReturnData.error.details);
                 return null;
             }
 

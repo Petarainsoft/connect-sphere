@@ -462,8 +462,8 @@ namespace Chat
         [SerializeField] private ConnectionPool _callPool;
 
 
-        private Dictionary<Ordered2Peers, VideoSingleConnection> _currentCalls =
-            new Dictionary<Ordered2Peers, VideoSingleConnection>();
+        private Dictionary<OrderedPeersInfo, VideoSingleConnection> _currentCalls =
+            new Dictionary<OrderedPeersInfo, VideoSingleConnection>();
         
         
 
@@ -478,15 +478,15 @@ namespace Chat
         {
             foreach (var videoCallSession in listSession)
             {
-                if (!videoCallSession.RelateTo(PlayerPrefs.GetInt("userId"))) continue;
+                if (!videoCallSession.InvolveUser(PlayerPrefs.GetInt("userId"))) continue;
                 
                 var connection = _callPool.Pool.Get();
                 connection.SetReceiveCodec(_settings.ReceiverVideoCodec);
                 connection.SetSenderCodec(_settings.SenderVideoCodec);
                 connection.SetCameraStreamerSource(_localVideoImage.texture);
                 connection.SetCameraStreamerSize((uint)_settings.StreamSize.x, (uint)_settings.StreamSize.y);
-                connection.CreateConnection(videoCallSession._peers.ConnectionId);
-                _currentCalls.TryAdd(videoCallSession._peers, connection);
+                connection.CreateConnection(videoCallSession._peersInfo.ConnectionId);
+                _currentCalls.TryAdd(videoCallSession._peersInfo, connection);
             }
         }
 
@@ -494,11 +494,11 @@ namespace Chat
         {
             foreach (var videoCallSession in listSession)
             {
-                if (!videoCallSession.RelateTo(PlayerPrefs.GetInt("userId"))) continue;
+                if (!videoCallSession.InvolveUser(PlayerPrefs.GetInt("userId"))) continue;
                 
-                if (_currentCalls.TryGetValue(videoCallSession._peers, out var connection))
+                if (_currentCalls.TryGetValue(videoCallSession._peersInfo, out var connection))
                 {
-                    connection.DeleteConnection(videoCallSession._peers.ConnectionId);
+                    connection.DeleteConnection(videoCallSession._peersInfo.ConnectionId);
                 }
             }
         }

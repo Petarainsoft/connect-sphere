@@ -25,7 +25,7 @@ namespace ConnectSphere
                     }
 
                     yield return new WaitForSeconds(UnityEngine.Random.Range(0, 1));
-                    AddPeers(new Ordered2Peers(firstUserId, secondUserId));
+                    AddPeers(new OrderedPeersInfo(firstUserId, secondUserId));
                 }
 
 
@@ -40,7 +40,7 @@ namespace ConnectSphere
                     }
 
                     yield return new WaitForSeconds(UnityEngine.Random.Range(0, 1));
-                    RemovePeers(new Ordered2Peers(firstUserId, secondUserId));
+                    RemovePeers(new OrderedPeersInfo(firstUserId, secondUserId));
                 }
 
 
@@ -55,7 +55,7 @@ namespace ConnectSphere
                     }
 
                     yield return new WaitForSeconds(UnityEngine.Random.Range(0, 1));
-                    AddPeers(new Ordered2Peers(firstUserId, secondUserId));
+                    AddPeers(new OrderedPeersInfo(firstUserId, secondUserId));
                 }
 
 
@@ -70,7 +70,7 @@ namespace ConnectSphere
                     }
 
                     yield return new WaitForSeconds(UnityEngine.Random.Range(0, 1));
-                    RemovePeers(new Ordered2Peers(firstUserId, secondUserId));
+                    RemovePeers(new OrderedPeersInfo(firstUserId, secondUserId));
                 }
 
                 yield return new WaitForSeconds(UnityEngine.Random.Range(0f, 2f));
