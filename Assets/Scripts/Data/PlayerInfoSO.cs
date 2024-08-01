@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using AccountManagement;
 using UnityEngine;
 
 namespace ConnectSphere
@@ -17,6 +16,16 @@ namespace ConnectSphere
         public Gender Gender;
         public string Occupation;
         public string Biography;
+
+        public void MapData(Profile profile)
+        {
+            PlayerName = profile.display_name;
+            AvatarIndex = profile.avatar_id;
+            Title = profile.title;
+            Gender = profile.gender == Gender.Female.ToString() ? Gender.Female : Gender.Male;
+            Occupation = profile.occupation;
+            Biography = profile.biography;
+        }
     }
 
     public enum NetworkRole

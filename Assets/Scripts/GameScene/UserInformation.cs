@@ -1,3 +1,4 @@
+using AccountManagement;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -34,12 +35,13 @@ namespace ConnectSphere
         [SerializeField] private IntegerEventHandlerSO _onAvatarChanged;
 
         private int _selectedAvatarIndex = 0;
+        private bool _isDirty;
 
         private void Awake()
         {
             _buttonCloseAvatarPicker.onClick.AddListener(OnAvatarPickerClosed);
             _buttonCloseTitlePicker.onClick.AddListener(OnTitlePickerClosed);
-            _inputBiography.onDeselect.AddListener(SaveBiography);
+            _inputBiography.onEndEdit.AddListener(SaveBiography);
         }
 
         private void OnEnable()
@@ -50,6 +52,11 @@ namespace ConnectSphere
         private void OnDisable()
         {
             _onAvatarImageClicked.OnEventRaised -= HandleSelectedAvatar;
+
+            if (_isDirty)
+            {
+                SaveToDb();
+            }
         }
 
         private void Start()
@@ -116,13 +123,12 @@ namespace ConnectSphere
             SaveLongName();
         }
 
-        // TODO: USE APIs TO SAVE PLAYERINFO TO DATABASE
-
         private void SaveAvatar()
         {
             _playerInfo.AvatarIndex = _selectedAvatarIndex;
             _imageChosenAvatar.sprite = _avatarSprites[_selectedAvatarIndex];
             _onAvatarChanged.RaiseEvent(_selectedAvatarIndex);
+            SetDirty();
         }
 
         private void SaveLongName()
@@ -130,14 +136,27 @@ namespace ConnectSphere
             string edittedName = _inputName.text.Trim();
             string selectedTitle;
             selectedTitle = _dropdownTitles.captionText.text != "None" ? _dropdownTitles.captionText.text : string.Empty;
+            _playerInfo.PlayerName = edittedName;
             _playerInfo.Title = selectedTitle;
             _textLongName.text = $"{_playerInfo.PlayerName} {selectedTitle}".Trim();
             _onLongNameChanged.RaiseEvent(edittedName, selectedTitle);
+            SetDirty();
         }
 
         private void SaveBiography(string text)
         {
             _playerInfo.Biography = _inputBiography.text.Trim();
+            SetDirty();
+        }
+
+        private void SetDirty()
+        {
+            _isDirty = true;
+        }
+
+        private async void SaveToDb()
+        {
+            await ApiManager.Instance.ProfileApi.UpdateUserProfile(_playerInfo.AvatarIndex, _playerInfo.PlayerName, _playerInfo.Title, "", "", _playerInfo.Biography);
         }
     }
 }

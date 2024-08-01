@@ -10,6 +10,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Vivox;
 using System.Reflection;
+using AccountManagement;
 
 namespace ConnectSphere
 {
@@ -57,6 +58,17 @@ namespace ConnectSphere
         private void OnDisable()
         {
             _onAvatarImageClicked.OnEventRaised -= HandleSelectedAvatar;
+        }
+
+        private async void Start()
+        {
+            Profile userProfile = await GetUserProfileFromDb();
+            if (userProfile != null)
+            {
+                _playerInfoSo.MapData(userProfile);
+                _inputPlayerName.text = _playerInfoSo.PlayerName.Equals(string.Empty) ? RandomNameGenerator.GetRandomName(false) : _playerInfoSo.PlayerName;
+                HandleSelectedAvatar(_playerInfoSo.AvatarIndex == -1 ? 0 : _playerInfoSo.AvatarIndex);
+            }
         }
 
         public void OnJoinButtonClicked()
@@ -114,7 +126,7 @@ namespace ConnectSphere
             _playerInfoSo.RoomName = _tempRoomName;
             _playerInfoSo.Email = PlayerPrefs.GetString("username");
             _playerInfoSo.DatabaseId = PlayerPrefs.GetInt("userId");
-
+            SaveUserProfileToDb();
             StartGame(GameMode.Shared, _tempRoomName, _gameScenePath);
         }
 
@@ -208,6 +220,18 @@ namespace ConnectSphere
         {
             await UniTask.Delay(TimeSpan.FromSeconds(0.25f));
             _loadingCanvas.SetActive(true);
+        }
+
+        private async UniTask<Profile> GetUserProfileFromDb()
+        {
+            int userId = PlayerPrefs.GetInt("userId");
+            var userProfile = await ApiManager.Instance.ProfileApi.GetUserProfile(userId);
+            return userProfile;
+        }
+
+        private async void SaveUserProfileToDb()
+        {
+            await ApiManager.Instance.ProfileApi.UpdateUserProfile(_playerInfoSo.AvatarIndex, _playerInfoSo.PlayerName);
         }
     }
 }

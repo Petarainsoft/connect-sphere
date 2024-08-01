@@ -58,7 +58,7 @@ namespace ConnectSphere
             var parameters = new Dictionary<string, object>();
 
             if ( avatarId > -1 ) parameters.Add("avatar_id", avatarId);
-            if ( !string.IsNullOrEmpty(displayName) ) parameters.Add("displayName", displayName);
+            if ( !string.IsNullOrEmpty(displayName) ) parameters.Add("display_name", displayName);
             
             if ( !string.IsNullOrEmpty(title) ) parameters.Add("title", title);
             if ( !string.IsNullOrEmpty(gender) ) parameters.Add("gender", gender);
