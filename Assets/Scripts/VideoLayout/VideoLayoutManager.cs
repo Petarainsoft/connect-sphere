@@ -118,7 +118,7 @@ namespace ConnectSphere
                 if ( remoteVideoContainer == null ) return;
                 remoteVideoContainer.SetRemoteVideoTexture(videoTexture);
                 remoteVideoContainer.transform.SetParent(targetContainer);
-                if ( _peersInfos != null ) _peersInfos[peersInfo] = remoteVideoContainer;
+                _peersInfos?.Add(peersInfo, remoteVideoContainer);
             }
         }
         
