@@ -88,6 +88,12 @@ public class TextChatUI : MonoBehaviour
 
     private void ScrollRectChange(Vector2 vector)
     {
+        if ( string.IsNullOrEmpty(currentChannelName) )
+        {
+            Debug.LogWarning("Current channel name is empty, cannot get chat history");
+            return;
+        }
+        
         // Scrolled near end and check if we are fetching history already
         if ( m_TextChatScrollRect.verticalNormalizedPosition >= 0.95f && FetchMessages != null &&
              (FetchMessages.IsCompleted || FetchMessages.IsFaulted || FetchMessages.IsCanceled) )
@@ -104,7 +110,7 @@ public class TextChatUI : MonoBehaviour
             Utils.ShowLoading();
             if ( string.IsNullOrEmpty(currentChannelName) )
             {
-                Debug.LogError("Current channel name is empty, cannot get chat history");
+                Debug.LogWarning("Current channel name is empty, cannot get chat history");
                 return;
             }
 

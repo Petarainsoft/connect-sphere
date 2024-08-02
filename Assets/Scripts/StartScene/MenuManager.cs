@@ -130,10 +130,18 @@ namespace ConnectSphere
             StartGame(GameMode.Shared, _tempRoomName, _gameScenePath);
         }
 
+        [SerializeField] private string _server = "https://unity.vivox.com/appconfig/10793-conne-77095-udash";
+        [SerializeField] private string _domain = "mtu1xp.vivox.com";
+        [SerializeField] private string _tokenIssuer = "10793-conne-77095-udash";
+        [SerializeField] private string _tokenKey = "8OZBvVqIzQMq1qqMQ3C23DWrrXNJrVuM";
+        
+
         private async UniTask<bool> JoinVivox(string playerEmail)
         {
             Debug.Log("** Initialize Unity Service");
-            await UnityServices.InitializeAsync( new InitializationOptions());
+            var options = new InitializationOptions();
+            options.SetVivoxCredentials(_server, _domain, _tokenIssuer, _tokenKey);
+            await UnityServices.InitializeAsync(options);
             var validName = playerEmail.Replace("@","_").Replace(".","_");
             AuthenticationService.Instance.SwitchProfile(validName);
             Debug.Log("** Sign In AuthenticationService");
