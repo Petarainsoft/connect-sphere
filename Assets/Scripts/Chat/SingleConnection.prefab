@@ -79,10 +79,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbb9d7ee921c46c5bfebf364dc3c0e22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  webCamStreamer: {fileID: 6902159440844824950}
-  receiveVideoViewer: {fileID: 4884648859875779020}
-  singleConnection: {fileID: 2049009814897707358}
-  IsWorking: 0
+  _webCamStreamer: {fileID: 6902159440844824950}
+  _receiveVideoViewer: {fileID: 4884648859875779020}
+  _singleWebRtcConnection: {fileID: 2049009814897707358}
 --- !u!114 &6902159440844824950
 MonoBehaviour:
   m_ObjectHideFlags: 0
