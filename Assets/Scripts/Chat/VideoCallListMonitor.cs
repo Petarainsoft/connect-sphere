@@ -42,7 +42,7 @@ namespace ConnectSphere
         {
             if ( currentPeers == null || currentPeers.Count < 1 ) return;
             var logPeers = string.Join(",", currentPeers);
-            // Debug.Log("<color=red>CurrentPeers</color>");
+            Debug.Log("<color=red>CurrentPeers</color>");
             Debug.Log($"<color=yellow>{logPeers}</color>");
             // the list is brand new
             if ( allSessions == null || allSessions.Count < 1 )
