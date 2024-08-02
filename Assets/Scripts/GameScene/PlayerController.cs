@@ -231,9 +231,13 @@ namespace ConnectSphere
             _animator.SetBool(_hashSitting, sittingParam);
         }
 
-        private void ToggleControl(bool value)
+        private void ToggleControl(bool isBlocking)
         {
-            _isBlockingControl = value;
+            _isBlockingControl = isBlocking;
+            if (isBlocking)
+            {
+                _rigidbody.velocity = Vector3.zero;
+            }
         }
     }
 }
