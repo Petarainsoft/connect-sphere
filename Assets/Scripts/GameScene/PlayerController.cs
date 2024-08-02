@@ -18,7 +18,7 @@ namespace ConnectSphere
 
         private Rigidbody2D _rigidbody;
         private Animator _animator;
-        private GameObject _interactionTarget;
+        private Interactable _interactionTarget;
         private Vector2 _movementDirection;
         private Vector2 refVelocity;
         private Vector2 _interactPosition;
@@ -108,7 +108,7 @@ namespace ConnectSphere
             _movementDirection = new Vector2(movement.x, movement.y);
         }
 
-        public void SetInteractionData(int code, Vector2 interactPosition = default, GameObject interactionTarget = null)  
+        public void SetInteractionData(int code, Vector2 interactPosition = default, Interactable interactionTarget = null)  
         {
             _canInteract = code != -1 ? true : false;
             InteractionCode = code;
@@ -156,6 +156,7 @@ namespace ConnectSphere
                         ToggleControl(true);
                         var target = _interactionTarget.GetComponent<StickerBoardInteractable>();
                         target.ActivateLocalCanvas();
+                        _interactionTarget.ToggleHighlight(false);
                     }
                 }
             }
@@ -181,6 +182,7 @@ namespace ConnectSphere
             }
             else
             {
+                _interactionTarget.ToggleHighlight(false);
                 _rigidbody.velocity = Vector2.zero;
                 ToggleControl(true);
                 transform.position = _interactPosition;
