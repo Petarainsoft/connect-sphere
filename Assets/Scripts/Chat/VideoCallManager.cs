@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using AhnLab.EventSystem;
 using ConnectSphere;
 using Cysharp.Threading.Tasks;
 using Unity.RenderStreaming;
@@ -176,34 +177,38 @@ namespace Chat
             foreach (var videoCallSession in mySessions)
             {
                 _currentCalls.TryAdd(videoCallSession._peersInfo, _callPool.Pool.Get());
-                if ( !_currentCalls.TryGetValue(videoCallSession._peersInfo, out var connection) ) continue;
-                _renderStreaming.AddHandler(connection._singleWebRtcConnection);
-                connection.SetCameraStreamerSource(_trayBarVideoImage.texture);
-                connection.SetReceiveCodec(_settings.ReceiverVideoCodec);
-                connection.SetSenderCodec(_settings.SenderVideoCodec);
-                connection.SetCameraStreamerSize((uint)_settings.StreamSize.x, (uint)_settings.StreamSize.y);
-                connection.CreateConnection(videoCallSession._peersInfo.ConnectionId);
-                connection.RegisterReceivedTexture(ShowFriendTexture);
+                if ( !_currentCalls.TryGetValue(videoCallSession._peersInfo, out var con) ) continue;
+                _renderStreaming.AddHandler(con._singleWebRtcConnection);
+                con.SetCameraStreamerSource(_trayBarVideoImage.texture);
+                con.SetReceiveCodec(_settings.ReceiverVideoCodec);
+                con.SetSenderCodec(_settings.SenderVideoCodec);
+                con.SetCameraStreamerSize((uint)_settings.StreamSize.x, (uint)_settings.StreamSize.y);
+                con.CreateConnection(videoCallSession._peersInfo.ConnectionId);
+                con.RegisterReceivedTexture((i, t) =>
+                    AEventHandler.ExecuteEvent(GlobalEvents.OnReceivedRemoteVideo, i, t));
                 _callListMonitor.SetSessionStatus(videoCallSession._peersInfo, VideoCallStatus.Started);
             }
-        }
-
-        private void ShowFriendTexture(Texture obj)
-        {
-            
         }
 
         private void ShouldEnd(List<VideoCallSession> listSession)
         {
             if ( listSession == null ) return;
             var mySessions = listSession.Where(videoCallSession => videoCallSession.InvolveUser(_playerSO.DatabaseId));
-            foreach (var videoCallSession in mySessions)
+            var aboutToRemove = new List<OrderedPeersInfo>();
+            foreach (var callSession in mySessions)
             {
-                if ( !_currentCalls.TryGetValue(videoCallSession._peersInfo, out var videoSingleCon) ) continue;
-                videoSingleCon.DeleteConnection(videoCallSession._peersInfo.ConnectionId);
+                if ( !_currentCalls.TryGetValue(callSession._peersInfo, out var videoSingleCon) ) continue;
+                videoSingleCon.DeleteConnection(callSession._peersInfo.ConnectionId);
                 _renderStreaming.RemoveHandler(videoSingleCon._singleWebRtcConnection);
-                Debug.Log($"<color=red>End Call {videoCallSession._peersInfo}</color>");
-                _callListMonitor.SetSessionStatus(videoCallSession._peersInfo, VideoCallStatus.Ended);
+                Debug.Log($"<color=red>End Call {callSession._peersInfo}</color>");
+                _callListMonitor.SetSessionStatus(callSession._peersInfo, VideoCallStatus.Ended);
+                AEventHandler.ExecuteEvent(GlobalEvents.OnCloseRemoteVideo, callSession._peersInfo);
+                aboutToRemove.Add(callSession._peersInfo);
+            }
+
+            foreach (var peersInfo in aboutToRemove)
+            {
+                _currentCalls.Remove(peersInfo);
             }
         }
     }
