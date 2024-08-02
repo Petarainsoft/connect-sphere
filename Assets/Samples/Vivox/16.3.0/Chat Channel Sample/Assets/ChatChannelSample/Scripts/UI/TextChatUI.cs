@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AccountManagement;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using Unity.Services.Vivox;
 using UnityEngine;
@@ -107,7 +108,8 @@ public class TextChatUI : MonoBehaviour
     {
         try
         {
-            Utils.ShowLoading();
+            // Utils.ShowLoading();
+            MessageInputField.enabled = false;
             if ( string.IsNullOrEmpty(currentChannelName) )
             {
                 Debug.LogWarning("Current channel name is empty, cannot get chat history");
@@ -139,7 +141,9 @@ public class TextChatUI : MonoBehaviour
         {
             Debug.LogError($"Tried to fetch chat history and failed with error: {e.Message}");
         }
-        Utils.HideLoading();
+        // Utils.HideLoading();
+        await UniTask.WaitUntil(() => ChatContentObj.transform.childCount > 0);
+        MessageInputField.enabled = true;
     }
 
     void OnDestroy()
