@@ -1390,7 +1390,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &462657867
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1407,7 +1407,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
 --- !u!114 &462657868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1573,7 +1573,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &498516141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1610,7 +1610,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
 --- !u!114 &498516143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2509,7 +2509,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
 --- !u!114 &639508852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5469,11 +5469,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7725317629072717694, guid: 8bb8e557d5f2e5248a61ccd8d6f56a54, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 29.88281
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8225501011031317028, guid: 8bb8e557d5f2e5248a61ccd8d6f56a54, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 29.88281
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
