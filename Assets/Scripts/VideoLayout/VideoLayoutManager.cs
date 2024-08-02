@@ -46,7 +46,7 @@ namespace ConnectSphere
         {
             var connectionGameObject = Instantiate(_remoteVideoPrefab, Vector3.zero, Quaternion.identity, _poolParent);
             if ( connectionGameObject == null ) return null;
-            var remoteVideoContainer = connectionGameObject.AddComponent<RemoteVideoContainer>();
+            var remoteVideoContainer = connectionGameObject.GetComponent<RemoteVideoContainer>();
             return remoteVideoContainer;
         }
 
