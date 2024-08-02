@@ -59,7 +59,7 @@ namespace ConnectSphere.Chat
             if ( !_areaPeers.TryGetValue(areaId, out var existingPeers) ) return;
             foreach (var p in currentPeersInArea)
             {
-                if ( !existingPeers.Contains(p) ) existingPeers.Add(p);
+                if ( !existingPeers.Contains(p) ) AddPeers(p);
             }
 
             foreach (var p in existingPeers)
