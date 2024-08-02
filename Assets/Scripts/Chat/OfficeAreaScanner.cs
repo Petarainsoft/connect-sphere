@@ -49,10 +49,19 @@ namespace ConnectSphere.Chat
                 return;
             }
 
-            if ( allPlayersInAreaLeft ) return;
+            if ( allPlayersInAreaLeft )
+            {
+                return;
+            }
             Debug.Log($"<color=yellow>__ List Players In Area {areaId}:</color>");
             var playersId = playersInArea.Select(e => e.GetComponent<Player>().DatabaseId).ToList();
             Debug.Log($"<color=yellow>{string.Join(",", playersId)}</color>");
+
+            if ( playersId.Count == 1 )
+            {
+                RemovePeersRelatedTo(playersId[0]);
+                return;
+            }
 
             var currentPeersInArea = ToOrderedPeers(playersId);
             _areaPeers.TryAdd(areaId, new HashSet<OrderedPeersInfo>());

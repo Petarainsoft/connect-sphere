@@ -31,6 +31,12 @@ namespace ConnectSphere
             if (done) _onPeersChanged?.Invoke(_orderedPeers);
         }
         
+        protected void RemovePeersRelatedTo(int id)
+        {
+            var count = _orderedPeers.RemoveWhere(e => e.HasUser(id));
+            if (count > 0) _onPeersChanged?.Invoke(_orderedPeers);
+        }
+        
         protected void AddPeers(OrderedPeersInfo peerInfo)
         {
             var done = _orderedPeers != null && _orderedPeers.Add(peerInfo);
