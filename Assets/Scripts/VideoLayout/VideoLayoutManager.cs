@@ -127,8 +127,8 @@ namespace ConnectSphere
             if (peersInfo != null && _peersInfos != null && _peersInfos.TryGetValue(peersInfo, out var remoteVideoContainer))
             {
                 if ( remoteVideoContainer == null ) return;
-                Pool.Release(remoteVideoContainer);
                 _peersInfos.Remove(peersInfo);
+                Pool.Release(remoteVideoContainer);
             }
         }
 
