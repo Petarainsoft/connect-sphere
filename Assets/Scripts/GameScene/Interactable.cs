@@ -8,6 +8,7 @@ namespace ConnectSphere
     public class Interactable : NetworkBehaviour
     {
         public int InteractionCode;
+        [SerializeField] protected GameObject _highlightSprite;
         [SerializeField] protected VoidEventHandlerSO _onInteractionTriggered;
 
         protected virtual void OnTriggerEnter2D(Collider2D collision)
@@ -20,7 +21,8 @@ namespace ConnectSphere
 
             if (collision.transform.parent.TryGetComponent<PlayerController>(out var playerObject))
             {
-                playerObject.SetInteractionData(InteractionCode, transform.position, gameObject);
+                ToggleHighlight(true);
+                playerObject.SetInteractionData(InteractionCode, transform.position, this);
                 _onInteractionTriggered.RaiseEvent();
             }
         }
@@ -35,8 +37,17 @@ namespace ConnectSphere
 
             if (collision.transform.parent.TryGetComponent<PlayerController>(out var playerObject))
             {
+                ToggleHighlight(false);
                 playerObject.SetInteractionData(-1);
                 _onInteractionTriggered.RaiseEvent();
+            }
+        }
+
+        public void ToggleHighlight(bool value)
+        {
+            if (_highlightSprite != null)
+            {
+                _highlightSprite.SetActive(value);
             }
         }
     }

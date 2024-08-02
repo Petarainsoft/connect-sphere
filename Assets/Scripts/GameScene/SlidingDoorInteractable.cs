@@ -48,7 +48,7 @@ namespace ConnectSphere
 
             if (collision.transform.parent.TryGetComponent<PlayerController>(out var playerObject))
             {
-                playerObject.SetInteractionData(InteractionCode, transform.position, gameObject);
+                playerObject.SetInteractionData(InteractionCode, transform.position, this);
                 _onInteractionTriggered.RaiseEvent();
             }
         }
