@@ -33,7 +33,7 @@ namespace ConnectSphere
         {
             var connectionGameObject = Instantiate(_videoConnectPrefab, Vector3.zero, quaternion.identity, transform);
             if ( connectionGameObject == null ) return null;
-            var videoSingleConnection = connectionGameObject.AddComponent<VideoSingleConnection>();
+            var videoSingleConnection = connectionGameObject.GetComponent<VideoSingleConnection>();
             var returnToPool = connectionGameObject.AddComponent<ReturnToPool>();
             if ( returnToPool != null ) returnToPool.pool = Pool;
             return videoSingleConnection;
