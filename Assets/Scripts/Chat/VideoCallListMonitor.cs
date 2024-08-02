@@ -51,6 +51,7 @@ namespace ConnectSphere
                 return;
             }
 
+            Debug.Log("<color=yellow>2</color>");
             var currentWorkingPeers = allSessions
                 .Where(e => e.Value._status == VideoCallStatus.Started || e.Value._status == VideoCallStatus.ShouldEnd)
                 .Select(e => e.Value._peersInfo).ToHashSet();
@@ -60,7 +61,7 @@ namespace ConnectSphere
 
             var newPeers = currentPeers.Except(currentWorkingPeers);
             var shouldEndPeers = currentWorkingPeers.Except(currentPeers);
-
+            Debug.Log("<color=yellow>3</color>");
             foreach (var newPeer in newPeers)
             {
                 var videoCallSession = new VideoCallSession()
@@ -70,30 +71,30 @@ namespace ConnectSphere
                 };
                 allSessions.TryAdd(newPeer, videoCallSession);
             }
-            
+            Debug.Log("<color=yellow>4</color>");
             var endedPeersButShouldStart = currentPeers.Intersect(endedPeers);
             foreach (var p in endedPeersButShouldStart)
             {
                 allSessions[p]._status = VideoCallStatus.ShouldStart;
             }
-
+            Debug.Log("<color=yellow>5</color>");
             // handle shouldStart Session
             var shouldStart = allSessions.Where(e => e.Value._status == VideoCallStatus.ShouldStart)
                 .Select(e => e.Value).ToList();
             OnShouldStartSession?.Invoke(shouldStart);
 
-
+            Debug.Log("<color=yellow>6</color>");
             // Handle shouldEnd session
             var shouldEndConnections = new List<VideoCallSession>();
             foreach (var shouldEnd in shouldEndPeers)
             {
                 allSessions[shouldEnd]._status = VideoCallStatus.ShouldEnd;
             }
-
+            Debug.Log("<color=yellow>7</color>");
             shouldEndConnections.AddRange(
                 allSessions.Where(e => e.Value._status == VideoCallStatus.ShouldEnd)
                     .Select(e => e.Value));
-
+            Debug.Log("<color=yellow>8</color>");
             OnShouldEndSession?.Invoke(shouldEndConnections);
         }
 
@@ -109,6 +110,8 @@ namespace ConnectSphere
                     _status = VideoCallStatus.ShouldStart
                 });
             }
+
+            OnShouldStartSession?.Invoke(allSessions.Values.ToList());
         }
 
         private void OnDisable()
