@@ -94,17 +94,20 @@ namespace ConnectSphere
                 stopwatch.Stop();
                 Debug.Log($"<color=green>\tTime to compute the result {stopwatch.Elapsed.TotalMilliseconds}</color>");
                 // _method2Time.value += (float)stopwatch.Elapsed.TotalMilliseconds;
+
+                bool raiseEvent = false;
+                var currentSets = new HashSet<OrderedPeersInfo>(pairsWithinDistance2.Select(pair =>
+                    new OrderedPeersInfo(pair.Item1._userId, pair.Item2._userId)));
                 
-                _orderedPeers.Clear();
-                foreach (var pair in pairsWithinDistance2)
+                if (!currentSets.SetEquals(_orderedPeers))
                 {
-                    // Debug.Log($"Distance: {Vector2.Distance(pair.Item1._position, pair.Item2._position)}");
-                    var orderedPeersInfo = new OrderedPeersInfo(pair.Item1._userId, pair.Item2._userId);
-                    orderedPeersInfo.SetPeerGroup(PeerGroup.OutOfOffice);
-                    _orderedPeers.Add(orderedPeersInfo);
+                    var temp = new HashSet<OrderedPeersInfo>(currentSets);
+                    temp.ExceptWith(_orderedPeers);
+
+                    _orderedPeers.IntersectWith(currentSets);
+                    _orderedPeers.UnionWith(temp);
+                    InvokePeersChanged();
                 }
-                
-                InvokePeersChanged();
                 
                 // if (pairsWithinDistance2.Count != pairsWithinDistance.Count) Debug.LogError("WROOONG RESULT");
                 
