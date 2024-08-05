@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AhnLab.EventSystem;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -25,13 +26,12 @@ namespace ConnectSphere
         //     GetComponentInChildren<TextMeshProUGUI>().text = userId.ToString();
         // }
         
-        private void Awake()
+        private async void Start()
         {
+            await UniTask.WaitUntil(() => GetComponent<Player>() != null);
             var player = GetComponent<Player>();
-            if ( player != null )
-            {
-                userId = player.DatabaseId;
-            }
+            await UniTask.WaitUntil(() => player.DatabaseId > -1);
+            userId = player.DatabaseId;
         }
 
         // private void Start()

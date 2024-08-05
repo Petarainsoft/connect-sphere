@@ -97,7 +97,7 @@ namespace ConnectSphere
                 _orderedPeers.Clear();
                 foreach (var pair in pairsWithinDistance2)
                 {
-                    // Debug.Log($"Point1: {pair.Item1}, Point2: {pair.Item2}, Distance: {Vector2.Distance(pair.Item1, pair.Item2)}");
+                    Debug.Log($"Distance: {Vector2.Distance(pair.Item1._position, pair.Item2._position)}");
                     var orderedPeersInfo = new OrderedPeersInfo(pair.Item1._userId, pair.Item2._userId);
                     orderedPeersInfo.SetPeerGroup(PeerGroup.OutOfOffice);
                     _orderedPeers.Add(orderedPeersInfo);
