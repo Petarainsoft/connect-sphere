@@ -22,6 +22,7 @@ namespace ConnectSphere
             rect.sizeDelta = new Vector2(rect.sizeDelta.x, CalculateHeight(_officeSO.Count));
 
             FillData();
+            Debug.Log(transform.childCount);
         }
 
         private void FillData()
@@ -42,7 +43,28 @@ namespace ConnectSphere
         private void FillItemData(GameObject item, int i)
         {
             Debug.Log(item.transform.GetComponentInChildren<TextMeshProUGUI>().text);
-            item.transform.GetComponentInChildren<TextMeshProUGUI>().text = _officeSO[i].name;
+            item.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = _officeSO[i].name;
+            int seconds = _officeSO[i].GetDateDiff();
+            if (_officeSO[i].GetDateDiff() < 60)
+            {
+                item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "Last minute";
+
+            }
+            else if (seconds < 3600)
+            {
+                item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = seconds % 60 + "-minute ago";
+
+            }
+
+            else if (seconds < 3600 * 24)
+            {
+                item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = seconds % 3600 + "-hour ago";
+            }
+            else
+            {
+                item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = seconds % (3600 * 24) + "-day ago";
+
+            }
         }
 
         private float CalculateHeight(int count)
