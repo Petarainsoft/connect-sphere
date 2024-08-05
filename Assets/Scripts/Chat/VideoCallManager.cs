@@ -191,10 +191,10 @@ namespace Chat
             }
         }
 
-        private void ShouldEnd(List<VideoCallSession> listSession)
+        private void ShouldEnd(List<VideoCallSession> shouldEndSessions)
         {
-            if ( listSession == null ) return;
-            var mySessions = listSession.Where(videoCallSession => videoCallSession.InvolveUser(_playerSO.DatabaseId));
+            if ( shouldEndSessions == null ) return;
+            var mySessions = shouldEndSessions.Where(videoCallSession => videoCallSession.InvolveUser(_playerSO.DatabaseId));
             var aboutToRemove = new List<OrderedPeersInfo>();
             foreach (var callSession in mySessions)
             {

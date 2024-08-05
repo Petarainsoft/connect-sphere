@@ -34,7 +34,10 @@ namespace ConnectSphere
         protected void RemovePeersRelatedTo(int id)
         {
             var count = _orderedPeers.RemoveWhere(e => e.HasUser(id));
-            if (count > 0) _onPeersChanged?.Invoke(_orderedPeers);
+            // if ( count > 0 )
+            {
+                _onPeersChanged?.Invoke(_orderedPeers);
+            }
         }
         
         protected void AddPeers(OrderedPeersInfo peerInfo)
@@ -54,7 +57,7 @@ namespace ConnectSphere
         {
             var pairs = new List<OrderedPeersInfo>();
 
-            for (int i = 0; i < elements.Count; i++)
+            for (var i = 0; i < elements.Count; i++)
             {
                 for (int j = i + 1; j < elements.Count; j++)
                 {
