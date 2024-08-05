@@ -40,7 +40,7 @@ namespace ConnectSphere
 
         private void HandlePeerList(HashSet<OrderedPeersInfo> currentPeers)
         {
-            if ( currentPeers == null || currentPeers.Count < 1 ) return;
+            if ( currentPeers == null ) return;
             var logPeers = string.Join(",", currentPeers);
             Debug.Log("<color=red>CurrentPeers</color>");
             Debug.Log($"<color=yellow>{logPeers}</color>");
@@ -71,12 +71,14 @@ namespace ConnectSphere
                 };
                 allSessions.TryAdd(newPeer, videoCallSession);
             }
+
             Debug.Log("<color=yellow>4</color>");
             var endedPeersButShouldStart = currentPeers.Intersect(endedPeers);
             foreach (var p in endedPeersButShouldStart)
             {
                 allSessions[p]._status = VideoCallStatus.ShouldStart;
             }
+
             Debug.Log("<color=yellow>5</color>");
             // handle shouldStart Session
             var shouldStart = allSessions.Where(e => e.Value._status == VideoCallStatus.ShouldStart)
@@ -90,6 +92,7 @@ namespace ConnectSphere
             {
                 allSessions[shouldEnd]._status = VideoCallStatus.ShouldEnd;
             }
+
             Debug.Log("<color=yellow>7</color>");
             shouldEndConnections.AddRange(
                 allSessions.Where(e => e.Value._status == VideoCallStatus.ShouldEnd)
@@ -101,9 +104,9 @@ namespace ConnectSphere
 
         private void InitSession(HashSet<OrderedPeersInfo> initSet)
         {
+            allSessions ??= new Dictionary<OrderedPeersInfo, VideoCallSession>();
             foreach (var peersPeer in initSet)
             {
-                allSessions ??= new Dictionary<OrderedPeersInfo, VideoCallSession>();
                 allSessions.TryAdd(peersPeer, new VideoCallSession()
                 {
                     _peersInfo = peersPeer,

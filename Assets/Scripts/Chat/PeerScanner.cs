@@ -22,37 +22,41 @@ namespace ConnectSphere
         {
             var peers = new OrderedPeersInfo(firstId, secondId);
             var done = _orderedPeers != null && _orderedPeers.Remove(peers);
-            if (done) _onPeersChanged?.Invoke(_orderedPeers);
+            if ( done ) _onPeersChanged?.Invoke(_orderedPeers);
         }
 
         protected void RemovePeers(OrderedPeersInfo peerInfo)
         {
             var done = _orderedPeers != null && _orderedPeers.Remove(peerInfo);
-            if (done) _onPeersChanged?.Invoke(_orderedPeers);
+            if ( done ) _onPeersChanged?.Invoke(_orderedPeers);
         }
-        
+
         protected void RemovePeersRelatedTo(int id)
         {
+            Debug.Log($"<color=yellow>Remove peers related to id {id}</color>");
+            Debug.Log($"<color=yellow>Peers Before removal {string.Join(",", _orderedPeers)}</color>");
             var count = _orderedPeers.RemoveWhere(e => e.HasUser(id));
             // if ( count > 0 )
-            {
-                _onPeersChanged?.Invoke(_orderedPeers);
-            }
+            // {
+            Debug.Log($"<color=yellow>Peers After removal {string.Join(",", _orderedPeers)}</color>");
+
+            _onPeersChanged?.Invoke(_orderedPeers);
+            // }
         }
-        
+
         protected void AddPeers(OrderedPeersInfo peerInfo)
         {
             var done = _orderedPeers != null && _orderedPeers.Add(peerInfo);
-            if (done) _onPeersChanged?.Invoke(_orderedPeers);
+            if ( done ) _onPeersChanged?.Invoke(_orderedPeers);
         }
 
         protected void AddPeers(int firstId, int secondId)
         {
             var peers = new OrderedPeersInfo(firstId, secondId);
             var done = _orderedPeers != null && _orderedPeers.Add(peers);
-            if (done) _onPeersChanged?.Invoke(_orderedPeers);
+            if ( done ) _onPeersChanged?.Invoke(_orderedPeers);
         }
-        
+
         protected List<OrderedPeersInfo> ToOrderedPeers(List<int> elements)
         {
             var pairs = new List<OrderedPeersInfo>();
@@ -84,8 +88,8 @@ namespace ConnectSphere
 
         public override int GetHashCode()
         {
-            var hash = 17 * 31 + firstPeerId.GetHashCode();
-            hash = hash * 31 + secondPeerId.GetHashCode();
+            var hash = 17*31 + firstPeerId.GetHashCode();
+            hash = hash*31 + secondPeerId.GetHashCode();
             return hash;
         }
 
@@ -93,10 +97,11 @@ namespace ConnectSphere
 
         public override bool Equals(object obj)
         {
-            if (obj is OrderedPeersInfo other)
+            if ( obj is OrderedPeersInfo other )
             {
                 return firstPeerId == other.firstPeerId && secondPeerId == other.secondPeerId;
             }
+
             return false;
         }
 
