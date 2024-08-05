@@ -42,9 +42,8 @@ namespace ConnectSphere
             Debug.Log($"<color=yellow>Peers Before removal {string.Join(",", _orderedPeers)}</color>");
             var count = _orderedPeers.RemoveWhere(e => e.HasUser(id));
             // if ( count > 0 )
-            // {
+            // {0
             Debug.Log($"<color=yellow>Peers After removal {string.Join(",", _orderedPeers)}</color>");
-
             _onPeersChanged?.Invoke(_orderedPeers);
             // }
         }
@@ -68,7 +67,7 @@ namespace ConnectSphere
 
             for (var i = 0; i < elements.Count; i++)
             {
-                for (int j = i + 1; j < elements.Count; j++)
+                for (var j = i + 1; j < elements.Count; j++)
                 {
                     pairs.Add(new OrderedPeersInfo(elements[i], elements[j]));
                 }

@@ -22,6 +22,9 @@ namespace ConnectSphere
         public static Action<int> OnPlayerEnteredArea;
         public static Action<int> OnPlayerExitArea;
 
+        public static Action<int> OnPlayerEntered;
+        public static Action<int> OnPlayerExit;
+
         private List<NetworkObject> _playersInThisArea = new List<NetworkObject>();
 
 
@@ -35,6 +38,7 @@ namespace ConnectSphere
             {
                 _playersInThisArea.Add(playerObject);
                 OnPlayerEnteredArea?.Invoke(areaId);
+                OnPlayerEntered?.Invoke(playerObject.GetComponent<Player>().DatabaseId);
                 
                 if (!playerObject.HasStateAuthority)
                     return;
@@ -65,6 +69,7 @@ namespace ConnectSphere
             {
                 _playersInThisArea.Remove(playerObject);
                 OnPlayerExitArea?.Invoke(areaId);
+                OnPlayerExit?.Invoke(playerObject.GetComponent<Player>().DatabaseId);
                 
                 if (!playerObject.HasStateAuthority)
                     return;

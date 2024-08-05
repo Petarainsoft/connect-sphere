@@ -24,9 +24,14 @@ namespace ConnectSphere
             base.Awake();
             currentPositions = new Dictionary<int, PositionedPeer>();
             AEventHandler.RegisterEvent<int, Vector2>(GlobalEvents.PositionUpdated, HandlePositionUpdated);
-
+            AEventHandler.RegisterEvent<int>(GlobalEvents.StopPositionTracking, HandlePositionRemoval);
 
             ProcessPeersInfo();
+        }
+
+        private void HandlePositionRemoval(int userId)
+        {
+            RemovePeersRelatedTo(userId);
         }
 
         private void HandlePositionUpdated(int userId, Vector2 position)
@@ -71,8 +76,9 @@ namespace ConnectSphere
                 // _method1Time.value += (float)stopwatch.Elapsed.TotalMilliseconds;
                 //
                 // algorithm 2
-                List<(PositionedPeer, PositionedPeer)> pairsWithinDistance2 = new List<(PositionedPeer, PositionedPeer)>();
-                Debug.Log("<color=red>METHOD 2</color>");;
+                var pairsWithinDistance2 = new List<(PositionedPeer, PositionedPeer)>();
+                Debug.Log("<color=red>METHOD 2</color>");
+                
                 stopwatch.Reset();
                 stopwatch.Start();
 
@@ -90,16 +96,15 @@ namespace ConnectSphere
                         }
                     }
                 }
-                
+
                 stopwatch.Stop();
                 Debug.Log($"<color=green>\tTime to compute the result {stopwatch.Elapsed.TotalMilliseconds}</color>");
                 // _method2Time.value += (float)stopwatch.Elapsed.TotalMilliseconds;
 
-                bool raiseEvent = false;
                 var currentSets = new HashSet<OrderedPeersInfo>(pairsWithinDistance2.Select(pair =>
                     new OrderedPeersInfo(pair.Item1._userId, pair.Item2._userId)));
-                
-                if (!currentSets.SetEquals(_orderedPeers))
+
+                if ( !currentSets.SetEquals(_orderedPeers) )
                 {
                     var temp = new HashSet<OrderedPeersInfo>(currentSets);
                     temp.ExceptWith(_orderedPeers);
@@ -108,9 +113,7 @@ namespace ConnectSphere
                     _orderedPeers.UnionWith(temp);
                     InvokePeersChanged();
                 }
-                
-                // if (pairsWithinDistance2.Count != pairsWithinDistance.Count) Debug.LogError("WROOONG RESULT");
-                
+
                 await UniTask.WaitForSeconds(_checkingInterval);
             }
         }
