@@ -184,6 +184,7 @@ namespace Chat
                 con.SetSenderCodec(_settings.SenderVideoCodec);
                 con.SetCameraStreamerSize((uint)_settings.StreamSize.x, (uint)_settings.StreamSize.y);
                 con.CreateConnection(videoCallSession._peersInfo.ConnectionId);
+                con.SetOrderedPeersInfo(videoCallSession._peersInfo);
                 con.RegisterReceivedTexture((i, t) =>
                     AEventHandler.ExecuteEvent(GlobalEvents.OnReceivedRemoteVideo, i, t));
                 _callListMonitor.SetSessionStatus(videoCallSession._peersInfo, VideoCallStatus.Started);

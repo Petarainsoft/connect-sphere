@@ -118,6 +118,7 @@ namespace ConnectSphere
                 if ( remoteVideoContainer == null ) return;
                 remoteVideoContainer.SetRemoteVideoTexture(videoTexture);
                 remoteVideoContainer.transform.SetParent(targetContainer);
+                if ( peersInfo == null ) Debug.Log("PeersInfo Is Null");
                 _peersInfos?.Add(peersInfo, remoteVideoContainer);
             }
         }
@@ -131,7 +132,6 @@ namespace ConnectSphere
                 Pool.Release(remoteVideoContainer);
             }
         }
-
 
         private void Start()
         {
