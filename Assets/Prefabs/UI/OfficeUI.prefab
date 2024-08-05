@@ -52354,7 +52354,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _checkingInterval: 0.25
-  _minimalDistance: 90
+  _minimalDistance: 1
 --- !u!1 &7267211538541053240
 GameObject:
   m_ObjectHideFlags: 0

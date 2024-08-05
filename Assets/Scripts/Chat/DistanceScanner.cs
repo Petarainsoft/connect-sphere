@@ -83,6 +83,7 @@ namespace ConnectSphere
                     for (int j = i + 1; j < currentPositions.Count; j++)
                     {
                         var distance = Vector2.Distance(listPos[i]._position, listPos[j]._position);
+                        Debug.Log($"Distance: {Vector2.Distance(listPos[i]._position, listPos[j]._position)}");
                         if ( distance <= _minimalDistance )
                         {
                             pairsWithinDistance2.Add((listPos[i], listPos[j]));
@@ -97,7 +98,7 @@ namespace ConnectSphere
                 _orderedPeers.Clear();
                 foreach (var pair in pairsWithinDistance2)
                 {
-                    Debug.Log($"Distance: {Vector2.Distance(pair.Item1._position, pair.Item2._position)}");
+                    // Debug.Log($"Distance: {Vector2.Distance(pair.Item1._position, pair.Item2._position)}");
                     var orderedPeersInfo = new OrderedPeersInfo(pair.Item1._userId, pair.Item2._userId);
                     orderedPeersInfo.SetPeerGroup(PeerGroup.OutOfOffice);
                     _orderedPeers.Add(orderedPeersInfo);
