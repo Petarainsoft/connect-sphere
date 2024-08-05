@@ -17,7 +17,7 @@ namespace ConnectSphere
 
         private float timeSinceLastChange;
 
-        private bool enablePositionTracking = false;
+        private bool enablePositionTracking = true;
 
         // public void SetUserId(int newUserId)
         // {
