@@ -18,6 +18,11 @@ namespace ConnectSphere
             _orderedPeers = new HashSet<OrderedPeersInfo>();
         }
 
+        protected void InvokePeersChanged()
+        {
+            _onPeersChanged?.Invoke(_orderedPeers);
+        }
+
         protected void RemovePeers(int firstId, int secondId)
         {
             var peers = new OrderedPeersInfo(firstId, secondId);
@@ -78,10 +83,17 @@ namespace ConnectSphere
         private readonly int firstPeerId;
         private readonly int secondPeerId;
 
+        private PeerGroup peerGroup;
+
         public OrderedPeersInfo(int first, int second)
         {
             firstPeerId = Math.Min(first, second);
             secondPeerId = Math.Max(first, second);
+        }
+
+        public void SetPeerGroup(PeerGroup pg)
+        {
+            peerGroup = pg;
         }
 
         public string ConnectionId => $"{firstPeerId}_{secondPeerId}";
@@ -106,5 +118,11 @@ namespace ConnectSphere
         }
 
         public bool HasUser(int userId) => firstPeerId == userId || secondPeerId == userId;
+    }
+
+    public enum PeerGroup
+    {
+        InOffice,
+        OutOfOffice
     }
 }
