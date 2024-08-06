@@ -8,7 +8,7 @@ namespace ConnectSphere
     /// <summary>
     /// The pool for webrtc video connection among peers
     /// </summary>
-    public class ConnectionPool : MonoBehaviour
+    public class VideoConnectionPool : MonoBehaviour
     {
         public bool _collectionChecks = true;
         public int _maxPoolSize = 15;

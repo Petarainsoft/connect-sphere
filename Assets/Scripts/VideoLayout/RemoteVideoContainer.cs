@@ -5,7 +5,7 @@ namespace ConnectSphere
 {
     public class RemoteVideoContainer : MonoBehaviour
     {
-        public RawImage _remoteVideoImage;
+        [SerializeField] private RawImage _remoteVideoImage;
 
         public void SetRemoteVideoTexture(Texture remoteTexture)
         {

@@ -26,7 +26,7 @@ namespace ConnectSphere
         {
             var peers = new OrderedPeersInfo(firstId, secondId);
             var done = _orderedPeers != null && _orderedPeers.Remove(peers);
-            if ( done ) _onPeersChanged?.Invoke(_orderedPeers);
+            if ( done ) InvokePeersChanged();
         }
 
         protected void RemovePeers(OrderedPeersInfo peerInfo)
@@ -35,40 +35,38 @@ namespace ConnectSphere
             if ( done ) _onPeersChanged?.Invoke(_orderedPeers);
         }
 
-        protected void RemovePeersRelatedTo(int id)
+        protected void RemovePeersForUser(int userId)
         {
-            Debug.Log($"<color=yellow>Remove peers related to id {id}</color>");
+            if ( _orderedPeers == null ) return;
+            Debug.Log($"<color=yellow>Remove peers related to userId {userId}</color>");
             Debug.Log($"<color=yellow>Peers Before removal {string.Join(",", _orderedPeers)}</color>");
-            var count = _orderedPeers.RemoveWhere(e => e.HasUser(id));
-            // if ( count > 0 )
-            // {0
+            var count = _orderedPeers.RemoveWhere(e => e != null && e.HasUser(userId));
             Debug.Log($"<color=yellow>Peers After removal {string.Join(",", _orderedPeers)}</color>");
-            _onPeersChanged?.Invoke(_orderedPeers);
-            // }
+            InvokePeersChanged();
         }
 
         protected void AddPeers(OrderedPeersInfo peerInfo)
         {
             var done = _orderedPeers != null && _orderedPeers.Add(peerInfo);
-            if ( done ) _onPeersChanged?.Invoke(_orderedPeers);
+            if ( done ) InvokePeersChanged();
         }
 
         protected void AddPeers(int firstId, int secondId)
         {
             var peers = new OrderedPeersInfo(firstId, secondId);
             var done = _orderedPeers != null && _orderedPeers.Add(peers);
-            if ( done ) _onPeersChanged?.Invoke(_orderedPeers);
+            if ( done ) InvokePeersChanged();
         }
 
-        protected List<OrderedPeersInfo> ToOrderedPeers(List<int> elements)
+        protected List<OrderedPeersInfo> ToOrderedPeers(List<int> userIds)
         {
             var pairs = new List<OrderedPeersInfo>();
-
-            for (var i = 0; i < elements.Count; i++)
+            if ( userIds == null ) return pairs;
+            for (var i = 0; i < userIds.Count; i++)
             {
-                for (var j = i + 1; j < elements.Count; j++)
+                for (var j = i + 1; j < userIds.Count; j++)
                 {
-                    pairs.Add(new OrderedPeersInfo(elements[i], elements[j]));
+                    pairs.Add(new OrderedPeersInfo(userIds[i], userIds[j]));
                 }
             }
 
@@ -81,7 +79,7 @@ namespace ConnectSphere
         private readonly int firstPeerId;
         private readonly int secondPeerId;
 
-        private PeerGroup peerGroup;
+        public PeerGroup PeerGroup { get; private set; }
 
         public OrderedPeersInfo(int first, int second)
         {
@@ -91,7 +89,7 @@ namespace ConnectSphere
 
         public void SetPeerGroup(PeerGroup pg)
         {
-            peerGroup = pg;
+            PeerGroup = pg;
         }
 
         public string ConnectionId => $"{firstPeerId}_{secondPeerId}";

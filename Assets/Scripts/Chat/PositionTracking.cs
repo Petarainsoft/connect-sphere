@@ -4,87 +4,64 @@ using UnityEngine;
 
 namespace ConnectSphere
 {
+    /// <summary>
+    /// Attach to player, reporting player position.
+    /// Listen to the GatheringArea event to start/stop reporting position.
+    /// When player enters an area, it will auto connect to other peers, no need to report its position.
+    /// When player leaves, keep reporting position.
+    /// </summary>
     public class PositionTracking : MonoBehaviour
     {
-        [Tooltip("Speed at which the object moves.")] [SerializeField]
-        private float _moveSpeed = 10f;
-
-        [Tooltip("Time interval to change direction.")] [SerializeField]
-        private float _changeDirectionInterval = 2.0f;
-
-        private int userId = -1;
-        private Vector2 moveDirection;
-
-        private float timeSinceLastChange;
-
+        private int userId = -1; // invalid userId
         private bool enablePositionTracking = true;
 
-        // public void SetUserId(int newUserId)
-        // {
-        //     userId = newUserId;
-        //     GetComponentInChildren<TextMeshProUGUI>().text = userId.ToString();
-        // }
-
-        private void Awake()
-        {
-            GatheringArea.OnPlayerEntered += HandlePlayerEnter;
-        }
-
-        private void OnDisable()
-        {
-            GatheringArea.OnPlayerExit -= HandlePlayerExit;
-        }
-
-        private void HandlePlayerEnter(int playerId)
-        {
-            enablePositionTracking = false;
-            AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, userId);
-        }
-        
-        private void HandlePlayerExit(int playerId)
-        {
-            enablePositionTracking = true;
-        }
-
+        [SerializeField] private float _reportInterval = 0.1f;
 
         private async void Start()
         {
             await UniTask.WaitUntil(() => GetComponent<Player>() != null);
             var player = GetComponent<Player>();
-            await UniTask.WaitUntil(() => player.DatabaseId > -1);
-            userId = player.DatabaseId;
+            await UniTask.WaitUntil(() => player != null && player.DatabaseId > -1);
+            if ( player != null ) userId = player.DatabaseId;
+            await ReportPosition();
         }
-
-        // private void Start()
-        // {
-        //     ChangeDirection();
-        // }
-
-        private void Update()
+        
+        private void OnEnable()
         {
-            // MoveObject();
-            // timeSinceLastChange += Time.deltaTime;
-            // if ( timeSinceLastChange >= changeDirectionInterval )
-            // {
-            //     ChangeDirection();
-            //     timeSinceLastChange = 0f;
-            // }
-
-            if ( userId <= -1 ) return;
-            if ( !enablePositionTracking ) return;
-            AEventHandler.ExecuteEvent(GlobalEvents.PositionUpdated, userId,
-                new Vector2(transform.position.x, transform.position.y));
+            GatheringArea.OnPlayerEntered += HandlePlayerEnter;
+            GatheringArea.OnPlayerExit += HandlePlayerExit;
         }
 
-        // private void MoveObject()
-        // {
-        //     transform.Translate(moveDirection*moveSpeed*Time.deltaTime);
-        // }
-        //
-        // private void ChangeDirection()
-        // {
-        //     float randomAngle = UnityEngine.Random.Range(0f, 360f);
-        //     moveDirection = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle));
-        // }
+        private void OnDisable()
+        {
+            GatheringArea.OnPlayerEntered -= HandlePlayerEnter;
+            GatheringArea.OnPlayerExit -= HandlePlayerExit;
+        }
+
+        private async void HandlePlayerEnter(int enteredUserId)
+        {
+            if ( enteredUserId != userId ) return; // if I am not the one, entering the area
+            enablePositionTracking = false;
+            await UniTask.DelayFrame(2);
+            AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, userId);
+        }
+
+        private void HandlePlayerExit(int exitedUserId)
+        {
+            if ( exitedUserId != userId ) return; // if I am not the one, exiting the area
+            enablePositionTracking = true;
+        }
+
+        private async UniTask ReportPosition()
+        {
+            while (true)
+            {
+                if ( userId <= -1 ) continue;
+                if ( !enablePositionTracking ) continue;
+                AEventHandler.ExecuteEvent(GlobalEvents.PlayerPositionUpdated, userId,
+                    new Vector2(transform.position.x, transform.position.y));
+                await UniTask.WaitForSeconds(_reportInterval);
+            }
+        }
     }
 }

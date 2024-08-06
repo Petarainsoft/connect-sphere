@@ -73,38 +73,41 @@ namespace ConnectSphere
         #endregion
         
         public Dictionary<OrderedPeersInfo, RemoteVideoContainer> _peersInfos;
+        private RemoteVideoContainer localVideoContainer;
 
         public void OnEnable()
         {
             AEventHandler.RegisterEvent<OrderedPeersInfo, Texture>(GlobalEvents.OnReceivedRemoteVideo, HandleRemoteVideo);
-            AEventHandler.RegisterEvent<OrderedPeersInfo>(GlobalEvents.OnCloseRemoteVideo, HandleCloseVideo);
+            AEventHandler.RegisterEvent<Texture>(GlobalEvents.DisplayLocalVideo, ShowLocalVideo);
+            AEventHandler.RegisterEvent(GlobalEvents.CloseLocalVideo, CloseLocalVideo);
+            AEventHandler.RegisterEvent<OrderedPeersInfo>(GlobalEvents.OnCloseRemoteCamera, HandleCloseVideo);
         }
 
         public void OnDisable()
         {
             AEventHandler.UnregisterEvent<OrderedPeersInfo, Texture>(GlobalEvents.OnReceivedRemoteVideo, HandleRemoteVideo);
-            AEventHandler.UnregisterEvent<OrderedPeersInfo>(GlobalEvents.OnCloseRemoteVideo, HandleCloseVideo);
+            AEventHandler.UnregisterEvent<Texture>(GlobalEvents.DisplayLocalVideo, ShowLocalVideo);
+            AEventHandler.UnregisterEvent(GlobalEvents.CloseLocalVideo, CloseLocalVideo);
+            AEventHandler.UnregisterEvent<OrderedPeersInfo>(GlobalEvents.OnCloseRemoteCamera, HandleCloseVideo);
+        }
+
+        private void ShowLocalVideo(Texture localTexture)
+        {
+            localVideoContainer = Pool.Get();
+            if ( localVideoContainer == null ) return;
+            localVideoContainer.SetRemoteVideoTexture(localTexture);
+            if ( GetTargetContainer(out var targetContainer) ) return;
+            localVideoContainer.transform.SetParent(targetContainer);
+        }
+
+        private void CloseLocalVideo()
+        {
+            if ( localVideoContainer != null ) Pool.Release(localVideoContainer);
         }
 
         private void HandleRemoteVideo(OrderedPeersInfo peersInfo, Texture videoTexture)
         {
-            RectTransform targetContainer = null;
-            switch (_currentMode)
-            {
-                case LayoutMode.None:
-                    return;
-                case LayoutMode.HorizontalTop:
-                    targetContainer = _horizontalContainer;
-                    break;
-                case LayoutMode.CenterGrid:
-                    targetContainer = _gridContainer;
-                    break;
-                case LayoutMode.Split:
-                    targetContainer = _leftRightContainer;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            if ( GetTargetContainer(out var targetContainer) ) return;
 
             if (peersInfo != null && _peersInfos != null && _peersInfos.TryGetValue(peersInfo, out var remoteVideoContainer))
             {
@@ -122,7 +125,30 @@ namespace ConnectSphere
                 _peersInfos?.Add(peersInfo, remoteVideoContainer);
             }
         }
-        
+
+        private bool GetTargetContainer(out RectTransform targetContainer)
+        {
+            targetContainer = null;
+            switch (_currentMode)
+            {
+                case LayoutMode.None:
+                    return true;
+                case LayoutMode.HorizontalTop:
+                    targetContainer = _horizontalContainer;
+                    break;
+                case LayoutMode.CenterGrid:
+                    targetContainer = _gridContainer;
+                    break;
+                case LayoutMode.Split:
+                    targetContainer = _leftRightContainer;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return false;
+        }
+
         private void HandleCloseVideo(OrderedPeersInfo peersInfo)
         {
             if (peersInfo != null && _peersInfos != null && _peersInfos.TryGetValue(peersInfo, out var remoteVideoContainer))

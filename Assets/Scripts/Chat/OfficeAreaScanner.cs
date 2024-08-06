@@ -59,7 +59,7 @@ namespace ConnectSphere.Chat
 
             if ( playersId.Count == 1 )
             {
-                RemovePeersRelatedTo(playersId[0]);
+                RemovePeersForUser(playersId[0]);
                 return;
             }
 

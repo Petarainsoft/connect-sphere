@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AhnLab.EventSystem;
 using ConnectSphere;
 using Cysharp.Threading.Tasks;
+using Doozy.Engine.UI;
 using Unity.RenderStreaming;
 using UnityEngine.Android;
 
@@ -17,41 +17,85 @@ namespace Chat
     /// </summary>
     public class VideoCallManager : MonoBehaviour
     {
-        [SerializeField] private SignalingManager _renderStreaming;
+        [SerializeField] private SignalingManager _signalingManager;
         [SerializeField] private RawImage _trayBarVideoImage;
-        [SerializeField] private List<RawImage> _remoteVideoImages;
 
 
         [SerializeField] private VideoCallListMonitor _callListMonitor;
-        [SerializeField] private ConnectionPool _callPool;
+        [SerializeField] private VideoConnectionPool _callPool;
 
-        private Dictionary<OrderedPeersInfo, VideoSingleConnection> _currentCalls =
+        private readonly Dictionary<OrderedPeersInfo, VideoSingleConnection> currentCalls =
             new Dictionary<OrderedPeersInfo, VideoSingleConnection>();
 
         [SerializeField] private RenderStreamingSettings _settings;
 
         [SerializeField] private PlayerInfoSO _playerSO;
 
-        private WebCamTexture webcamTexture;
-        private const float WaitTime = 2f;
+        [Header("Camera Requested Size")]
+        [SerializeField] private int _requestedWidth = 640;
+        [SerializeField] private int _requestedHeight = 480;
+        [SerializeField] private int _requestedFps = 20;
 
+        [SerializeField] private float _requestCameraTimeout = 5f;
+        
         [SerializeField] private Texture2D _black;
 
 
-        private PermissionHelper _cameraPermissionHelper = new PermissionHelper(Permission.Camera);
+        private WebCamTexture currentWebcamTexture;
+        
+        private readonly PermissionHelper cameraPermissionHelper = new PermissionHelper(Permission.Camera);
 
-        private void AskPermissionVideo()
+        private void Awake()
         {
-            _cameraPermissionHelper.OnPermissionResult = AfterRequestPermission;
-            _cameraPermissionHelper.Ask();
+            if ( _trayBarVideoImage == null )
+            {
+                Debug.LogError("Texture for showing camera is null");
+            }
+        }
+
+        private async void Start()
+        {
+            if ( _signalingManager.runOnAwake ) return;
+            if ( _settings != null && _settings?.SignalingSettings != null )
+            {
+                _signalingManager.useDefaultSettings = _settings.UseDefaultSettings;
+                _signalingManager.SetSignalingSettings(_settings.SignalingSettings);
+                _signalingManager.Configure();
+                Debug.Log("RenderingStreaming is running");
+            }
+
+            await UniTask.DelayFrame(1);
+            AskForCameraPermission();
+        }
+
+        private void AskForCameraPermission()
+        {
+            if ( cameraPermissionHelper == null )
+            {
+                Debug.LogError("cameraPermisisonHelper is not assigned!");
+                return;
+            }
+            cameraPermissionHelper.OnPermissionResult = AfterRequestPermission;
+            cameraPermissionHelper.Ask();
         }
 
         private void AfterRequestPermission(bool requestOk)
         {
             Debug.Log($"Request Permission with {requestOk}");
-            if ( requestOk )
+            if ( requestOk ) TryStartCamera();
+            else
             {
-                RequestCameraPermission();
+                var warningPopup = UIPopupManager.GetPopup("ActionPopup");
+                warningPopup.Data.SetButtonsLabels("Ok");
+                warningPopup.Data.SetLabelsTexts("Camera", "Camera Permission is denied!\nPlease grant permission from OS settings");
+                warningPopup.HideOnClickOverlay = false;
+                warningPopup.HideOnClickAnywhere = false;
+                warningPopup.HideOnClickContainer = false;
+                warningPopup.Data.SetButtonsCallbacks(()=>
+                {
+                    warningPopup.Hide();
+                });
+                warningPopup.Show();
             }
         }
 
@@ -59,104 +103,49 @@ namespace Chat
         {
             if ( !isOff )
             {
-                AskPermissionVideo();
+                AskForCameraPermission();
             }
             else
             {
-                webcamTexture.Stop();
-                _trayBarVideoImage.texture = _black;
+                if ( currentWebcamTexture != null ) currentWebcamTexture.Stop();
+                if ( _trayBarVideoImage != null ) _trayBarVideoImage.texture = _black;
             }
         }
 
-        private async void RequestCameraPermission()
+        private async UniTask<bool> TryStartCamera()
         {
-            if ( _trayBarVideoImage == null )
-            {
-                Debug.LogError("Texture for showing camera is null");
-                return;
-            }
-
-            await UniTask.WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length >= 1);
+            // wait until camera is available
+            var getWebcam = UniTask.WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length >= 1);
+            var timeout = UniTask.WaitForSeconds(_requestCameraTimeout);
+            await UniTask.WhenAny(getWebcam, timeout);
 
             if ( WebCamTexture.devices == null || WebCamTexture.devices.Length == 0 )
             {
-                return;
-            }
-
-            var cameraDevice = WebCamTexture.devices[0];
-            if ( WebCamTexture.devices.Length > 1 )
-                cameraDevice = WebCamTexture.devices[1]; // front camera for mobile devices
-
-            webcamTexture = new WebCamTexture(cameraDevice.name, 600, 480, (int)20);
-            webcamTexture.Play();
-
-            await UniTask.WaitUntil(() => webcamTexture != null && webcamTexture.didUpdateThisFrame);
-            Debug.Log($"CameraTexture Size w:{webcamTexture.width} h{webcamTexture.height}");
-
-            _trayBarVideoImage.texture = webcamTexture;
-        }
-
-
-        private async UniTask<bool> RequestCamera()
-        {
-            if ( _trayBarVideoImage == null )
-            {
-                Debug.LogError("Texture for showing camera is null");
+                var warningPopup = UIPopupManager.GetPopup("ActionPopup");
+                warningPopup.Data.SetButtonsLabels("Ok");
+                warningPopup.Data.SetLabelsTexts("Camera", "Failed to start camera");
+                warningPopup.HideOnClickOverlay = false;
+                warningPopup.HideOnClickAnywhere = false;
+                warningPopup.HideOnClickContainer = false;
+                warningPopup.Data.SetButtonsCallbacks(()=>
+                {
+                    warningPopup.Hide();
+                });
+                warningPopup.Show();
+                await UniTask.WaitUntil(warningPopup.IsDestroyed);
                 return false;
             }
 
-            var timeout = UniTask.WaitForSeconds(4f);
-            var waitForCameraAvailable =
-                UniTask.WaitUntil(() => WebCamTexture.devices != null && WebCamTexture.devices.Length >= 1);
-            await UniTask.WhenAny(timeout, waitForCameraAvailable);
+            var cameraDevice = WebCamTexture.devices[0]; // default is back camera
+            if ( WebCamTexture.devices.Length > 1 ) cameraDevice = WebCamTexture.devices[1]; // front camera for mobile devices
 
-            if ( WebCamTexture.devices == null || WebCamTexture.devices.Length == 0 )
-            {
-                return false;
-            }
-
-            var cameraDevice = WebCamTexture.devices[0];
-            if ( WebCamTexture.devices.Length > 1 )
-            {
-                cameraDevice = WebCamTexture.devices[1]; // front camera for mobile devices
-            }
-
-            webcamTexture = new WebCamTexture(cameraDevice.name, 600, 480, (int)20);
-            webcamTexture.Play();
-
-            await UniTask.WaitUntil(() => webcamTexture != null && webcamTexture.didUpdateThisFrame);
-            Debug.Log($"CameraTexture Size w:{webcamTexture.width} h{webcamTexture.height}");
-
-            _trayBarVideoImage.texture = webcamTexture;
-
-            Debug.Log($"Container Size w:{_trayBarVideoImage.texture.width} h{_trayBarVideoImage.texture.height}");
-
-            await UniTask.WaitForEndOfFrame(this);
-            await UniTask.WaitForSeconds(1f);
-
+            currentWebcamTexture = new WebCamTexture(cameraDevice.name, _requestedWidth, _requestedHeight, _requestedFps);
+            currentWebcamTexture.Play();
+            
+            await UniTask.WaitUntil(() => currentWebcamTexture != null && currentWebcamTexture.didUpdateThisFrame);
+            _trayBarVideoImage.texture = currentWebcamTexture;
             return true;
         }
-
-        public void OnTextureReceive(Texture receiveTexture, int textureIndex)
-        {
-            Debug.Log($"Receive Texture for index {textureIndex}");
-            _remoteVideoImages[textureIndex].texture = receiveTexture;
-            _remoteVideoImages[textureIndex].transform.parent.gameObject.SetActive(true);
-        }
-
-        private IEnumerator Start()
-        {
-            if ( _renderStreaming.runOnAwake )
-                yield break;
-            if ( _settings != null )
-                _renderStreaming.useDefaultSettings = _settings.UseDefaultSettings;
-            if ( _settings?.SignalingSettings != null )
-                _renderStreaming.SetSignalingSettings(_settings.SignalingSettings);
-            _renderStreaming.Configure();
-            RequestCamera();
-            Debug.Log("RenderingStreaming is running");
-        }
-
 
         private void OnEnable()
         {
@@ -174,12 +163,13 @@ namespace Chat
         {
             if ( listSession == null ) return;
             var mySessions = listSession.Where(videoCallSession => videoCallSession.InvolveUser(_playerSO.DatabaseId));
+            bool hasStartASession = false;
             foreach (var videoCallSession in mySessions)
             {
-                _currentCalls.TryAdd(videoCallSession._peersInfo, _callPool.Pool.Get());
-                if ( !_currentCalls.TryGetValue(videoCallSession._peersInfo, out var con) ) continue;
-                _renderStreaming.AddHandler(con._singleWebRtcConnection);
-                con.SetCameraStreamerSource(_trayBarVideoImage.texture);
+                currentCalls.TryAdd(videoCallSession._peersInfo, _callPool.Pool.Get());
+                if ( !currentCalls.TryGetValue(videoCallSession._peersInfo, out var con) ) continue;
+                _signalingManager.AddHandler(con._singleWebRtcConnection);
+                con.SetCameraStreamerSource(currentWebcamTexture);
                 con.SetReceiveCodec(_settings.ReceiverVideoCodec);
                 con.SetSenderCodec(_settings.SenderVideoCodec);
                 con.SetCameraStreamerSize((uint)_settings.StreamSize.x, (uint)_settings.StreamSize.y);
@@ -188,31 +178,44 @@ namespace Chat
                 con.RegisterReceivedTexture((i, t) =>
                     AEventHandler.ExecuteEvent(GlobalEvents.OnReceivedRemoteVideo, i, t));
                 _callListMonitor.SetSessionStatus(videoCallSession._peersInfo, VideoCallStatus.Started);
+                hasStartASession = true;
+            }
+
+            if ( hasStartASession )
+            {
+                AEventHandler.ExecuteEvent(GlobalEvents.DisplayLocalVideo, currentWebcamTexture);
             }
         }
 
         private void ShouldEnd(List<VideoCallSession> shouldEndSessions)
         {
             if ( shouldEndSessions == null ) return;
-            var mySessions = shouldEndSessions.Where(videoCallSession => videoCallSession.InvolveUser(_playerSO.DatabaseId));
+            var mySessions =
+                shouldEndSessions.Where(videoCallSession => videoCallSession.InvolveUser(_playerSO.DatabaseId));
             var aboutToRemove = new List<OrderedPeersInfo>();
             foreach (var callSession in mySessions)
             {
-                if ( !_currentCalls.TryGetValue(callSession._peersInfo, out var videoSingleCon) ) continue;
-                if (videoSingleCon._singleWebRtcConnection.ExistConnection(callSession._peersInfo.ConnectionId))
+                if ( !currentCalls.TryGetValue(callSession._peersInfo, out var videoSingleCon) ) continue;
+                if ( videoSingleCon._singleWebRtcConnection.ExistConnection(callSession._peersInfo.ConnectionId) )
                 {
                     videoSingleCon.DeleteConnection(callSession._peersInfo.ConnectionId);
                 }
-                _renderStreaming.RemoveHandler(videoSingleCon._singleWebRtcConnection);
+
+                _signalingManager.RemoveHandler(videoSingleCon._singleWebRtcConnection);
                 Debug.Log($"<color=red>End Call {callSession._peersInfo}</color>");
                 _callListMonitor.SetSessionStatus(callSession._peersInfo, VideoCallStatus.Ended);
-                AEventHandler.ExecuteEvent(GlobalEvents.OnCloseRemoteVideo, callSession._peersInfo);
+                AEventHandler.ExecuteEvent(GlobalEvents.OnCloseRemoteCamera, callSession._peersInfo);
                 aboutToRemove.Add(callSession._peersInfo);
             }
 
             foreach (var peersInfo in aboutToRemove)
             {
-                _currentCalls.Remove(peersInfo);
+                if ( peersInfo != null ) currentCalls?.Remove(peersInfo);
+            }
+
+            if ( currentCalls.Count == 0 )
+            {
+                AEventHandler.ExecuteEvent(GlobalEvents.CloseLocalVideo);
             }
         }
     }

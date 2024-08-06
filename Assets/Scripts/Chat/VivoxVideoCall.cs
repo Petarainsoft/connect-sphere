@@ -459,7 +459,7 @@ namespace Chat
         }
 
         [SerializeField] private VideoCallListMonitor _callListMonitor;
-        [SerializeField] private ConnectionPool _callPool;
+        [SerializeField] private VideoConnectionPool _callPool;
 
 
         private Dictionary<OrderedPeersInfo, VideoSingleConnection> _currentCalls =

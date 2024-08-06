@@ -61208,9 +61208,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f79bb6c4d478ef4bb13e431977d1ada, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _renderStreaming: {fileID: 9089694420433546358}
+  _signalingManager: {fileID: 9089694420433546358}
   _trayBarVideoImage: {fileID: 1556560745763989759}
-  _remoteVideoImages: []
   _callListMonitor: {fileID: 4064234240134681267}
   _callPool: {fileID: 8298925119216281068}
   _settings:
@@ -61219,7 +61218,7 @@ MonoBehaviour:
     signalingAddress: localhost
     signalingInterval: 5000
     signalingSecured: 0
-    streamSize: {x: 1280, y: 720}
+    streamSize: {x: 640, y: 480}
     receiverVideoCodec:
       m_MimeType: 
       m_SdpFmtpLine: 
@@ -61227,6 +61226,10 @@ MonoBehaviour:
       m_MimeType: 
       m_SdpFmtpLine: 
   _playerSO: {fileID: 11400000, guid: 592e4bbe575cc0d418dbf8b8efa31ad3, type: 2}
+  _requestedWidth: 640
+  _requestedHeight: 480
+  _requestedFps: 20
+  _requestCameraTimeout: 5
   _black: {fileID: 2800000, guid: b9d479250e7ac0547a32dc79c6ced1de, type: 3}
 --- !u!1 &8860967175604555767
 GameObject:

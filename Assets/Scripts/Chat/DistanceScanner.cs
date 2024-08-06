@@ -1,48 +1,47 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using AhnLab.EventSystem;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
-using Debug = UnityEngine.Debug;
 
 namespace ConnectSphere
 {
+    /// <summary>
+    /// Listen to the reported positions, and provide the list of OrderedPeerInfo of both peers in
+    /// a specific distance
+    /// </summary>
     public class DistanceScanner : PeerScanner
     {
         [SerializeField] private float _checkingInterval = 0.2f;
         [SerializeField] private float _minimalDistance = 1f;
 
-        // [SerializeField] private Slider _method1Time;
-        // [SerializeField] private Slider _method2Time;
-
-        private Dictionary<int, PositionedPeer> currentPositions;
+        private readonly Dictionary<int, PeerPosition> currentPositions = new Dictionary<int, PeerPosition>();
 
         protected override void Awake()
         {
             base.Awake();
-            currentPositions = new Dictionary<int, PositionedPeer>();
-            AEventHandler.RegisterEvent<int, Vector2>(GlobalEvents.PositionUpdated, HandlePositionUpdated);
-            AEventHandler.RegisterEvent<int>(GlobalEvents.StopPositionTracking, HandlePositionRemoval);
+            AEventHandler.RegisterEvent<int, Vector2>(GlobalEvents.PlayerPositionUpdated, HandlePositionUpdated);
+            AEventHandler.RegisterEvent<int>(GlobalEvents.StopPositionTracking, RemovePeersForUser);
 
-            ProcessPeersInfo();
+            _ = ProcessPeersInfo();
         }
 
-        private void HandlePositionRemoval(int userId)
+        private void OnDestroy()
         {
-            RemovePeersRelatedTo(userId);
+            AEventHandler.UnregisterEvent<int, Vector2>(GlobalEvents.PlayerPositionUpdated, HandlePositionUpdated);
+            AEventHandler.UnregisterEvent<int>(GlobalEvents.StopPositionTracking, RemovePeersForUser);
         }
 
         private void HandlePositionUpdated(int userId, Vector2 position)
         {
-            if ( currentPositions.ContainsKey(userId) )
+            if ( currentPositions == null ) return;
+            if ( currentPositions.TryGetValue(userId, out var positionedPeer) )
             {
-                currentPositions[userId]._position = position;
+                if ( positionedPeer != null ) positionedPeer._position = position;
             }
             else
             {
-                currentPositions.Add(userId, new PositionedPeer()
+                currentPositions.Add(userId, new PeerPosition
                 {
                     _userId = userId,
                     _position = position
@@ -50,67 +49,35 @@ namespace ConnectSphere
             }
         }
 
-        private readonly Stopwatch stopwatch = new Stopwatch();
-
-        // private KDTree kdTree = null;
         private async UniTaskVoid ProcessPeersInfo()
         {
-            while (true)
+            while (currentPositions != null)
             {
-                // // algorithm 1
-                // Debug.Log("<color=red>METHOD 1</color>");;
-                //
-                // var listPos = currentPositions.Values.Select(e=>e._position).ToList();
-                // kdTree = new KDTree(listPos);
-                // stopwatch.Reset();
-                // stopwatch.Start();
-                // List<(Vector2, Vector2)> pairsWithinDistance = kdTree.FindPairsWithinDistance(_minimalDistance);
-                // stopwatch.Stop();
-                //
-                // foreach (var pair in pairsWithinDistance)
-                // {
-                //     Debug.Log($"Point1: {pair.Item1}, Point2: {pair.Item2}, Distance: {Vector2.Distance(pair.Item1, pair.Item2)}");
-                // }
-                //
-                // Debug.Log($"<color=green>\tTime to compute the result {stopwatch.Elapsed.TotalMilliseconds}</color>");
-                // _method1Time.value += (float)stopwatch.Elapsed.TotalMilliseconds;
-                //
-                // algorithm 2
-                var pairsWithinDistance2 = new List<(PositionedPeer, PositionedPeer)>();
-                Debug.Log("<color=red>METHOD 2</color>");
-                
-                stopwatch.Reset();
-                stopwatch.Start();
+                var pairWithDistance = new List<(PeerPosition, PeerPosition)>();
 
-                var listPos = currentPositions.Values.ToList();
-
-                for (int i = 0; i < currentPositions.Count - 1; i++)
+                foreach (var positionA in currentPositions)
                 {
-                    for (int j = i + 1; j < currentPositions.Count; j++)
+                    foreach (var positionB in currentPositions)
                     {
-                        var distance = Vector2.Distance(listPos[i]._position, listPos[j]._position);
-                        Debug.Log($"Distance: {Vector2.Distance(listPos[i]._position, listPos[j]._position)}");
-                        if ( distance <= _minimalDistance )
-                        {
-                            pairsWithinDistance2.Add((listPos[i], listPos[j]));
-                        }
+                        if ( positionA.Key == positionB.Key ) continue;
+                        if ( positionA.Value == null || positionB.Value == null ) continue;
+                        var distance = Vector2.Distance(positionA.Value._position, positionB.Value._position);
+                        if ( !(distance <= _minimalDistance) ) continue;
+                        pairWithDistance.Add((positionA.Value, positionB.Value));
                     }
                 }
 
-                stopwatch.Stop();
-                Debug.Log($"<color=green>\tTime to compute the result {stopwatch.Elapsed.TotalMilliseconds}</color>");
-                // _method2Time.value += (float)stopwatch.Elapsed.TotalMilliseconds;
-
-                var currentSets = new HashSet<OrderedPeersInfo>(pairsWithinDistance2.Select(pair =>
+                var currentSets = new HashSet<OrderedPeersInfo>(pairWithDistance.Select(pair =>
                     new OrderedPeersInfo(pair.Item1._userId, pair.Item2._userId)));
 
                 if ( !currentSets.SetEquals(_orderedPeers) )
                 {
-                    var temp = new HashSet<OrderedPeersInfo>(currentSets);
-                    temp.ExceptWith(_orderedPeers);
-
-                    _orderedPeers.IntersectWith(currentSets);
-                    _orderedPeers.UnionWith(temp);
+                    // var temp = new HashSet<OrderedPeersInfo>(currentSets);
+                    // temp.ExceptWith(_orderedPeers);
+                    //
+                    // _orderedPeers.IntersectWith(currentSets);
+                    // _orderedPeers.UnionWith(temp);
+                    _orderedPeers = currentSets;
                     InvokePeersChanged();
                 }
 
@@ -118,92 +85,10 @@ namespace ConnectSphere
             }
         }
 
-        private class PositionedPeer
+        private class PeerPosition
         {
             public int _userId;
             public Vector2 _position;
         }
     }
-
-    // public class KDTreeNode
-    // {
-    //     public Vector2 Point { get; private set; }
-    //     public KDTreeNode Left { get; set; }
-    //     public KDTreeNode Right { get; set; }
-    //
-    //     public KDTreeNode(Vector2 point)
-    //     {
-    //         Point = point;
-    //         Left = null;
-    //         Right = null;
-    //     }
-    // }
-    //
-    // public class KDTree
-    // {
-    //     private KDTreeNode root;
-    //     private int k = 2; // Number of dimensions (2 for 2D space)
-    //
-    //     public KDTree(List<Vector2> points)
-    //     {
-    //         root = BuildKDTree(points, 1);
-    //     }
-    //
-    //     private KDTreeNode BuildKDTree(List<Vector2> points, int depth)
-    //     {
-    //         if ( points.Count == 0 )
-    //             return null;
-    //
-    //         int axis = depth%k;
-    //         points.Sort((a, b) => a[axis].CompareTo(b[axis]));
-    //         int medianIndex = points.Count/2;
-    //
-    //         KDTreeNode node = new KDTreeNode(points[medianIndex])
-    //         {
-    //             Left = BuildKDTree(points.GetRange(0, medianIndex), depth + 1),
-    //             Right = BuildKDTree(points.GetRange(medianIndex + 1, points.Count - medianIndex - 1), depth + 1)
-    //         };
-    //
-    //         return node;
-    //     }
-    //
-    //     public List<(Vector2, Vector2)> FindPairsWithinDistance(float distance)
-    //     {
-    //         List<(Vector2, Vector2)> result = new List<(Vector2, Vector2)>();
-    //         FindPairsWithinDistance(root, distance, 0, result);
-    //         return result;
-    //     }
-    //
-    //     private void FindPairsWithinDistance(KDTreeNode node, float distance, int depth,
-    //         List<(Vector2, Vector2)> result)
-    //     {
-    //         if ( node == null )
-    //             return;
-    //
-    //         FindPairsWithinSubtree(node, node, distance, depth, result);
-    //
-    //         if ( node.Left != null )
-    //             FindPairsWithinDistance(node.Left, distance, depth + 1, result);
-    //
-    //         if ( node.Right != null )
-    //             FindPairsWithinDistance(node.Right, distance, depth + 1, result);
-    //     }
-    //
-    //     private void FindPairsWithinSubtree(KDTreeNode node, KDTreeNode target, float distance, int depth,
-    //         List<(Vector2, Vector2)> result)
-    //     {
-    //         if ( node == null || target == null )
-    //             return;
-    //
-    //         if ( node != target && Vector2.Distance(node.Point, target.Point) < distance )
-    //             result.Add((node.Point, target.Point));
-    //
-    //         int axis = depth%k;
-    //         if ( node.Left != null && Mathf.Abs(node.Point[axis] - target.Point[axis]) < distance )
-    //             FindPairsWithinSubtree(node.Left, target, distance, depth + 1, result);
-    //
-    //         if ( node.Right != null && Mathf.Abs(node.Point[axis] - target.Point[axis]) < distance )
-    //             FindPairsWithinSubtree(node.Right, target, distance, depth + 1, result);
-    //     }
-    // }
 }
