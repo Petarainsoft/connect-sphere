@@ -52336,11 +52336,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7ad5f77fd7e91047b42bd3a151b10fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _areas:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  _playerInfoSo: {fileID: 11400000, guid: 592e4bbe575cc0d418dbf8b8efa31ad3, type: 2}
 --- !u!114 &1489893705320929572
 MonoBehaviour:
   m_ObjectHideFlags: 0
