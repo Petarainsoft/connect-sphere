@@ -98,6 +98,7 @@ namespace ConnectSphere
             localVideoContainer.SetRemoteVideoTexture(localTexture);
             if ( GetTargetContainer(out var targetContainer) ) return;
             localVideoContainer.transform.SetParent(targetContainer);
+            localVideoContainer.transform.SetSiblingIndex(0);
         }
 
         private void CloseLocalVideo()

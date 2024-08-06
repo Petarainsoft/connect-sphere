@@ -183,7 +183,7 @@ namespace Chat
 
             if ( hasStartASession )
             {
-                AEventHandler.ExecuteEvent(GlobalEvents.DisplayLocalVideo, currentWebcamTexture);
+                AEventHandler.ExecuteEvent(GlobalEvents.DisplayLocalVideo, currentWebcamTexture as Texture);
             }
         }
 
