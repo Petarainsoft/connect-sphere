@@ -53,6 +53,7 @@ namespace ConnectSphere
         {
             while (currentPositions != null)
             {
+                //todo remove this temp pairwithdistance
                 var pairWithDistance = new List<(PeerPosition, PeerPosition)>();
 
                 foreach (var positionA in currentPositions)

@@ -25,7 +25,7 @@ namespace ConnectSphere
             if ( player != null ) userId = player.DatabaseId;
             await ReportPosition();
         }
-        
+
         private void OnEnable()
         {
             GatheringArea.OnPlayerEntered += HandlePlayerEnter;
@@ -56,8 +56,8 @@ namespace ConnectSphere
         {
             while (true)
             {
-                if ( userId <= -1 ) continue;
-                if ( !enablePositionTracking ) continue;
+                await UniTask.WaitUntil(() => userId > -1);
+                await UniTask.WaitUntil(() => enablePositionTracking);
                 AEventHandler.ExecuteEvent(GlobalEvents.PlayerPositionUpdated, userId,
                     new Vector2(transform.position.x, transform.position.y));
                 await UniTask.WaitForSeconds(_reportInterval);

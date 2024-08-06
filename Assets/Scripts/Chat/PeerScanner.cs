@@ -32,7 +32,7 @@ namespace ConnectSphere
         protected void RemovePeers(OrderedPeersInfo peerInfo)
         {
             var done = _orderedPeers != null && _orderedPeers.Remove(peerInfo);
-            if ( done ) _onPeersChanged?.Invoke(_orderedPeers);
+            if ( done ) InvokePeersChanged();
         }
 
         protected void RemovePeersForUser(int userId)
