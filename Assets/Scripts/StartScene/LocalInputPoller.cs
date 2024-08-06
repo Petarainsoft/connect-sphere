@@ -12,7 +12,8 @@ namespace ConnectSphere
         private const string AXIS_HORIZONTAL = "Horizontal";
         private const string AXIS_VERTICAL = "Vertical";
         private const string BUTTON_INTERACT = "Interact";
-        private const string BUTTON_OPENUSERINFO = "OpenUserInfo";
+        private const string BUTTON_OPEN_USER_INFO = "OpenUserInfo";
+        private const string BUTTON_INVITE_TO_GAME = "InviteToGame";
 
         // The INetworkRunnerCallbacks of this LocalInputPoller are automatically detected
         // because the script is located on the same object as the NetworkRunner and
@@ -41,7 +42,8 @@ namespace ConnectSphere
             localInput.HorizontalInput = Input.GetAxisRaw(AXIS_HORIZONTAL);
             localInput.VerticalInput = Input.GetAxisRaw(AXIS_VERTICAL);
             localInput.Buttons.Set(PlayerButtons.Interact, Input.GetButton(BUTTON_INTERACT));
-            localInput.Buttons.Set(PlayerButtons.OpenUserInfo, Input.GetButton(BUTTON_OPENUSERINFO));
+            localInput.Buttons.Set(PlayerButtons.OpenUserInfo, Input.GetButton(BUTTON_OPEN_USER_INFO));
+            localInput.Buttons.Set(PlayerButtons.InviteToGame, Input.GetButton(BUTTON_INVITE_TO_GAME));
 
             input.Set(localInput);
         }

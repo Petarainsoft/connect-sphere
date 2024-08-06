@@ -9,7 +9,10 @@ namespace ConnectSphere
     {
         public int InteractionCode;
         [SerializeField] protected GameObject _highlightSprite;
+        [SerializeField] protected Activity _linkedActivity;
         [SerializeField] protected VoidEventHandlerSO _onInteractionTriggered;
+
+        [Networked] public bool LimitToOne { get; set; }
 
         protected virtual void OnTriggerEnter2D(Collider2D collision)
         {
@@ -49,6 +52,59 @@ namespace ConnectSphere
             {
                 _highlightSprite.SetActive(value);
             }
+        }
+
+        public void SetLimit(bool value, int playerNetworkedId)
+        {
+            if (value)
+            {
+                LimitToOne = value;
+                if (_linkedActivity != null)
+                    _linkedActivity.AddPlayer(playerNetworkedId);
+            }
+            else
+            {
+                LimitToOne = value;
+                if (_linkedActivity != null)
+                    _linkedActivity.RemovePlayer(playerNetworkedId);
+            }
+        }
+
+        public bool GetActivityAvail()
+        {
+            return _linkedActivity != null;
+        }
+
+        public void SendInvite()
+        {
+            if (_linkedActivity == null)
+                return;
+
+            foreach (var player in _linkedActivity.InteractingPlayers)
+            {
+                SendInvitationToAnotherUserRpc(GetPlayerRefById(player));
+            }
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void SendInvitationToAnotherUserRpc([RpcTarget] PlayerRef player)
+        {
+            if (_linkedActivity.InteractingPlayers.Count > 1)
+            {
+                _linkedActivity.StartActivity();
+            }
+        }
+
+        private PlayerRef GetPlayerRefById(int playerId)
+        {
+            foreach (PlayerRef playerRef in Runner.ActivePlayers)
+            {
+                if (Runner.GetPlayerObject(playerRef) is NetworkObject playerObject && playerObject.InputAuthority.PlayerId == playerId)
+                {
+                    return playerRef;
+                }
+            }
+            return PlayerRef.None;
         }
     }
 }

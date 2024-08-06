@@ -8,6 +8,13 @@ namespace ConnectSphere
 {
     public class PlayerController : NetworkBehaviour
     {
+        private enum State
+        {
+            Normal = 0,
+            BlockControl = 1,
+            Busy = 2
+        }
+
         [Header("Data")]
         [SerializeField] private float _speed = 5f;
         public int InteractionCode { get; set; } = -1;
@@ -15,6 +22,7 @@ namespace ConnectSphere
         [Header("Events")]
         [SerializeField] private VoidEventHandlerSO _onOpenUserInfoButtonPressed;
         [SerializeField] private BooleanEventHandlerSO _onUiInteracting;
+        [SerializeField] private BooleanEventHandlerSO _onActivityPanelToggled;
 
         private Rigidbody2D _rigidbody;
         private Animator _animator;
@@ -26,6 +34,8 @@ namespace ConnectSphere
         private bool _isMobile;
         private bool _canInteract;
         private bool _isBlockingControl;
+        private bool _isReadyForActivity;
+        private bool _isInActivity;
 
         [Networked, OnChangedRender(nameof(OnHorizontalChanged))] public float horizontalParam { get; set; }
         [Networked, OnChangedRender(nameof(OnVerticalChanged))] public float verticalPararm { get; set; }
@@ -40,12 +50,14 @@ namespace ConnectSphere
 
         private void OnEnable()
         {
-            _onUiInteracting.OnEventRaised += ToggleControl;
+            _onUiInteracting.OnEventRaised += BlockControl;
+            _onActivityPanelToggled.OnEventRaised += SetInActivity;
         }
 
         private void OnDisable()
         {
-            _onUiInteracting.OnEventRaised -= ToggleControl;
+            _onUiInteracting.OnEventRaised -= BlockControl;
+            _onActivityPanelToggled.OnEventRaised -= SetInActivity;
         }
 
         private void Start()
@@ -143,7 +155,7 @@ namespace ConnectSphere
                     if (_interactionTarget != null)
                     {
                         var targetDoor = _interactionTarget.GetComponent<SlidingDoorInteractable>();
-                        targetDoor.ToggleDoor(!targetDoor.IsActivated);
+                        targetDoor.ToggleDoorRpc(!targetDoor.IsActivated);
                     }
                 }
                 else if (InteractionCode == 5)
@@ -153,7 +165,7 @@ namespace ConnectSphere
 
                     if (_interactionTarget != null)
                     {
-                        ToggleControl(true);
+                        BlockControl(true);
                         var target = _interactionTarget.GetComponent<StickerBoardInteractable>();
                         target.ActivateLocalCanvas();
                         _interactionTarget.ToggleHighlight(false);
@@ -168,24 +180,42 @@ namespace ConnectSphere
 
                 _onOpenUserInfoButtonPressed.RaiseEvent();
             }
-            previousButton = input.Buttons;
+
+            if (input.Buttons.WasPressed(previousButton, PlayerButtons.InviteToGame))
+            {
+                if (!_isReadyForActivity || _isInActivity)
+                    return;
+
+                if (_interactionTarget != null)
+                {
+                    _interactionTarget.SendInvite();
+                }
+            }
+
+             previousButton = input.Buttons;
         }
 
         private void HandleSitting()
         {
             if (_isBlockingControl)
             {
+                _interactionTarget.SetLimit(false, Object.InputAuthority.PlayerId);
                 verticalPararm = 0;
                 horizontalParam = 0;
                 sittingParam = false;
-                ToggleControl(false);
+                BlockControl(false);
+                _isReadyForActivity = false;
             }
             else
             {
+                if (_interactionTarget.LimitToOne)
+                    return;
+
+                _interactionTarget.SetLimit(true, Object.InputAuthority.PlayerId);
                 _interactionTarget.ToggleHighlight(false);
-                _rigidbody.velocity = Vector2.zero;
-                ToggleControl(true);
+                BlockControl(true);
                 transform.position = _interactPosition;
+                _isReadyForActivity = _interactionTarget.GetActivityAvail();
 
                 switch (InteractionCode)
                 {
@@ -233,13 +263,18 @@ namespace ConnectSphere
             _animator.SetBool(_hashSitting, sittingParam);
         }
 
-        private void ToggleControl(bool isBlocking)
+        private void BlockControl(bool isBlocking)
         {
             _isBlockingControl = isBlocking;
             if (isBlocking)
             {
                 _rigidbody.velocity = Vector3.zero;
             }
+        }
+
+        private void SetInActivity(bool value)
+        {
+            _isInActivity = value;
         }
     }
 }
