@@ -163,16 +163,19 @@ namespace Chat
         {
             if ( listSession == null ) return;
             var mySessions = listSession.Where(videoCallSession => videoCallSession.InvolveUser(_playerSO.DatabaseId));
+            Debug.Log($"SHOULD START {string.Join(",",listSession)}");
             var hasStartASession = false;
             foreach (var videoCallSession in mySessions)
             {
                 currentCalls.TryAdd(videoCallSession._peersInfo, _callPool.Pool.Get());
                 if ( !currentCalls.TryGetValue(videoCallSession._peersInfo, out var con) ) continue;
+                Debug.Log($"_____ Process for {videoCallSession._peersInfo}");
                 _signalingManager.AddHandler(con._singleWebRtcConnection);
                 con.SetCameraStreamerSource(currentWebcamTexture);
                 con.SetReceiveCodec(_settings.ReceiverVideoCodec);
                 con.SetSenderCodec(_settings.SenderVideoCodec);
                 con.SetCameraStreamerSize((uint)_settings.StreamSize.x, (uint)_settings.StreamSize.y);
+                Debug.Log($"_____ Create CONNECTION: {videoCallSession._peersInfo.ConnectionId}");
                 con.CreateConnection(videoCallSession._peersInfo.ConnectionId);
                 con.SetOrderedPeersInfo(videoCallSession._peersInfo);
                 con.RegisterReceivedTexture((i, t) =>
@@ -192,16 +195,17 @@ namespace Chat
             if ( shouldEndSessions == null ) return;
             var mySessions =
                 shouldEndSessions.Where(videoCallSession => videoCallSession.InvolveUser(_playerSO.DatabaseId));
+            Debug.Log($"SHOULD END {string.Join(",", mySessions)}");
             var aboutToRemove = new List<OrderedPeersInfo>();
             foreach (var callSession in mySessions)
             {
                 if ( !currentCalls.TryGetValue(callSession._peersInfo, out var videoSingleCon) ) continue;
             
-                
+                Debug.Log($"_____ Delete CONNECTION: {callSession._peersInfo.ConnectionId}");
                 videoSingleCon.DeleteConnection(callSession._peersInfo.ConnectionId);
 
                 _signalingManager.RemoveHandler(videoSingleCon._singleWebRtcConnection);
-                Debug.Log($"<color=red>End Call {callSession._peersInfo}</color>");
+                Debug.Log($"<color=red>_____ End Call: {callSession._peersInfo}</color>");
                 _callListMonitor.SetSessionStatus(callSession._peersInfo, VideoCallStatus.Ended);
                 AEventHandler.ExecuteEvent(GlobalEvents.OnCloseRemoteCamera, callSession._peersInfo);
                 aboutToRemove.Add(callSession._peersInfo);

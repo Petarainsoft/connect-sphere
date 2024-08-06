@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace ConnectSphere
@@ -47,12 +48,11 @@ namespace ConnectSphere
 
         
         //TODO better approach
-        private void HandlePeerList(HashSet<OrderedPeersInfo> currentPeers)
+        private async void HandlePeerList(HashSet<OrderedPeersInfo> currentPeers)
         {
             if ( currentPeers == null ) return;
             var logPeers = string.Join(",", currentPeers);
-            Debug.Log("<color=red>CurrentPeers</color>");
-            Debug.Log($"<color=yellow>{logPeers}</color>");
+            Debug.Log($"<color=red>CurrentPeers: {logPeers}</color>");
             
             // the list is brand new
             if ( allSessions == null || allSessions.Count < 1 )
@@ -90,7 +90,6 @@ namespace ConnectSphere
             // handle shouldStart Session
             var shouldStart = allSessions.Where(e => e.Value._status == VideoCallStatus.ShouldStart)
                 .Select(e => e.Value).ToList();
-            OnShouldStartSession?.Invoke(shouldStart);
 
             // Handle shouldEnd session
             var shouldEndConnections = new List<VideoCallSession>();
@@ -104,6 +103,8 @@ namespace ConnectSphere
                     .Select(e => e.Value));
 
             OnShouldEndSession?.Invoke(shouldEndConnections);
+            await UniTask.WaitForEndOfFrame();
+            OnShouldStartSession?.Invoke(shouldStart);
         }
 
 

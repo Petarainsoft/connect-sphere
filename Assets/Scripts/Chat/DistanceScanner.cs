@@ -24,7 +24,7 @@ namespace ConnectSphere
         {
             base.Awake();
             AEventHandler.RegisterEvent<int, Vector2>(GlobalEvents.PlayerPositionUpdated, HandlePositionUpdated);
-            AEventHandler.RegisterEvent<int>(GlobalEvents.StopPositionTracking, RemovePeersForUser);
+            AEventHandler.RegisterEvent<int>(GlobalEvents.StopPositionTracking, RemoveTrackedPosition);
 
             _ = ProcessPeersInfo();
         }
@@ -32,7 +32,17 @@ namespace ConnectSphere
         private void OnDestroy()
         {
             AEventHandler.UnregisterEvent<int, Vector2>(GlobalEvents.PlayerPositionUpdated, HandlePositionUpdated);
-            AEventHandler.UnregisterEvent<int>(GlobalEvents.StopPositionTracking, RemovePeersForUser);
+            AEventHandler.UnregisterEvent<int>(GlobalEvents.StopPositionTracking, RemoveTrackedPosition);
+        }
+
+        private void RemoveTrackedPosition(int userId)
+        {
+            if (currentPositions.TryGetValue(userId, out var peerPosition))
+            {
+                Debug.Log($"REMOVE USER {userId} from position tracking");
+                currentPositions.Remove(userId);
+                RemovePeersForUser(userId);
+            }
         }
 
         private void HandlePositionUpdated(int userId, Vector2 position)

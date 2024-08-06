@@ -52,6 +52,7 @@ namespace ConnectSphere
             if ( enteredUserId == _userId ) // me entering
             {
                 _enablePositionTracking = false;
+                Debug.Log($"STOP TRACKING POSITION FOR USER {_userId}");
                 AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, _userId);
                 return;
             }
@@ -59,6 +60,7 @@ namespace ConnectSphere
             if ( userInArea.Contains(_userId) ) // I am in the area
             {
                 _enablePositionTracking = false;
+                Debug.Log($"STOP TRACKING POSITION FOR USER {_userId}");
                 AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, _userId);
             }
         }
@@ -68,12 +70,14 @@ namespace ConnectSphere
             if ( enteredUserId == _userId ) // me entering
             {
                 _enablePositionTracking = true;
+                Debug.Log($"RESUME TRACKING POSITION FOR USER {_userId}");
                 return;
             }
             
             if ( userInArea.Contains(_userId) ) // I am in the area
             {
                 _enablePositionTracking = false;
+                Debug.Log($"STOP TRACKING POSITION FOR USER {_userId}");
                 AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, _userId);
             }
         }
