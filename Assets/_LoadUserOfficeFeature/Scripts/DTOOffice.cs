@@ -1,19 +1,39 @@
 ﻿using System;
+using System.Collections.Generic;
+using AccountManagement;
 
 namespace ConnectSphere
 {
     [Serializable]
     public class DTOOffice
     {
-        public int id;
-        public string name;
-        public int userId;
-        public DateTime lastAccess = DateTime.Now;
-        public bool isRemove;
+        public string name { get; set; }
+        public DateTime last_access { get; set; }
+        public string resource_url { get; set; }
 
         public int GetDateDiff()
         {
-            return (int)(DateTime.Now - lastAccess).TotalSeconds;
+            if (last_access == null)
+                last_access = DateTime.Now;
+            return (int)(DateTime.Now - last_access).TotalSeconds;
         }
+    }
+
+    [Serializable]
+    public class DTOBaseOffice
+    {
+        public string name { get; set; }
+    }
+
+    [Serializable]
+    public class CreateOfficeResult : BaseResult
+    {
+        public DTOBaseOffice data { get; set; }
+    }
+
+    [Serializable]
+    public class LoadAllOfficeResult : BaseResult
+    {
+        public List<DTOOffice> data { get; set; }
     }
 }
