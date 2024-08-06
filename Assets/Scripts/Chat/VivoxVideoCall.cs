@@ -211,14 +211,14 @@ namespace Chat
             _webcamSelectDropdown.options = WebCamTexture.devices.Select(x => x.name)
                 .Select(x => new TMP_Dropdown.OptionData(x)).ToList();
 
-            GatheringArea.OnPlayerEnteredArea += HandlePlayerEnter;
-            GatheringArea.OnPlayerExitArea += HandlePlayerExit;
+            // GatheringArea.OnPlayerEnteredArea += HandlePlayerEnter;
+            // GatheringArea.OnPlayerExitArea += HandlePlayerExit;
         }
 
         private void OnDestroy()
         {
-            GatheringArea.OnPlayerEnteredArea -= HandlePlayerEnter;
-            GatheringArea.OnPlayerExitArea -= HandlePlayerExit;
+            // GatheringArea.OnPlayerEnteredArea -= HandlePlayerEnter;
+            // GatheringArea.OnPlayerExitArea -= HandlePlayerExit;
         }
 
         private void HandlePlayerExit(int areaId)

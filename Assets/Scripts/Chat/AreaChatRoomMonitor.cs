@@ -38,7 +38,7 @@ namespace ConnectSphere
             GatheringArea.OnPlayerExitArea += HandlePlayerExit;
         }
 
-        private void HandlePlayerExit(int areaId)
+        private void HandlePlayerExit(int areaId, int userId, List<int> usersInArea)
         {
             Debug.Log($"<color=red>PlayerEXIT {areaId}</color>");
             var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
@@ -65,7 +65,7 @@ namespace ConnectSphere
             }
         }
 
-        private async void HandlePlayerEnter(int areaId)
+        private async void HandlePlayerEnter(int areaId, int userId, List<int> usersInArea)
         {
             Debug.Log($"<color=red>PlayerENTER {areaId}</color>");
             var area = _areas.FirstOrDefault(e => e.AreaId == areaId);

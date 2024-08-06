@@ -19,6 +19,7 @@ namespace ConnectSphere
 
         protected void InvokePeersChanged()
         {
+            Debug.Log("<color=red>**** FIRE EVENT PEERS CHANGED</color>");
             _onPeersChanged?.Invoke(_orderedPeers);
         }
 
@@ -28,7 +29,7 @@ namespace ConnectSphere
             var done = _orderedPeers != null && _orderedPeers.Remove(peers);
             if ( done ) InvokePeersChanged();
         }
-
+        
         protected void RemovePeers(OrderedPeersInfo peerInfo)
         {
             var done = _orderedPeers != null && _orderedPeers.Remove(peerInfo);
@@ -38,10 +39,10 @@ namespace ConnectSphere
         protected void RemovePeersForUser(int userId)
         {
             if ( _orderedPeers == null ) return;
-            Debug.Log($"<color=yellow>Remove peers related to userId {userId}</color>");
-            Debug.Log($"<color=yellow>Peers Before removal {string.Join(",", _orderedPeers)}</color>");
+            Debug.Log($"<color=yellow>_____Remove peers related to userId {userId}</color>");
+            Debug.Log($"<color=yellow>_____Peers Before removal {string.Join(",", _orderedPeers)}</color>");
             var count = _orderedPeers.RemoveWhere(e => e != null && e.HasUser(userId));
-            Debug.Log($"<color=yellow>Peers After removal {string.Join(",", _orderedPeers)}</color>");
+            Debug.Log($"<color=yellow>_____Peers After removal {string.Join(",", _orderedPeers)}</color>");
             InvokePeersChanged();
         }
 

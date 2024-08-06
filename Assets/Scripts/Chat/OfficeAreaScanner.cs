@@ -6,82 +6,47 @@ namespace ConnectSphere.Chat
 {
     public class OfficeAreaScanner : PeerScanner
     {
-        [Header("Gather Areas")] [SerializeField]
-        private List<GatheringArea> _areas;
-
-        private Dictionary<int, HashSet<OrderedPeersInfo>> _areaPeers;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            if ( _areas == null || _areas.Count < 1 )
-            {
-                Debug.LogWarning($"{GetType()} does not work because it has no {typeof(GatheringArea)}");
-            }
-
-            _areaPeers = new Dictionary<int, HashSet<OrderedPeersInfo>>();
-        }
-
+        [SerializeField] private PlayerInfoSO _playerInfoSo;
         private void OnEnable()
         {
-            GatheringArea.OnPlayerEnteredArea += AddOrRemovePeers;
-            GatheringArea.OnPlayerExitArea += AddOrRemovePeers;
+            GatheringArea.OnPlayerEnteredArea += OnEnterArea;
+            GatheringArea.OnPlayerExitArea += OnExitArea;
         }
 
-        private void AddOrRemovePeers(int areaId)
+        private void OnEnterArea(int areaId, int userId, List<int> userInArea)
         {
-            if ( _areaPeers == null ) return;
-            Debug.Log($"<color=yellow>|>>>> Player enter {areaId}</color>");
-            if ( _areas == null || _areas.Count < 1 ) return;
-            var area = _areas.FirstOrDefault(e => e != null && e.AreaId == areaId);
-            if ( area == null ) return;
-            var playersInArea = area.PlayersInArea;
-
-            // all left the area that exist once in the tracked dict
-            var allPlayersInAreaLeft = playersInArea == null || playersInArea.Count < 1;
-            if ( allPlayersInAreaLeft && _areaPeers.TryGetValue(areaId, out var peerSet) )
-            {
-                foreach (var orderedPeers in peerSet)
-                {
-                    RemovePeers(orderedPeers);
-                }
-
-                return;
-            }
-
-            if ( allPlayersInAreaLeft )
-            {
-                return;
-            }
-            Debug.Log($"<color=yellow>__ List Players In Area {areaId}:</color>");
-            var playersId = playersInArea.Select(e => e.GetComponent<Player>().DatabaseId).ToList();
-            Debug.Log($"<color=yellow>{string.Join(",", playersId)}</color>");
-
-            if ( playersId.Count == 1 )
-            {
-                RemovePeersForUser(playersId[0]);
-                return;
-            }
-
-            var currentPeersInArea = ToOrderedPeers(playersId);
-            _areaPeers.TryAdd(areaId, new HashSet<OrderedPeersInfo>());
-            if ( !_areaPeers.TryGetValue(areaId, out var existingPeers) ) return;
-            foreach (var p in currentPeersInArea)
-            {
-                if ( !existingPeers.Contains(p) ) AddPeers(p);
-            }
-
-            foreach (var p in existingPeers)
-            {
-                if ( !currentPeersInArea.Contains(p) ) RemovePeers(p);
-            }
+            // things happen in other area
+            if (userId != _playerInfoSo.DatabaseId && !userInArea.Contains(_playerInfoSo.DatabaseId)) return;
+            var peers = ToOrderedPeers(userInArea);
+            if ( _orderedPeers.SetEquals(peers) ) return;
+            _orderedPeers = peers.ToHashSet();
+            InvokePeersChanged();
         }
 
+        private void OnExitArea(int areaId, int userId, List<int> userInArea)
+        {
+            // things happen in other area
+            if (userId != _playerInfoSo.DatabaseId && !userInArea.Contains(_playerInfoSo.DatabaseId))
+            {
+                return;
+            }
+
+            if ( userId == _playerInfoSo.DatabaseId ) // me leaving
+            {
+                RemovePeersForUser(userId);
+                return;
+            }
+            // other left, and I am still in the area
+            var peers = ToOrderedPeers(userInArea);
+            if ( _orderedPeers.SetEquals(peers) ) return;
+            _orderedPeers = peers.ToHashSet();
+            InvokePeersChanged();
+        }
 
         private void OnDisable()
         {
-            GatheringArea.OnPlayerEnteredArea -= AddOrRemovePeers;
-            GatheringArea.OnPlayerExitArea -= AddOrRemovePeers;
+            GatheringArea.OnPlayerEnteredArea -= OnEnterArea;
+            GatheringArea.OnPlayerExitArea -= OnExitArea;
         }
     }
 }

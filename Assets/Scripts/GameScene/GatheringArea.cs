@@ -19,8 +19,8 @@ namespace ConnectSphere
         private float offIntensity = 0f;
         private float duration = 0.2f;
 
-        public static Action<int> OnPlayerEnteredArea;
-        public static Action<int> OnPlayerExitArea;
+        public static Action<int, int, List<int>> OnPlayerEnteredArea;
+        public static Action<int, int, List<int>> OnPlayerExitArea;
 
         public static Action<int> OnPlayerEntered;
         public static Action<int> OnPlayerExit;
@@ -37,7 +37,11 @@ namespace ConnectSphere
             if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
             {
                 _playersInThisArea.Add(playerObject);
-                OnPlayerEnteredArea?.Invoke(areaId);
+                
+                OnPlayerEnteredArea?.Invoke(areaId, 
+                    playerObject.GetComponent<Player>().DatabaseId, 
+                    _playersInThisArea.ConvertAll(x => x.GetComponent<Player>().DatabaseId));
+                
                 OnPlayerEntered?.Invoke(playerObject.GetComponent<Player>().DatabaseId);
                 
                 if (!playerObject.HasStateAuthority)
@@ -68,7 +72,9 @@ namespace ConnectSphere
             if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
             {
                 _playersInThisArea.Remove(playerObject);
-                OnPlayerExitArea?.Invoke(areaId);
+                OnPlayerExitArea?.Invoke(areaId, 
+                    playerObject.GetComponent<Player>().DatabaseId, 
+                    _playersInThisArea.ConvertAll(x => x.GetComponent<Player>().DatabaseId));
                 if ( playerObject != null && playerObject.GetComponent<Player>() != null)
                 {
                     OnPlayerExit?.Invoke(playerObject.GetComponent<Player>().DatabaseId);
