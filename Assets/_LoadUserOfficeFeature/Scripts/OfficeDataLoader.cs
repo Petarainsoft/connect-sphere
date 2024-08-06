@@ -1,14 +1,20 @@
 using System.Collections.Generic;
+using AccountManagement;
+using Cysharp.Threading.Tasks;
+using Doozy.Engine.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace ConnectSphere
 {
-    public class OfficeDataLoader : MonoBehaviour
+    public class OfficeDataLoader : AppBaseState
     {
         [SerializeField]
         OfficeSO _officeSO;
+
+        [SerializeField]
+        OfficeApiHandler _officeApiHandler;
 
         [SerializeField]
         private GameObject _officeItemPrefabs;
@@ -23,9 +29,9 @@ namespace ConnectSphere
         private const int SECONDS_IN_HOUR = 3600;
         private const int SECONDS_IN_DAY = 3600 * 24;
 
-        // Start is called before the first frame update
-        void Start()
+        public override void OnEnter()
         {
+            base.OnEnter();
             _layoutHolderOfficeData = GetComponent<GridLayoutGroup>();
             RectTransform rect = GetComponent<RectTransform>();
             rect.sizeDelta = new Vector2(rect.sizeDelta.x, CalculateHeight(_officeSO.Count));
@@ -42,6 +48,29 @@ namespace ConnectSphere
             {
                 _offices[i].SetActive(_officeSO[i].name.Contains(_searchField.text));
             }
+        }
+
+        private async UniTaskVoid LoadAllOffices()
+        {
+            Utils.ShowLoading();
+
+            var officeResult = await _officeApiHandler.LoadAllOffices();
+
+            if (officeResult.offices != null)
+            {
+                //_networkCanvas.SetActive(true);
+
+                Machine.ChangeState<Empty>();
+            }
+            else
+            {
+                var warningPopup = UIPopupManager.GetPopup("ActionPopup");
+                warningPopup.Data.SetButtonsLabels("Ok");
+                warningPopup.Data.SetLabelsTexts("Message", officeResult.message);
+                warningPopup.Show();
+            }
+
+            Utils.HideLoading();
         }
 
         private void FillData()
