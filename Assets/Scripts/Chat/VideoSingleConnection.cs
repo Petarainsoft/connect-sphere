@@ -56,7 +56,11 @@ namespace Chat
 
         public void CreateConnection(string connectionUniqueId)
         {
-            if ( _singleWebRtcConnection != null ) _singleWebRtcConnection.CreateConnection(connectionUniqueId);
+            if ( _singleWebRtcConnection != null )
+            {
+                _singleWebRtcConnection.CreateConnection(connectionUniqueId);
+                
+            }
         }
 
         public void DeleteConnection(string peersConnectionId)

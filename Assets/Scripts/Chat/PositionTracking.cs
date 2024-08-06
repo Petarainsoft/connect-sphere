@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using AhnLab.EventSystem;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -36,28 +37,45 @@ namespace ConnectSphere
 
         private void OnEnable()
         {
-            GatheringArea.OnPlayerEntered += HandlePlayerEnter;
-            GatheringArea.OnPlayerExit += HandlePlayerExit;
+            GatheringArea.OnPlayerEnteredArea += HandlePlayerEnter;
+            GatheringArea.OnPlayerExitArea += HandlePlayerExit;
         }
 
         private void OnDisable()
         {
-            GatheringArea.OnPlayerEntered -= HandlePlayerEnter;
-            GatheringArea.OnPlayerExit -= HandlePlayerExit;
+            GatheringArea.OnPlayerEnteredArea -= HandlePlayerEnter;
+            GatheringArea.OnPlayerExitArea -= HandlePlayerExit;
         }
 
-        private async void HandlePlayerEnter(int enteredUserId)
+        private void HandlePlayerEnter(int areaId, int enteredUserId, List<int> userInArea)
         {
-            if ( enteredUserId != _userId ) return; // if I am not the one, entering the area
-            _enablePositionTracking = false;
-            await UniTask.DelayFrame(2);
-            AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, _userId);
+            if ( enteredUserId == _userId ) // me entering
+            {
+                _enablePositionTracking = false;
+                AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, _userId);
+                return;
+            }
+            
+            if ( userInArea.Contains(_userId) ) // I am in the area
+            {
+                _enablePositionTracking = false;
+                AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, _userId);
+            }
         }
-
-        private void HandlePlayerExit(int exitedUserId)
+   
+        private void HandlePlayerExit(int exitedUserId, int enteredUserId, List<int> userInArea)
         {
-            if ( exitedUserId != _userId ) return; // if I am not the one, exiting the area
-            _enablePositionTracking = true;
+            if ( enteredUserId == _userId ) // me entering
+            {
+                _enablePositionTracking = true;
+                return;
+            }
+            
+            if ( userInArea.Contains(_userId) ) // I am in the area
+            {
+                _enablePositionTracking = false;
+                AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, _userId);
+            }
         }
 
         private async UniTask ReportPosition()

@@ -39,7 +39,6 @@ namespace ConnectSphere
         protected void RemovePeersForUser(int userId)
         {
             if ( _orderedPeers == null ) return;
-            Debug.Log($"<color=yellow>_____Remove peers related to userId {userId}</color>");
             Debug.Log($"<color=yellow>_____Peers Before removal {string.Join(",", _orderedPeers)}</color>");
             var count = _orderedPeers.RemoveWhere(e => e != null && e.HasUser(userId));
             Debug.Log($"<color=yellow>_____Peers After removal {string.Join(",", _orderedPeers)}</color>");

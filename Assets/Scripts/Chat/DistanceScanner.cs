@@ -15,6 +15,9 @@ namespace ConnectSphere
         [SerializeField] private float _checkingInterval = 0.2f;
         [SerializeField] private float _minimalDistance = 1f;
 
+        [SerializeField] private PlayerInfoSO _playerInfoSo;
+        
+
         private readonly Dictionary<int, PeerPosition> currentPositions = new Dictionary<int, PeerPosition>();
 
         protected override void Awake()
@@ -53,7 +56,6 @@ namespace ConnectSphere
         {
             while (currentPositions != null)
             {
-                //todo remove this temp pairwithdistance
                 var pairWithDistance = new List<(PeerPosition, PeerPosition)>();
 
                 foreach (var positionA in currentPositions)
@@ -62,6 +64,8 @@ namespace ConnectSphere
                     {
                         if ( positionA.Key == positionB.Key ) continue;
                         if ( positionA.Value == null || positionB.Value == null ) continue;
+                        if (positionA.Key != _playerInfoSo.DatabaseId && positionB.Key != _playerInfoSo.DatabaseId) continue; // not related to me
+                        
                         var distance = Vector2.Distance(positionA.Value._position, positionB.Value._position);
                         if ( !(distance <= _minimalDistance) ) continue;
                         pairWithDistance.Add((positionA.Value, positionB.Value));
