@@ -24,6 +24,31 @@ MonoBehaviour:
         m_url: ws://35.213.142.140:3456/ws
         m_iceServers:
         - m_urls:
+          - stun:stun.relay.metered.ca:80
+          m_username: 
+          m_credentialType: 1
+          m_credential: 
+        - m_urls:
+          - turn:asia.relay.metered.ca:80
+          m_username: 85bd9446807cee9307a8f2fc
+          m_credentialType: 0
+          m_credential: omMGI6nK0NYV+giU
+        - m_urls:
+          - turn:asia.relay.metered.ca:80?transport=tcp
+          m_username: 85bd9446807cee9307a8f2fc
+          m_credentialType: 0
+          m_credential: omMGI6nK0NYV+giU
+        - m_urls:
+          - turn:asia.relay.metered.ca:443
+          m_username: 85bd9446807cee9307a8f2fc
+          m_credentialType: 0
+          m_credential: omMGI6nK0NYV+giU
+        - m_urls:
+          - turns:asia.relay.metered.ca:443?transport=tcp
+          m_username: 85bd9446807cee9307a8f2fc
+          m_credentialType: 0
+          m_credential: omMGI6nK0NYV+giU
+        - m_urls:
           - stun:stun.l.google.com:19302
           m_username: 
           m_credentialType: 0
