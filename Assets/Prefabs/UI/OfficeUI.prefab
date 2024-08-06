@@ -52351,6 +52351,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _checkingInterval: 0.25
   _minimalDistance: 1
+  _playerInfoSo: {fileID: 11400000, guid: 592e4bbe575cc0d418dbf8b8efa31ad3, type: 2}
 --- !u!1 &7267211538541053240
 GameObject:
   m_ObjectHideFlags: 0
