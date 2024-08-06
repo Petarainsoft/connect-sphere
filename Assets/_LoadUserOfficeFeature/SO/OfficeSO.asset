@@ -12,20 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c52924df06313b84f8113fa077fe6035, type: 3}
   m_Name: OfficeSO
   m_EditorClassIdentifier: 
-  data:
+  _officeData:
   - id: 1
     name: conchoheo1
-    userId: 1
+    userId: 0
     isRemove: 0
   - id: 2
-    name: conchoheo5
-    userId: 1
+    name: conchoheo2
+    userId: 0
     isRemove: 0
   - id: 3
-    name: conchoheo4
-    userId: 1
+    name: conchoheo5
+    userId: 0
     isRemove: 0
   - id: 4
     name: conchoheo3
-    userId: 1
+    userId: 0
+    isRemove: 0
+  - id: 5
+    name: conchoheo4
+    userId: 0
     isRemove: 0

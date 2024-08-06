@@ -7,9 +7,9 @@ namespace ConnectSphere
     public class OfficeSO : ScriptableObject
     {
         [SerializeField]
-        private List<DTOOffice> data;
+        private List<DTOOffice> _officeData;
 
-        public int Count => data.Count;
+        public int Count => _officeData.Count;
         public DTOOffice this[int i]
         {
             get
@@ -18,11 +18,8 @@ namespace ConnectSphere
                 {
                     return null;
                 }
-                return data[i];
+                return _officeData[i];
             }
-
         }
-
-
     }
 }

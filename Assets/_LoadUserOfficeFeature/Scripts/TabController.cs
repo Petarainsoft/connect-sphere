@@ -5,16 +5,20 @@ namespace ConnectSphere
 {
     public class TabController : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI textMeshProUGUI;
-        [SerializeField] private Lean.Gui.LeanBox backGroundButton;
+        [SerializeField]
+        private TextMeshProUGUI textMeshProUGUI;
 
-        public void OnChoosingTab()
+        [SerializeField]
+        private Lean.Gui.LeanBox backGroundButton;
+
+        public void ChooseTab()
         {
-            ChangeColor(chooseColor);
+            ChangeColor(CHOOSE_COLOR);
             backGroundButton.enabled = true;
         }
-        private static string unchooseColor = "#A6A6A0";
-        private static string chooseColor = "#FFFFFF";
+
+        private static string UNCHOOSE_COLOR = "#A6A6A0";
+        private static string CHOOSE_COLOR = "#FFFFFF";
 
         private void ChangeColor(string color)
         {
@@ -29,9 +33,9 @@ namespace ConnectSphere
             }
         }
 
-        public void OnUnChoosingTab()
+        public void UnChooseTab()
         {
-            ChangeColor(unchooseColor);
+            ChangeColor(UNCHOOSE_COLOR);
             backGroundButton.enabled = false;
         }
     }
