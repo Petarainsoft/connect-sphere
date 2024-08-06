@@ -24,8 +24,8 @@ namespace Unity.RenderStreaming.Editor
         const string LabelCreateSettingsButton = "Create New Settings Asset";
 
         const string kSettingsPath = "Project/Render Streaming";
-        const string kTemplatePath = "Packages/com.unity.renderstreaming/Editor/UXML/RenderStreamingProjectSettings.uxml";
-        const string kStylePath = "Packages/com.unity.renderstreaming/Editor/Styles/RenderStreamingProjectSettings.uss";
+        const string kTemplatePath = "Assets/ThirdParty/com.unity.renderstreaming/Editor/UXML/RenderStreamingProjectSettings.uxml";
+        const string kStylePath = "Assets/ThirdParty/com.unity.renderstreaming/Editor/Styles/RenderStreamingProjectSettings.uss";
 
         [SettingsProvider]
         public static SettingsProvider CreateProvider()
