@@ -103,7 +103,17 @@ namespace ConnectSphere
 
         private void CloseLocalVideo()
         {
-            if ( localVideoContainer != null ) Pool.Release(localVideoContainer);
+            if ( localVideoContainer != null )
+            {
+                try
+                {
+                    Pool.Release(localVideoContainer);
+                }
+                catch (InvalidOperationException e)
+                {
+                    Debug.LogWarning(e);
+                }
+            }
         }
 
         private void HandleRemoteVideo(OrderedPeersInfo peersInfo, Texture videoTexture)

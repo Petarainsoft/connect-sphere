@@ -1,3 +1,4 @@
+using System;
 using AhnLab.EventSystem;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -12,8 +13,8 @@ namespace ConnectSphere
     /// </summary>
     public class PositionTracking : MonoBehaviour
     {
-        private int userId = -1; // invalid userId
-        private bool enablePositionTracking = true;
+        private int _userId = -1; // invalid userId
+        private bool _enablePositionTracking = true;
 
         [SerializeField] private float _reportInterval = 0.1f;
 
@@ -22,8 +23,15 @@ namespace ConnectSphere
             await UniTask.WaitUntil(() => GetComponent<Player>() != null);
             var player = GetComponent<Player>();
             await UniTask.WaitUntil(() => player != null && player.DatabaseId > -1);
-            if ( player != null ) userId = player.DatabaseId;
-            await ReportPosition().AttachExternalCancellation(this.GetCancellationTokenOnDestroy());;
+            if ( player != null ) _userId = player.DatabaseId;
+            try
+            {
+                await ReportPosition();
+            }
+            catch (OperationCanceledException e)
+            {
+                Debug.LogWarning("ReportPosition has been cancelled");
+            }
         }
 
         private void OnEnable()
@@ -40,25 +48,25 @@ namespace ConnectSphere
 
         private async void HandlePlayerEnter(int enteredUserId)
         {
-            if ( enteredUserId != userId ) return; // if I am not the one, entering the area
-            enablePositionTracking = false;
+            if ( enteredUserId != _userId ) return; // if I am not the one, entering the area
+            _enablePositionTracking = false;
             await UniTask.DelayFrame(2);
-            AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, userId);
+            AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, _userId);
         }
 
         private void HandlePlayerExit(int exitedUserId)
         {
-            if ( exitedUserId != userId ) return; // if I am not the one, exiting the area
-            enablePositionTracking = true;
+            if ( exitedUserId != _userId ) return; // if I am not the one, exiting the area
+            _enablePositionTracking = true;
         }
 
         private async UniTask ReportPosition()
         {
             while (true)
             {
-                await UniTask.WaitUntil(() => userId > -1);
-                await UniTask.WaitUntil(() => enablePositionTracking);
-                AEventHandler.ExecuteEvent(GlobalEvents.PlayerPositionUpdated, userId,
+                await UniTask.WaitUntil(() => _userId > -1);
+                await UniTask.WaitUntil(() => _enablePositionTracking);
+                AEventHandler.ExecuteEvent(GlobalEvents.PlayerPositionUpdated, _userId,
                     new Vector2(transform.position.x, transform.position.y));
                 await UniTask.WaitForSeconds(_reportInterval);
             }

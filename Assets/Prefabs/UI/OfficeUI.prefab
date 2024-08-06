@@ -1315,7 +1315,7 @@ GameObject:
   - component: {fileID: 5642834030399032134}
   - component: {fileID: 1138584987132831168}
   m_Layer: 5
-  m_Name: ChatRoomItem (4)
+  m_Name: Area4Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3763,7 +3763,7 @@ MonoBehaviour:
   _openChat: {fileID: 6471749242168752640}
   _areaNameText: {fileID: 4907096794491443534}
   _vivoxHelper: {fileID: 7528049980501378430}
-  areaId: 0
+  areaId: 3
 --- !u!1 &374588917059827105
 GameObject:
   m_ObjectHideFlags: 0
@@ -7334,7 +7334,7 @@ GameObject:
   - component: {fileID: 296389457915818678}
   - component: {fileID: 219520365467742217}
   m_Layer: 5
-  m_Name: ChatRoomItem (2)
+  m_Name: Area2Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15894,7 +15894,7 @@ GameObject:
   - component: {fileID: 5772496830494344237}
   - component: {fileID: 298854715802889844}
   m_Layer: 5
-  m_Name: UIView (1)
+  m_Name: ChatRoomsView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15964,7 +15964,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
 --- !u!225 &4642034002369139348
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -26823,7 +26823,7 @@ GameObject:
   - component: {fileID: 8743530789308362555}
   - component: {fileID: 4138247195609590326}
   m_Layer: 5
-  m_Name: UIView
+  m_Name: PlayerListView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27689,7 +27689,7 @@ GameObject:
   - component: {fileID: 7569982140824758842}
   - component: {fileID: 232464727692921967}
   m_Layer: 5
-  m_Name: ChatRoomItem (3)
+  m_Name: Area3Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41042,7 +41042,7 @@ GameObject:
   - component: {fileID: 5630180894505217081}
   - component: {fileID: 799158410756232169}
   m_Layer: 5
-  m_Name: Content
+  m_Name: Content(AreaChatChatRoomMonitor)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41119,7 +41119,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5003919627436748891}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b514f77255fb1854b8fb04c107855310, type: 3}
   m_Name: 
@@ -42219,7 +42219,7 @@ GameObject:
   - component: {fileID: 8223827100475832216}
   - component: {fileID: 7579876418009459790}
   m_Layer: 5
-  m_Name: ChatRoomItem (1)
+  m_Name: Area1Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61121,16 +61121,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_useDefault: 1
-  signalingSettingsObject: {fileID: 0}
+  signalingSettingsObject: {fileID: 11400000, guid: 65662d71af45cc24fa4da622b2a770f9, type: 2}
   signalingSettings:
-    rid: 0
+    rid: 5523227481016631297
   handlers: []
   runOnAwake: 0
   evaluateCommandlineArguments: 1
   references:
     version: 2
     RefIds:
-    - rid: 0
+    - rid: 5523227481016631297
       type: {class: WebSocketSignalingSettings, ns: Unity.RenderStreaming, asm: Unity.RenderStreaming}
       data:
         m_url: ws://127.0.0.1

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace ConnectSphere
 {
-    public class MonitorAreaChat : MonoBehaviour
+    public class AreaChatRoomMonitor : MonoBehaviour
     {
         [Header("Gather Areas Handle Connection")] [SerializeField]
         private List<GatheringArea> _areas;

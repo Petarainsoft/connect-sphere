@@ -13,18 +13,11 @@ namespace ConnectSphere
         [SerializeField] private UIButton _openChat;
         [SerializeField] private TMP_Text _areaNameText;
         [SerializeField] private VivoxServiceHelper _vivoxHelper;
-        
 
         [SerializeField]
         private int areaId;
 
         public int AreaId => areaId;
-
-        public void SetAreaId(int areaId)
-        {
-            this.areaId = areaId;
-            _areaNameText.text = $"Area {areaId}";
-        }
 
         private void Start()
         {
@@ -41,9 +34,6 @@ namespace ConnectSphere
             _openChat.OnClick.OnTrigger.Event.RemoveListener(JoinChatArea);
         }
 
-        private void JoinChatArea()
-        {
-            _vivoxHelper.JoinAreaChat(areaId);
-        }
+        private void JoinChatArea() =>   _vivoxHelper.JoinAreaChat(areaId);
     }
 }
