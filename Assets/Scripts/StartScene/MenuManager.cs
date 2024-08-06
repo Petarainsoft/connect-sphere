@@ -121,30 +121,44 @@ namespace ConnectSphere
         private async UniTask<bool> JoinVivox(string playerEmail)
         {
             Debug.Log("** Initialize Unity Service");
-            await UnityServices.InitializeAsync( new InitializationOptions());
+            var initializationOptions = new InitializationOptions();
+            
+            initializationOptions.SetVivoxCredentials(
+                server: "https://unity.vivox.com/appconfig/10793-conne-77095-udash",
+                domain: "mtu1xp.vivox.com",
+                issuer: "10793-conne-77095-udash",
+                "8OZBvVqIzQMq1qqMQ3C23DWrrXNJrVuM");
+            
+            await UnityServices.InitializeAsync( initializationOptions);
             var validName = playerEmail.Replace("@","_").Replace(".","_");
             AuthenticationService.Instance.SwitchProfile(validName);
             Debug.Log("** Sign In AuthenticationService");
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            Debug.Log("** Sign In AuthenticationService 2");
             var checkNull = UniTask.WaitUntil(() => VivoxService.Instance != null);
+            Debug.Log("** Sign In AuthenticationService 3");
             var timeout = UniTask.WaitForSeconds(_timeout);
+            Debug.Log("** Sign In AuthenticationService 4");
             await UniTask.WhenAny(checkNull, timeout);
             if ( VivoxService.Instance == null )
             {
+                Debug.Log("** Sign In AuthenticationService 5");
                 Debug.LogWarning("** Cannot start Vivox service");
                 return false;
             }
-
+            Debug.Log("** Sign In AuthenticationService 6");
             await VivoxService.Instance.InitializeAsync();
             Debug.Log($"** Initialize Vivox done!");
+            Debug.Log("** Sign In AuthenticationService 7");
 
             var loginOptions = new LoginOptions()
             {
                 DisplayName = validName,
-                ParticipantUpdateFrequency = ParticipantPropertyUpdateFrequency.OnePerSecond
+                ParticipantUpdateFrequency = ParticipantPropertyUpdateFrequency.FivePerSecond
             };
-
+            Debug.Log("** Sign In AuthenticationService 8");
             await VivoxService.Instance.LoginAsync(loginOptions);
+            Debug.Log("** Sign In AuthenticationService 9");
             Debug.Log($"** Login vivox done!");
             return true;
         }
@@ -170,27 +184,27 @@ namespace ConnectSphere
                 Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath(_gameScenePath)),
             };
 
-            // try
-            // {
-            //     if ( !await JoinVivox(_playerInfoSo.Email.Trim()) )
-            //     {
-            //         var warningPopup = UIPopupManager.GetPopup("ActionPopup");
-            //         warningPopup.Data.SetButtonsLabels("Ok");
-            //         warningPopup.Data.SetLabelsTexts("Chat Service", "Currently Chat feature isn't available!");
-            //         warningPopup.Show();
-            //         await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
-            //     }
-            // }
-            // catch (Exception e)
-            // {
-            //     var warningPopup = UIPopupManager.GetPopup("ActionPopup");
-            //     warningPopup.Data.SetButtonsLabels("Ok");
-            //     warningPopup.Data.SetLabelsTexts("Services Error",
-            //         "Currently voice/chat isn't available!\nRetry again!");
-            //     warningPopup.Show();
-            //     await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
-            //     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            // }
+            try
+            {
+                if ( !await JoinVivox(_playerInfoSo.Email.Trim()) )
+                {
+                    var warningPopup = UIPopupManager.GetPopup("ActionPopup");
+                    warningPopup.Data.SetButtonsLabels("Ok");
+                    warningPopup.Data.SetLabelsTexts("Chat Service", "Currently Chat feature isn't available!");
+                    warningPopup.Show();
+                    await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
+                }
+            }
+            catch (Exception e)
+            {
+                var warningPopup = UIPopupManager.GetPopup("ActionPopup");
+                warningPopup.Data.SetButtonsLabels("Ok");
+                warningPopup.Data.SetLabelsTexts("Services Error",
+                    "Currently voice/chat isn't available!\nRetry again!");
+                warningPopup.Show();
+                await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            }
 
             // GameMode.Host = Start a session with a specific name
             // GameMode.Client = Join a session with a specific name

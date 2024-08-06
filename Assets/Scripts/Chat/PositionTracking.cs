@@ -23,7 +23,7 @@ namespace ConnectSphere
             var player = GetComponent<Player>();
             await UniTask.WaitUntil(() => player != null && player.DatabaseId > -1);
             if ( player != null ) userId = player.DatabaseId;
-            await ReportPosition();
+            await ReportPosition().AttachExternalCancellation(this.GetCancellationTokenOnDestroy());;
         }
 
         private void OnEnable()

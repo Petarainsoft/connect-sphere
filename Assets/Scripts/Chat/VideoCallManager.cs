@@ -163,7 +163,7 @@ namespace Chat
         {
             if ( listSession == null ) return;
             var mySessions = listSession.Where(videoCallSession => videoCallSession.InvolveUser(_playerSO.DatabaseId));
-            bool hasStartASession = false;
+            var hasStartASession = false;
             foreach (var videoCallSession in mySessions)
             {
                 currentCalls.TryAdd(videoCallSession._peersInfo, _callPool.Pool.Get());

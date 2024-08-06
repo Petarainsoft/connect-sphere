@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AccountManagement;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using Unity.Services.Vivox;
 using UnityEngine;
@@ -101,7 +102,6 @@ public class TextChatUI : MonoBehaviour
     {
         try
         {
-            Utils.ShowLoading();
             if ( string.IsNullOrEmpty(currentChannelName) )
             {
                 Debug.LogError("Current channel name is empty, cannot get chat history");
@@ -116,10 +116,14 @@ public class TextChatUI : MonoBehaviour
                 await VivoxService.Instance.GetChannelTextMessageHistoryAsync(currentChannelName, 10,
                     chatHistoryOptions);
             var reversedMessages = historyMessages.Reverse();
+        
             foreach (var historyMessage in reversedMessages)
             {
                 AddMessageToChat(historyMessage, true, scrollToBottom);
+                await UniTask.WaitForEndOfFrame();
             }
+
+            MessageInputField.enabled = true;
 
             // Update the oldest message ReceivedTime if it exists to help the next fetch get the next batch of history
             oldestMessage = historyMessages.FirstOrDefault()?.ReceivedTime;
@@ -133,7 +137,6 @@ public class TextChatUI : MonoBehaviour
         {
             Debug.LogError($"Tried to fetch chat history and failed with error: {e.Message}");
         }
-        Utils.HideLoading();
     }
 
     void OnDestroy()
@@ -244,7 +247,6 @@ public class TextChatUI : MonoBehaviour
 
         // We need to wait for the end of the frame for this to be updated, otherwise it happens too quickly.
         m_TextChatScrollRect.normalizedPosition = new Vector2(0, 0);
-
         yield return null;
     }
 
@@ -267,6 +269,7 @@ public class TextChatUI : MonoBehaviour
         ClearMessageObjectPool();
         oldestMessage = null;
         _chatFrameTitle.text = GetDisplayName(currentChannelName);
+        MessageInputField.enabled = false;
         FetchMessages = FetchHistory(true);
     }
 
@@ -305,7 +308,7 @@ public class TextChatUI : MonoBehaviour
         editedMessage?.SetTextMessage(message, true);
     }
 
-    void AddMessageToChat(VivoxMessage message, bool isHistory = false, bool scrollToBottom = false)
+    void AddMessageToChat(VivoxMessage message, bool isHistory = false, bool scrollToBottom = false, bool isLastMessage = false)
     {
         var newMessageObj = Instantiate(MessageObject, ChatContentObj.transform);
         var newMessageTextObject = newMessageObj.GetComponent<MessageObjectUI>();
@@ -324,15 +327,6 @@ public class TextChatUI : MonoBehaviour
         if ( scrollToBottom )
         {
             StartCoroutine(SendScrollRectToBottom());
-        }
-
-        if ( !message.FromSelf )
-        {
-            if ( ToggleTTS.isOn )
-            {
-                VivoxService.Instance.TextToSpeechSendMessage(
-                    $"{message.SenderDisplayName} said, {message.MessageText}", TextToSpeechMessageType.LocalPlayback);
-            }
         }
     }
 }
