@@ -196,10 +196,9 @@ namespace Chat
             foreach (var callSession in mySessions)
             {
                 if ( !currentCalls.TryGetValue(callSession._peersInfo, out var videoSingleCon) ) continue;
-                if ( videoSingleCon._singleWebRtcConnection.ExistConnection(callSession._peersInfo.ConnectionId) )
-                {
-                    videoSingleCon.DeleteConnection(callSession._peersInfo.ConnectionId);
-                }
+            
+                
+                videoSingleCon.DeleteConnection(callSession._peersInfo.ConnectionId);
 
                 _signalingManager.RemoveHandler(videoSingleCon._singleWebRtcConnection);
                 Debug.Log($"<color=red>End Call {callSession._peersInfo}</color>");

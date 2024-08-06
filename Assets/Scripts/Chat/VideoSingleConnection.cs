@@ -56,16 +56,25 @@ namespace Chat
 
         public void CreateConnection(string connectionUniqueId)
         {
-            if ( _singleWebRtcConnection != null )
+            if ( _singleWebRtcConnection == null ) return;
+            // make sure to delete the connection if it exists
+            if ( _singleWebRtcConnection.ExistConnection(connectionUniqueId) )
             {
-                _singleWebRtcConnection.CreateConnection(connectionUniqueId);
-                
+                _singleWebRtcConnection.DeleteConnection(connectionUniqueId);
             }
+            _singleWebRtcConnection.CreateConnection(connectionUniqueId);
         }
 
         public void DeleteConnection(string peersConnectionId)
         {
-            if ( _singleWebRtcConnection != null ) _singleWebRtcConnection.DeleteConnection(peersConnectionId);
+            if ( _singleWebRtcConnection != null )
+            {
+                if ( _singleWebRtcConnection.ExistConnection(peersConnectionId) )
+                {
+                    _singleWebRtcConnection.DeleteConnection(peersConnectionId);
+                }
+            }
+
             Release();
         }
     }
