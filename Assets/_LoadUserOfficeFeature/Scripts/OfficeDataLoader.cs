@@ -88,10 +88,10 @@ namespace ConnectSphere
         {
             float elementHeight = _layoutHolderOfficeData.cellSize.y;
             float spacingTop = _layoutHolderOfficeData.spacing.y;
-
-            return elementHeight * (count / NUMBER_COLUMNS_IN_ROW)
-                + spacingTop * count
-                - spacingTop;
+            float paddingTop = _layoutHolderOfficeData.padding.top;
+            Debug.Log(count / NUMBER_COLUMNS_IN_ROW);
+            return paddingTop
+                + (elementHeight + spacingTop) * ((count / NUMBER_COLUMNS_IN_ROW) + 1);
         }
     }
 }
