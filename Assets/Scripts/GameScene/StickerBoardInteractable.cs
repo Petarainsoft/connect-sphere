@@ -69,7 +69,14 @@ namespace ConnectSphere
             if (thisNote == null)
             {
                 _thisNote = await ApiManager.Instance.NoteApi.CreateNote(_stickyNoteId, _inputField.text.Trim());
-                return _thisNote.last_version.content;
+                if (_thisNote != null)
+                {
+                    return _thisNote.last_version.content;
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
             return thisNote.content;
         }

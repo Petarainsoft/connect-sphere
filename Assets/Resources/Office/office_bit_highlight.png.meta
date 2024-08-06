@@ -193,6 +193,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: office_bit_highlight_4
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 12
+        width: 52
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e2027c401fa154641a8c2a6f52a7b896
+      internalID: 555481271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -208,6 +229,7 @@ TextureImporter:
       office_bit_highlight_1: -1886616174
       office_bit_highlight_2: -1051634430
       office_bit_highlight_3: 335363430
+      office_bit_highlight_4: 555481271
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

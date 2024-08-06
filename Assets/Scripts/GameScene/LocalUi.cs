@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace ConnectSphere
 {
-    public class LocalUi : MonoBehaviour
+    public class LocalUi : Singleton<MonoBehaviour>
     {
         [Header("UI")]
         public GameObject InteractPrompt;
@@ -15,6 +15,11 @@ namespace ConnectSphere
         [SerializeField] private VoidEventHandlerSO _onInteractionTriggered;
         [SerializeField] private VoidEventHandlerSO _onOpenUserInfoButtonPressed;
         [SerializeField] private BooleanEventHandlerSO _onUiInteracting;
+
+        [Header("Prefabs")]
+        [SerializeField] private GameObject _interactPromptPrefab;
+        [SerializeField] private GameObject _userInformationPrefab;
+        [SerializeField] private ActivityController _rocPapSciPrefab;
 
         private void OnEnable()
         {
@@ -30,13 +35,35 @@ namespace ConnectSphere
 
         private void TogglePrompt()
         {
-            InteractPrompt.SetActive(!InteractPrompt.activeSelf);
+            if (InteractPrompt == null)
+            {
+                InteractPrompt = Instantiate(_interactPromptPrefab, transform);
+            }
+            else
+            {
+                InteractPrompt.SetActive(!InteractPrompt.activeSelf);
+            }
         }
 
         public void ToggleUserInfo()
         {
-            UserInformation.SetActive(!UserInformation.activeSelf);
-            _onUiInteracting.RaiseEvent(UserInformation.activeSelf);
+            if (UserInformation == null)
+            {
+                UserInformation = Instantiate(_userInformationPrefab, transform);
+                _onUiInteracting.RaiseEvent(UserInformation.activeSelf);
+            }
+            else
+            {
+                UserInformation.SetActive(!UserInformation.activeSelf);
+                _onUiInteracting.RaiseEvent(UserInformation.activeSelf);
+            }
+        }
+
+        public PopupHandler CreatePopup()
+        {
+            var asset = Resources.Load<PopupHandler>("Popup/Popup_Blue");
+            PopupHandler popup = Instantiate(asset);
+            return popup;
         }
     }
 }
