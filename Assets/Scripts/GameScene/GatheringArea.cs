@@ -69,9 +69,13 @@ namespace ConnectSphere
             {
                 _playersInThisArea.Remove(playerObject);
                 OnPlayerExitArea?.Invoke(areaId);
-                OnPlayerExit?.Invoke(playerObject.GetComponent<Player>().DatabaseId);
-                
-                if (!playerObject.HasStateAuthority)
+                if ( playerObject != null && playerObject.GetComponent<Player>() != null)
+                {
+                    OnPlayerExit?.Invoke(playerObject.GetComponent<Player>().DatabaseId);
+
+                }
+
+                if ( !playerObject.HasStateAuthority )
                     return;
             }
             else
