@@ -18,10 +18,12 @@ namespace ConnectSphere
             string resourceUrl
         )
         {
+
             if (string.IsNullOrEmpty(PlayerPrefs.GetString("token")))
             {
                 PlayerPrefs.SetString("token", test);
             }
+
             var apiResponse = await CreatePostRequestInternal<CreateOfficeResult>(
                 $"{_serverUrl}{OFFICE_ROUTE}{CREATE_OFFICE}",
                 new Dictionary<string, object>
@@ -43,7 +45,9 @@ namespace ConnectSphere
         {
             PlayerPrefs.SetString("token", test);
             var apiResponse = await CreateGetRequestInternal<LoadAllOfficeResult>(
+
                 $"{_serverUrl}{OFFICE_ROUTE}{LOAD_ALL_OFFICE}",
+
                 new Dictionary<string, object> { }
             );
 

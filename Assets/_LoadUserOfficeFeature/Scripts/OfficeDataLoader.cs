@@ -36,6 +36,7 @@ namespace ConnectSphere
 
         private void Start()
         {
+            base.OnEnter();
             _layoutHolderOfficeData = GetComponent<GridLayoutGroup>();
             _searchField = _searchBar.GetComponentInChildren<TMP_InputField>();
 
