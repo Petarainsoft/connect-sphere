@@ -72,11 +72,11 @@ namespace ConnectSphere
             if (collision.transform.parent.TryGetComponent<NetworkObject>(out var playerObject))
             {
                 _playersInThisArea.Remove(playerObject);
-                OnPlayerExitArea?.Invoke(areaId, 
-                    playerObject.GetComponent<Player>().DatabaseId, 
-                    _playersInThisArea.ConvertAll(x => x.GetComponent<Player>().DatabaseId));
                 if ( playerObject != null && playerObject.GetComponent<Player>() != null)
                 {
+                    OnPlayerExitArea?.Invoke(areaId,
+                        playerObject.GetComponent<Player>().DatabaseId,
+                        _playersInThisArea.ConvertAll(x => x.GetComponent<Player>().DatabaseId));
                     OnPlayerExit?.Invoke(playerObject.GetComponent<Player>().DatabaseId);
 
                 }

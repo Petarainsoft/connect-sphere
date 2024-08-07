@@ -93,6 +93,7 @@ namespace ConnectSphere
 
         private void ShowLocalVideo(Texture localTexture)
         {
+            if ( localVideoContainer != null ) return;
             localVideoContainer = Pool.Get();
             if ( localVideoContainer == null ) return;
             localVideoContainer.SetRemoteVideoTexture(localTexture);
@@ -108,6 +109,7 @@ namespace ConnectSphere
                 try
                 {
                     Pool.Release(localVideoContainer);
+                    localVideoContainer = null;
                 }
                 catch (InvalidOperationException e)
                 {
