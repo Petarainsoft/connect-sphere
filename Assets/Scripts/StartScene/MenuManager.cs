@@ -1,47 +1,72 @@
-using UnityEngine;
-using Fusion;
-using TMPro;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using System;
+using AccountManagement;
 using Cysharp.Threading.Tasks;
 using Doozy.Engine.UI;
+using Fusion;
+using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Vivox;
-using System.Reflection;
-using AccountManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace ConnectSphere
 {
     public class MenuManager : MonoBehaviour
     {
         [Header("Prefabs")]
-        [SerializeField] private NetworkRunner _networkRunnerPrefab;
+        [SerializeField]
+        private NetworkRunner _networkRunnerPrefab;
 
         [Header("Network Canvas")]
-        [SerializeField] private TMP_InputField _inputRoomName;
-        [SerializeField] private TextMeshProUGUI _roomNamePlaceholder;
+        [SerializeField]
+        private TMP_InputField _inputRoomName;
+
+        [SerializeField]
+        private TextMeshProUGUI _roomNamePlaceholder;
 
         [Header("Selection Canvas")]
-        [SerializeField] private TMP_InputField _inputPlayerName;
-        [SerializeField] private TextMeshProUGUI _playerNamePlaceholder;
-        [SerializeField] private Transform _avatarsContainer;
-        [SerializeField] private TextMeshProUGUI _textConnectionStatus;
-        [SerializeField] private Button _buttonStart;
+        [SerializeField]
+        private TMP_InputField _inputPlayerName;
+
+        [SerializeField]
+        private TextMeshProUGUI _playerNamePlaceholder;
+
+        [SerializeField]
+        private Transform _avatarsContainer;
+
+        [SerializeField]
+        private TextMeshProUGUI _textConnectionStatus;
+
+        [SerializeField]
+        private Button _buttonStart;
 
         [Header("Others")]
-        [SerializeField] GameObject _loadingCanvas;
-        [SerializeField] GameObject _networkCanvasObject;
-        [SerializeField] GameObject _selectionCanvasObject;
-        [SerializeField] private PlayerInfoSO _playerInfoSo;
-        [SerializeField] private string _gameScenePath;
-        [SerializeField] private IntegerEventHandlerSO _onAvatarImageClicked;
+        [SerializeField]
+        GameObject _loadingCanvas;
 
-        [Header("Vivox")] [SerializeField]
+        [SerializeField]
+        GameObject _networkCanvasObject;
+
+        [SerializeField]
+        GameObject _selectionCanvasObject;
+
+        [SerializeField]
+        private PlayerInfoSO _playerInfoSo;
+
+        [SerializeField]
+        private string _gameScenePath;
+
+        [SerializeField]
+        private IntegerEventHandlerSO _onAvatarImageClicked;
+
+        [SerializeField]
+        private GameObject _officeLoaderUI;
+
+        [Header("Vivox")]
+        [SerializeField]
         private float _timeout = 3f;
-
-        
 
         private NetworkRunner _runnerInstance;
         private string _tempRoomName;
@@ -66,8 +91,12 @@ namespace ConnectSphere
             if (userProfile != null)
             {
                 _playerInfoSo.MapData(userProfile);
-                _inputPlayerName.text = _playerInfoSo.PlayerName.Equals(string.Empty) ? RandomNameGenerator.GetRandomName(false) : _playerInfoSo.PlayerName;
-                HandleSelectedAvatar(_playerInfoSo.AvatarIndex == -1 ? 0 : _playerInfoSo.AvatarIndex);
+                _inputPlayerName.text = _playerInfoSo.PlayerName.Equals(string.Empty)
+                    ? RandomNameGenerator.GetRandomName(false)
+                    : _playerInfoSo.PlayerName;
+                HandleSelectedAvatar(
+                    _playerInfoSo.AvatarIndex == -1 ? 0 : _playerInfoSo.AvatarIndex
+                );
             }
         }
 
@@ -130,11 +159,23 @@ namespace ConnectSphere
             StartGame(GameMode.Shared, _tempRoomName, _gameScenePath);
         }
 
-        [SerializeField] private string _server = "https://unity.vivox.com/appconfig/10793-conne-77095-udash";
-        [SerializeField] private string _domain = "mtu1xp.vivox.com";
-        [SerializeField] private string _tokenIssuer = "10793-conne-77095-udash";
-        [SerializeField] private string _tokenKey = "8OZBvVqIzQMq1qqMQ3C23DWrrXNJrVuM";
-        
+        public void OnJoinOfficeEvent(string officeName)
+        {
+            OnJoinButtonClicked();
+            _tempRoomName = officeName;
+        }
+
+        [SerializeField]
+        private string _server = "https://unity.vivox.com/appconfig/10793-conne-77095-udash";
+
+        [SerializeField]
+        private string _domain = "mtu1xp.vivox.com";
+
+        [SerializeField]
+        private string _tokenIssuer = "10793-conne-77095-udash";
+
+        [SerializeField]
+        private string _tokenKey = "8OZBvVqIzQMq1qqMQ3C23DWrrXNJrVuM";
 
         private async UniTask<bool> JoinVivox(string playerEmail)
         {
@@ -142,21 +183,21 @@ namespace ConnectSphere
             var options = new InitializationOptions();
             options.SetVivoxCredentials(_server, _domain, _tokenIssuer, _tokenKey);
             await UnityServices.InitializeAsync(options);
-            var validName = playerEmail.Replace("@","_").Replace(".","_");
+            var validName = playerEmail.Replace("@", "_").Replace(".", "_");
             AuthenticationService.Instance.SwitchProfile(validName);
             Debug.Log("** Sign In AuthenticationService");
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
             var checkNull = UniTask.WaitUntil(() => VivoxService.Instance != null);
             var timeout = UniTask.WaitForSeconds(_timeout);
             await UniTask.WhenAny(checkNull, timeout);
-            if ( VivoxService.Instance == null )
+            if (VivoxService.Instance == null)
             {
                 Debug.LogWarning("** Cannot start Vivox service");
                 return false;
             }
             await VivoxService.Instance.InitializeAsync();
             Debug.Log($"** Initialize Vivox done!");
-            
+
             var loginOptions = new LoginOptions()
             {
                 DisplayName = validName,
@@ -167,9 +208,11 @@ namespace ConnectSphere
             Debug.Log($"** Login vivox done!");
             return true;
         }
-        
+
         private async void StartGame(GameMode mode, string roomName, string sceneName)
         {
+            _officeLoaderUI.GetComponentInChildren<OfficeDataLoader>().JoinOffice(roomName);
+
             _runnerInstance = FindObjectOfType<NetworkRunner>();
             if (_runnerInstance == null)
             {
@@ -191,11 +234,14 @@ namespace ConnectSphere
 
             try
             {
-                if ( !await JoinVivox(_playerInfoSo.Email.Trim()) )
+                if (!await JoinVivox(_playerInfoSo.Email.Trim()))
                 {
                     var warningPopup = UIPopupManager.GetPopup("ActionPopup");
                     warningPopup.Data.SetButtonsLabels("Ok");
-                    warningPopup.Data.SetLabelsTexts("Chat Service", "Currently Chat feature isn't available!");
+                    warningPopup.Data.SetLabelsTexts(
+                        "Chat Service",
+                        "Currently Chat feature isn't available!"
+                    );
                     warningPopup.Show();
                     await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
                 }
@@ -204,7 +250,10 @@ namespace ConnectSphere
             {
                 var warningPopup = UIPopupManager.GetPopup("ActionPopup");
                 warningPopup.Data.SetButtonsLabels("Ok");
-                warningPopup.Data.SetLabelsTexts("Services Error", "Currently voice/chat isn't available!\nRetry again!");
+                warningPopup.Data.SetLabelsTexts(
+                    "Services Error",
+                    "Currently voice/chat isn't available!\nRetry again!"
+                );
                 warningPopup.Show();
                 await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -222,6 +271,8 @@ namespace ConnectSphere
         public void ExitGame()
         {
             Application.Quit();
+            _officeLoaderUI.SetActive(true);
+            _networkCanvasObject.SetActive(false);
         }
 
         private async UniTask ShowLoadingScreen()
@@ -239,7 +290,10 @@ namespace ConnectSphere
 
         private async void SaveUserProfileToDb()
         {
-            await ApiManager.Instance.ProfileApi.UpdateUserProfile(_playerInfoSo.AvatarIndex, _playerInfoSo.PlayerName);
+            await ApiManager.Instance.ProfileApi.UpdateUserProfile(
+                _playerInfoSo.AvatarIndex,
+                _playerInfoSo.PlayerName
+            );
         }
     }
 }

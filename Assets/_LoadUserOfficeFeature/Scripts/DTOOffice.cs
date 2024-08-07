@@ -10,6 +10,7 @@ namespace ConnectSphere
         public string name { get; set; }
         public DateTime last_access { get; set; }
         public string resource_url { get; set; }
+        public string type_user { get; set; }
 
         public int GetDateDiff()
         {

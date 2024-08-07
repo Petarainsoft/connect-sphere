@@ -7,7 +7,6 @@ namespace ConnectSphere
 {
     public class OfficeApiHandler : ServerHandler
     {
-        public string test = "abv";
         private static string OFFICE_ROUTE = "/office";
         private static string CREATE_OFFICE = "/new_office";
         private static string LOAD_ALL_OFFICE = "/old_offices";
@@ -17,11 +16,6 @@ namespace ConnectSphere
             string resourceUrl
         )
         {
-            if (string.IsNullOrEmpty(PlayerPrefs.GetString("token")))
-            {
-                PlayerPrefs.SetString("token", test);
-            }
-
             var apiResponse = await CreatePostRequestInternal<CreateOfficeResult>(
                 $"{_serverUrl}{OFFICE_ROUTE}{CREATE_OFFICE}",
                 new Dictionary<string, object>
@@ -41,7 +35,6 @@ namespace ConnectSphere
 
         public async UniTask<LoadAllOfficeResult> LoadAllOffices()
         {
-            PlayerPrefs.SetString("token", test);
             var apiResponse = await CreateGetRequestInternal<LoadAllOfficeResult>(
                 $"{_serverUrl}{OFFICE_ROUTE}{LOAD_ALL_OFFICE}",
                 new Dictionary<string, object> { }

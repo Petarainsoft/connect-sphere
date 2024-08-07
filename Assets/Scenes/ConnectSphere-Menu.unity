@@ -2324,7 +2324,12 @@ MonoBehaviour:
   _playerInfoSo: {fileID: 11400000, guid: 592e4bbe575cc0d418dbf8b8efa31ad3, type: 2}
   _gameScenePath: ConnectSphere-Game
   _onAvatarImageClicked: {fileID: 11400000, guid: 1661d43874320d84086b26d160e52d10, type: 2}
+  _officeLoaderUI: {fileID: 1039320160}
   _timeout: 3
+  _server: https://unity.vivox.com/appconfig/10793-conne-77095-udash
+  _domain: mtu1xp.vivox.com
+  _tokenIssuer: 10793-conne-77095-udash
+  _tokenKey: 8OZBvVqIzQMq1qqMQ3C23DWrrXNJrVuM
 --- !u!4 &611479360
 Transform:
   m_ObjectHideFlags: 0
@@ -3376,6 +3381,80 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 978489186}
   m_CullTransparentMesh: 1
+--- !u!1001 &1023196609
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1129786109386456450, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 462657865}
+    - target: {fileID: 3544240092082468982, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3544240092082468982, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3544240092082468982, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3544240092082468982, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3544240092082468982, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3544240092082468982, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3544240092082468982, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3544240092082468982, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3544240092082468982, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3544240092082468982, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6660773265488707500, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: _menuManager
+      value: 
+      objectReference: {fileID: 611479359}
+    - target: {fileID: 6824641892123628232, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7505669738591013005, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: m_Name
+      value: OfficeLoaderUI
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+--- !u!1 &1039320160 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7505669738591013005, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+  m_PrefabInstance: {fileID: 1023196609}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1119980162
 GameObject:
   m_ObjectHideFlags: 0
@@ -5382,11 +5461,19 @@ PrefabInstance:
     - target: {fileID: 3118807433987671117, guid: 8bb8e557d5f2e5248a61ccd8d6f56a54, type: 3}
       propertyPath: _networkCanvas
       value: 
-      objectReference: {fileID: 462657865}
+      objectReference: {fileID: 1039320160}
     - target: {fileID: 3743955826186944612, guid: 8bb8e557d5f2e5248a61ccd8d6f56a54, type: 3}
       propertyPath: _networkCanvas
       value: 
       objectReference: {fileID: 462657865}
+    - target: {fileID: 3743955826186944612, guid: 8bb8e557d5f2e5248a61ccd8d6f56a54, type: 3}
+      propertyPath: _officeLoaderUI
+      value: 
+      objectReference: {fileID: 1039320160}
+    - target: {fileID: 4322495649511739331, guid: 8bb8e557d5f2e5248a61ccd8d6f56a54, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4501290148883702670, guid: 8bb8e557d5f2e5248a61ccd8d6f56a54, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -5498,3 +5585,4 @@ SceneRoots:
   - {fileID: 318157655}
   - {fileID: 498516145}
   - {fileID: 74703063}
+  - {fileID: 1023196609}

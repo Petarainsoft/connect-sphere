@@ -21,6 +21,21 @@ namespace ConnectSphere
 
         [SerializeField]
         private GameObject _searchBar;
+
+        [SerializeField]
+        private Button _createOfficeButton;
+
+        [SerializeField]
+        private string ERROR_LOG = "Something went wrong";
+
+        [SerializeField]
+        TextMeshProUGUI _usernameBox;
+
+        [SerializeField]
+        MenuManager _menuManager;
+
+        [SerializeField]
+        GameObject _officeItemHolder;
         private GridLayoutGroup _layoutHolderOfficeData;
         private List<GameObject> _offices = new List<GameObject>();
         private TMP_InputField _searchField;
@@ -29,14 +44,27 @@ namespace ConnectSphere
         private const int SECONDS_IN_HOUR = 3600;
         private const int SECONDS_IN_DAY = 3600 * 24;
 
-        private void Awake()
+        private void OnEnable()
         {
             _ = LoadAllOffices();
+
+            _createOfficeButton.onClick.AddListener(() => { });
+        }
+
+        private void OnDisable()
+        {
+            foreach (var office in _offices)
+            {
+                RemoveOnOfficeClickEventListener(office);
+                Destroy(office);
+            }
+            _offices.Clear();
+            _createOfficeButton.onClick.RemoveAllListeners();
         }
 
         private void Start()
         {
-            _layoutHolderOfficeData = GetComponent<GridLayoutGroup>();
+            _layoutHolderOfficeData = GetComponentInChildren<GridLayoutGroup>();
             _searchField = _searchBar.GetComponentInChildren<TMP_InputField>();
 
             _searchField.interactable = false;
@@ -63,7 +91,7 @@ namespace ConnectSphere
                 //handle error
                 var warningPopup = UIPopupManager.GetPopup("ActionPopup");
                 warningPopup.Data.SetButtonsLabels("Ok");
-                warningPopup.Data.SetLabelsTexts("Message", officeResult.message);
+                warningPopup.Data.SetLabelsTexts("Error", ERROR_LOG);
                 warningPopup.Show();
             }
             else
@@ -82,23 +110,40 @@ namespace ConnectSphere
 
         private void FillData()
         {
+            _usernameBox.text = PlayerPrefs.GetString("username").Split("@")[0];
+
             int count = _officeSO.Count;
-            RectTransform rect = GetComponent<RectTransform>();
+            RectTransform rect = _officeItemHolder.GetComponent<RectTransform>();
             rect.sizeDelta = new Vector2(rect.sizeDelta.x, CalculateHeight(count));
             for (int i = 0; i < count; i++)
             {
-                GameObject office = Instantiate(_officeItemPrefabs, transform);
-                Debug.Log(office.name);
-
+                GameObject office = Instantiate(_officeItemPrefabs, _officeItemHolder.transform);
+                office.name = _officeSO[i].name;
                 FillItemData(office, i);
+                AddOnOfficeClickEventListener(office);
                 _offices.Add(office);
             }
             _searchField.interactable = true;
         }
 
+        private void AddOnOfficeClickEventListener(GameObject office)
+        {
+            Button officeButton = office.AddComponent<Button>();
+            officeButton.onClick.AddListener(() =>
+            {
+                _menuManager.OnJoinOfficeEvent(office.name);
+                gameObject.SetActive(false);
+            });
+        }
+
+        private void RemoveOnOfficeClickEventListener(GameObject office)
+        {
+            Button officeButton = office.GetComponent<Button>();
+            officeButton.onClick.RemoveAllListeners();
+        }
+
         private void FillItemData(GameObject office, int i)
         {
-            Debug.Log(office.transform.GetComponentInChildren<TextMeshProUGUI>().text);
             office.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = _officeSO[i].name;
             int seconds = _officeSO[i].GetDateDiff();
             if (_officeSO[i].GetDateDiff() < SECONDS_IN_MINUTE)
@@ -130,6 +175,33 @@ namespace ConnectSphere
             Debug.Log(count / NUMBER_COLUMNS_IN_ROW);
             return paddingTop
                 + (elementHeight + spacingTop) * ((count / NUMBER_COLUMNS_IN_ROW) + 1);
+        }
+
+        public void JoinOffice(string name)
+        {
+            _ = CreateNewOffice(name);
+        }
+
+        private async UniTaskVoid CreateNewOffice(string office_name)
+        {
+            Utils.ShowLoading();
+
+            var officeResult = await _officeApiHandler.CreateNewOffice(office_name, "abc");
+
+            if (officeResult.data == null)
+            {
+                //handle error
+                var warningPopup = UIPopupManager.GetPopup("ActionPopup");
+                warningPopup.Data.SetButtonsLabels("Ok");
+                warningPopup.Data.SetLabelsTexts("Error", ERROR_LOG);
+                warningPopup.Show();
+            }
+            else
+            {
+                Debug.Log("Success " + officeResult.data);
+            }
+
+            Utils.HideLoading();
         }
     }
 }
