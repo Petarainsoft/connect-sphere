@@ -88,7 +88,7 @@ namespace ConnectSphere
             {
                 await UniTask.WaitUntil(() => _userId > -1);
                 await UniTask.WaitUntil(() => _enablePositionTracking);
-                if (gameObject != null && transform != null)
+                if (this != null && gameObject != null && transform != null)
                 {
                     AEventHandler.ExecuteEvent(GlobalEvents.PlayerPositionUpdated, _userId,
                         new Vector2(transform.position.x, transform.position.y));
