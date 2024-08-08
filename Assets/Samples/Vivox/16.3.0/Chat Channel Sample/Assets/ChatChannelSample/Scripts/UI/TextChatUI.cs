@@ -21,12 +21,15 @@ public class TextChatUI : MonoBehaviour
 
     public GameObject ChatContentObj;
     public GameObject MessageObject;
+    
     public Button EnterButton;
     public InputField MessageInputField;
     private Task FetchMessages = null;
     private DateTime? oldestMessage = null;
 
     public TMP_Text _chatFrameTitle;
+
+    public GameObject _loadingScreen;
 
     public void FireOntypingFalse()
     {
@@ -67,10 +70,7 @@ public class TextChatUI : MonoBehaviour
 
     private void OnDisable()
     {
-        if ( m_MessageObjPool.Count > 0 )
-        {
-            ClearMessageObjectPool();
-        }
+        ClearMessageObjectPool();
         OnTyping?.Invoke(false);
         oldestMessage = null;
     }
@@ -78,10 +78,12 @@ public class TextChatUI : MonoBehaviour
     private void ScrollRectChange(Vector2 vector)
     {
         // Scrolled near end and check if we are fetching history already
-        if ( m_TextChatScrollRect.verticalNormalizedPosition >= 0.95f && FetchMessages != null &&
+        if ( m_TextChatScrollRect.verticalNormalizedPosition >= 0.99f && FetchMessages != null &&
              (FetchMessages.IsCompleted || FetchMessages.IsFaulted || FetchMessages.IsCanceled) )
         {
-            m_TextChatScrollRect.normalizedPosition = new Vector2(0, 0.8f);
+            m_TextChatScrollRect.normalizedPosition = new Vector2(0, 0.5f);
+            _loadingScreen.SetActive(true);
+            MessageInputField.enabled = false;
             FetchMessages = FetchHistory(false);
         }
     }
@@ -105,14 +107,14 @@ public class TextChatUI : MonoBehaviour
                     chatHistoryOptions);
             var reversedMessages = historyMessages.Reverse().ToList();
 
-            for (int i = 0; i < reversedMessages.Count; i++)
+            for (var i = 0; i < reversedMessages.Count; i++)
             {
                 var historyMessage = reversedMessages[i];
                 var prevDisplayName = i > 0 ? reversedMessages[i - 1].SenderDisplayName : string.Empty;
                 AddMessageToChat(historyMessage, true, scrollToBottom, prevDisplayName:prevDisplayName);
-                await UniTask.WaitForEndOfFrame();
+                await UniTask.Yield();
             }
-
+            _loadingScreen.SetActive(false);
             MessageInputField.enabled = true;
 
             // Update the oldest message ReceivedTime if it exists to help the next fetch get the next batch of history
@@ -214,11 +216,11 @@ public class TextChatUI : MonoBehaviour
         if ( channelName.Trim() != currentChannelName )
         {
             currentChannelName = channelName.Trim();
-      
         }
         ClearMessageObjectPool();
         oldestMessage = null;
         _chatFrameTitle.text = GetDisplayName(currentChannelName);
+        _loadingScreen.SetActive(true);
         MessageInputField.enabled = false;
         FetchMessages = FetchHistory(true);
     }
@@ -276,6 +278,7 @@ public class TextChatUI : MonoBehaviour
         else
         {
             m_MessageObjPool.Add(new KeyValuePair<string, MessageObjectUI>(message.MessageId, newMessageTextObject));
+            _lastMessageDisplayName = message.SenderDisplayName;
         }
 
         newMessageTextObject.SetTextMessage(message, showName:message.SenderDisplayName != prevDisplayName);
@@ -283,7 +286,5 @@ public class TextChatUI : MonoBehaviour
         {
             StartCoroutine(SendScrollRectToBottom());
         }
-
-        _lastMessageDisplayName = message.SenderDisplayName;
     }
 }
