@@ -1,7 +1,6 @@
-using System.Collections;
+using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
-using Fusion;
 
 namespace ConnectSphere
 {
@@ -17,11 +16,12 @@ namespace ConnectSphere
         [Networked] private GamePhase Phase { get; set; }
         private List<NetworkBehaviourId> _playerDataNetworkedIds = new List<NetworkBehaviourId>();
 
+
         private void Awake()
         {
             GetComponent<NetworkObject>().Flags |= NetworkObjectFlags.MasterClientObject;
         }
-
+    
         public override void Spawned()
         {
             if (Object.HasStateAuthority)
@@ -61,5 +61,6 @@ namespace ConnectSphere
             _playerDataNetworkedIds.Add(playerDataNetworkedId);
             Debug.Log($"<color=green>New player: {playerDataNetworkedId}</color>");
         }
+
     }
 }

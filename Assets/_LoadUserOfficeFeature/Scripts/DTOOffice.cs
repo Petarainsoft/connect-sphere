@@ -1,6 +1,6 @@
-﻿using System;
+﻿using AccountManagement;
+using System;
 using System.Collections.Generic;
-using AccountManagement;
 
 namespace ConnectSphere
 {
@@ -36,5 +36,10 @@ namespace ConnectSphere
     public class LoadAllOfficeResult : BaseResult
     {
         public List<DTOOffice> data { get; set; }
+    }
+
+    [Serializable]
+    public class ExitOfficeResult : BaseResult { 
+        public DTOOffice data { get; set; }
     }
 }

@@ -1,8 +1,9 @@
-using System.Collections.Generic;
 using AccountManagement;
 using Cysharp.Threading.Tasks;
 using Doozy.Engine.UI;
+using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,6 +37,13 @@ namespace ConnectSphere
 
         [SerializeField]
         GameObject _officeItemHolder;
+
+        [SerializeField]
+        private string _officeResourcePath;
+
+        [SerializeField] 
+        private Sprite _defaultTemplate;
+
         private GridLayoutGroup _layoutHolderOfficeData;
         private List<GameObject> _offices = new List<GameObject>();
         private TMP_InputField _searchField;
@@ -71,6 +79,7 @@ namespace ConnectSphere
 
             Debug.Log(transform.childCount);
         }
+
 
         public void Search()
         {
@@ -128,7 +137,7 @@ namespace ConnectSphere
 
         private void AddOnOfficeClickEventListener(GameObject office)
         {
-            Button officeButton = office.AddComponent<Button>();
+            Button officeButton = office.transform.GetOrAddComponent<Button>();
             officeButton.onClick.AddListener(() =>
             {
                 _menuManager.OnJoinOfficeEvent(office.name);
@@ -165,6 +174,11 @@ namespace ConnectSphere
                 office.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text =
                     seconds / SECONDS_IN_DAY + "-day ago";
             }
+            Sprite template = Resources.Load<Sprite>(_officeResourcePath + _officeSO[i].resource_url);
+            Debug.Log(_officeResourcePath + _officeSO[i].resource_url);
+            office.transform.GetChild(2).GetOrAddComponent<Image>().sprite = template ?? _defaultTemplate ;
+
+
         }
 
         private float CalculateHeight(int count)
@@ -174,19 +188,21 @@ namespace ConnectSphere
             float paddingTop = _layoutHolderOfficeData.padding.top;
             Debug.Log(count / NUMBER_COLUMNS_IN_ROW);
             return paddingTop
-                + (elementHeight + spacingTop) * ((count / NUMBER_COLUMNS_IN_ROW) + 1);
+                + (elementHeight + spacingTop) * ((count / NUMBER_COLUMNS_IN_ROW));
         }
 
         public void JoinOffice(string name)
         {
             _ = CreateNewOffice(name);
         }
-
+        public void UpdateLastAccess(string officename, string username) { 
+            _= _officeApiHandler.UpdateLastAccess(officename, username);
+        }
         private async UniTaskVoid CreateNewOffice(string office_name)
         {
             Utils.ShowLoading();
 
-            var officeResult = await _officeApiHandler.CreateNewOffice(office_name, "abc");
+            var officeResult = await _officeApiHandler.CreateNewOffice(office_name, "/office-1");
 
             if (officeResult.data == null)
             {
@@ -202,6 +218,13 @@ namespace ConnectSphere
             }
 
             Utils.HideLoading();
+        }
+
+        public void Filter(string typeUser)
+        {
+            for (int i = 0; i < _officeSO.Count; i++) {
+                _offices[i].SetActive(_officeSO[i].type_user.Contains(typeUser));
+            }
         }
     }
 }

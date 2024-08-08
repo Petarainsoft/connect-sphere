@@ -131,6 +131,7 @@ namespace ConnectSphere
             _playerInfoSo.Email = PlayerPrefs.GetString("username");
             _playerInfoSo.DatabaseId = PlayerPrefs.GetInt("userId");
             SaveUserProfileToDb();
+            PlayerPrefs.SetString("office", _tempRoomName);
             StartGame(GameMode.Shared, _tempRoomName, _gameScenePath);
         }
 
@@ -179,8 +180,9 @@ namespace ConnectSphere
 
         private async void StartGame(GameMode mode, string roomName, string sceneName)
         {
-            _officeLoaderUI.GetComponentInChildren<OfficeDataLoader>().JoinOffice(roomName);
-
+            OfficeDataLoader officeLoader = _officeLoaderUI.GetComponentInChildren<OfficeDataLoader>();
+            officeLoader.JoinOffice(roomName);
+            officeLoader.UpdateLastAccess(roomName, PlayerPrefs.GetString("username"));
             _runnerInstance = FindObjectOfType<NetworkRunner>();
             if (_runnerInstance == null)
             {
@@ -228,8 +230,9 @@ namespace ConnectSphere
             }
             // GameMode.Host = Start a session with a specific name
             // GameMode.Client = Join a session with a specific name
-            await _runnerInstance.StartGame(startGameArgs);
 
+            await _runnerInstance.StartGame(startGameArgs);
+            
             if (_runnerInstance.IsServer)
             {
                 await _runnerInstance.LoadScene(sceneName);
