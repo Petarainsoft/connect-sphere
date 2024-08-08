@@ -1,17 +1,14 @@
-using System.Collections.Generic;
 using AccountManagement;
 using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ConnectSphere
 {
     public class ProfileApiHandler : ServerHandler
     {
-        [SerializeField]
-        private string _getUserProfile = "chat/get_user_by_id";
-
-        [SerializeField]
-        private string _updateUserProfile = "auth/update_profile";
+        [SerializeField] private string _getUserProfile = "chat/get_user_by_id";
+        [SerializeField] private string _updateUserProfile = "auth/update_profile";
 
 #if ANH_LOCAL
         [Sirenix.OdinInspector.Button]

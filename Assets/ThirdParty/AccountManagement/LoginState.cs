@@ -8,30 +8,16 @@ namespace AccountManagement
     public class LoginState : AppBaseState
     {
         [Header("GameEvents")]
-        [SerializeField]
-        private string _backToIntroEventName = "BackIntroduction";
-
+        [SerializeField] private string _backToIntroEventName = "BackIntroduction";
+        
         [Header("UI")]
-        [SerializeField]
-        private TMP_InputField _emailInput;
-
-        [SerializeField]
-        private TMP_InputField _passwordInput;
-
-        [SerializeField]
-        private UIButton _nextButton;
-
-        [SerializeField]
-        private UIButton _resetPassButton;
-
-        [SerializeField]
-        private UIButton _backButton;
-
-        [SerializeField]
-        private GameObject _networkCanvas;
-
-        [SerializeField]
-        private GameObject _officeLoaderUI;
+        [SerializeField] private TMP_InputField _emailInput;
+        [SerializeField] private TMP_InputField _passwordInput;
+        [SerializeField] private UIButton _nextButton;
+        [SerializeField] private UIButton _resetPassButton;
+        [SerializeField] private UIButton _backButton;
+        [SerializeField] private GameObject _networkCanvas;
+        [SerializeField] private GameObject _officeLoaderUI;
 
         public override void OnEnter()
         {

@@ -1,8 +1,8 @@
-using System;
 using AccountManagement;
 using Cysharp.Threading.Tasks;
 using Doozy.Engine.UI;
 using Fusion;
+using System;
 using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
@@ -15,64 +15,39 @@ namespace ConnectSphere
 {
     public class MenuManager : MonoBehaviour
     {
-        [Header("Prefabs")]
-        [SerializeField]
-        private NetworkRunner _networkRunnerPrefab;
+        [Header("Prefabs")] 
+        [SerializeField] private NetworkRunner _networkRunnerPrefab;
 
-        [Header("Network Canvas")]
-        [SerializeField]
-        private TMP_InputField _inputRoomName;
+        [Header("Network Canvas")] 
+        [SerializeField] private TMP_InputField _inputRoomName;
+        [SerializeField] private TextMeshProUGUI _roomNamePlaceholder;
 
-        [SerializeField]
-        private TextMeshProUGUI _roomNamePlaceholder;
-
-        [Header("Selection Canvas")]
-        [SerializeField]
-        private TMP_InputField _inputPlayerName;
-
-        [SerializeField]
-        private TextMeshProUGUI _playerNamePlaceholder;
-
-        [SerializeField]
-        private Transform _avatarsContainer;
-
-        [SerializeField]
-        private TextMeshProUGUI _textConnectionStatus;
-
-        [SerializeField]
-        private Button _buttonStart;
+        [Header("Selection Canvas")] 
+        [SerializeField] private TMP_InputField _inputPlayerName;
+        [SerializeField] private TextMeshProUGUI _playerNamePlaceholder;
+        [SerializeField] private Transform _avatarsContainer;
+        [SerializeField] private TextMeshProUGUI _textConnectionStatus;
+        [SerializeField] private Button _buttonStart;
 
         [Header("Others")]
-        [SerializeField]
-        GameObject _loadingCanvas;
-
-        [SerializeField]
-        GameObject _networkCanvasObject;
-
-        [SerializeField]
-        GameObject _selectionCanvasObject;
-
-        [SerializeField]
-        private PlayerInfoSO _playerInfoSo;
-
-        [SerializeField]
-        private string _gameScenePath;
-
-        [SerializeField]
-        private IntegerEventHandlerSO _onAvatarImageClicked;
-
-        [SerializeField]
-        private GameObject _officeLoaderUI;
-
-        [Header("Vivox")]
-        [SerializeField]
+        [SerializeField] GameObject _loadingCanvas;
+        [SerializeField] GameObject _networkCanvasObject;
+        [SerializeField] GameObject _selectionCanvasObject;
+        [SerializeField] private PlayerInfoSO _playerInfoSo;
+        [SerializeField] private string _gameScenePath;
+        [SerializeField] private IntegerEventHandlerSO _onAvatarImageClicked;
+        
+        [Header("Vivox")] [SerializeField]
         private float _timeout = 3f;
-
         private NetworkRunner _runnerInstance;
+
         private string _tempRoomName;
         private string _tempPlayerName;
         private int _selectedAvatarIndex = 0;
 
+
+        [SerializeField]
+        private GameObject _officeLoaderUI;
         public string RoomName => _tempRoomName;
 
         private void OnEnable()
@@ -165,17 +140,10 @@ namespace ConnectSphere
             _tempRoomName = officeName;
         }
 
-        [SerializeField]
-        private string _server = "https://unity.vivox.com/appconfig/10793-conne-77095-udash";
-
-        [SerializeField]
-        private string _domain = "mtu1xp.vivox.com";
-
-        [SerializeField]
-        private string _tokenIssuer = "10793-conne-77095-udash";
-
-        [SerializeField]
-        private string _tokenKey = "8OZBvVqIzQMq1qqMQ3C23DWrrXNJrVuM";
+        [SerializeField] private string _server = "https://unity.vivox.com/appconfig/10793-conne-77095-udash";
+        [SerializeField] private string _domain = "mtu1xp.vivox.com";
+        [SerializeField] private string _tokenIssuer = "10793-conne-77095-udash";
+        [SerializeField] private string _tokenKey = "8OZBvVqIzQMq1qqMQ3C23DWrrXNJrVuM";
 
         private async UniTask<bool> JoinVivox(string playerEmail)
         {
