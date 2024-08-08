@@ -191,7 +191,7 @@ namespace Unity.RenderStreaming.Signaling
         private void WSProcessMessage(object sender, MessageEventArgs e)
         {
             var content = Encoding.UTF8.GetString(e.RawData);
-            RenderStreaming.Logger.Log($"Signaling: Receiving message: {content}");
+            // RenderStreaming.Logger.Log($"Signaling: Receiving message: {content}");
 
             try
             {
@@ -284,19 +284,19 @@ namespace Unity.RenderStreaming.Signaling
         {
             if (m_webSocket == null || m_webSocket.ReadyState != WebSocketState.Open)
             {
-                RenderStreaming.Logger.Log(LogType.Error, "Signaling: WS is not connected. Unable to send message");
+                // RenderStreaming.Logger.Log(LogType.Error, "Signaling: WS is not connected. Unable to send message");
                 return;
             }
 
             if (data is string s)
             {
-                RenderStreaming.Logger.Log("Signaling: Sending WS data: " + s);
+                // RenderStreaming.Logger.Log("Signaling: Sending WS data: " + s);
                 m_webSocket.Send(s);
             }
             else
             {
                 string str = JsonUtility.ToJson(data);
-                RenderStreaming.Logger.Log("Signaling: Sending WS data: " + str);
+                // RenderStreaming.Logger.Log("Signaling: Sending WS data: " + str);
                 m_webSocket.Send(str);
             }
         }

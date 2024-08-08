@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Chat;
@@ -14,7 +12,6 @@ namespace ConnectSphere
         private List<GatheringArea> _areas;
 
         [SerializeField] private List<AreaChatItem> _areaChatItems;
-
 
         [SerializeField] private VivoxServiceHelper _vivoxHelper;
 
@@ -38,26 +35,39 @@ namespace ConnectSphere
             GatheringArea.OnPlayerExitArea += HandlePlayerExit;
         }
 
-        private void HandlePlayerExit(int areaId, int userId, List<int> usersInArea)
+        private async void HandlePlayerEnter(int areaId, int userId, List<int> usersInArea)
         {
-            Debug.Log($"<color=red>PlayerEXIT {areaId}</color>");
-            var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
-            if ( area == null ) return;
-            var listPlayers = area.PlayersInArea;
-            Debug.Log($"<color=red>listPlayers {string.Join(",", listPlayers)}</color>");
-            // me went out
-            var myId = PlayerPrefs.GetInt("userId");
-            Debug.Log($"<color=red>MyId {myId}</color>");
-            // me not in the area just raise leave-event
-            if ( !listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
+            Debug.Log($"<color=red>listPlayers {string.Join(",", usersInArea)}</color>");
+            var meEnterArea = userId == _playerInfoSo.DatabaseId;
+            if (meEnterArea)
             {
                 foreach (var areaChatItem in _areaChatItems)
                 {
-                    if ( areaChatItem.AreaId == areaId )
+                    var enableItem = (areaChatItem.AreaId == areaId);
+                    areaChatItem.gameObject.SetActive(enableItem);
+                    areaChatItem.enabled = enableItem;
+                    if (areaChatItem.AreaId == areaId)
                     {
-                        areaChatItem.gameObject.SetActive(false);
-                        areaChatItem.enabled = false;
-                        _vivoxHelper.LeaveAreaChat(areaId); // me leave that area}
+                        _vivoxHelper.JoinAreaChat(areaId);
+                        _vivoxHelper.JoinAudio(areaId);
+                        _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
+                    }
+                }
+            }
+        }
+
+        private void HandlePlayerExit(int areaId, int userId, List<int> usersInArea)
+        {
+            var meOutOfArea = userId == _playerInfoSo.DatabaseId;
+            if (meOutOfArea)
+            {
+                foreach (var areaChatItem in _areaChatItems)
+                {
+                    areaChatItem.gameObject.SetActive(false);
+                    areaChatItem.enabled = false;
+                    if ( areaId == areaChatItem.AreaId)
+                    {
+                        _vivoxHelper.LeaveAreaChat(areaId);
                         _vivoxHelper.LeaveAudio(areaId);
                         _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
                     }
@@ -65,30 +75,6 @@ namespace ConnectSphere
             }
         }
 
-        private async void HandlePlayerEnter(int areaId, int userId, List<int> usersInArea)
-        {
-            Debug.Log($"<color=red>PlayerENTER {areaId}</color>");
-            var area = _areas.FirstOrDefault(e => e.AreaId == areaId);
-            if ( area == null ) return;
-            var listPlayers = area.PlayersInArea;
-            Debug.Log(
-                $"<color=red>listPlayers {string.Join(",", listPlayers.Select(e => e.GetComponent<Player>().DatabaseId))}</color>");
-            // me went in
-            var myId = PlayerPrefs.GetInt("userId");
-            Debug.Log($"<color=red>MyId {myId}</color>");
-            if ( listPlayers.Any(p => p.GetComponent<Player>().DatabaseId == myId) )
-            {
-                foreach (var areaChatItem in _areaChatItems)
-                {
-                    areaChatItem.gameObject.SetActive((areaChatItem.AreaId == areaId));
-                    areaChatItem.enabled = areaChatItem.AreaId == areaId;
-                    if ( areaChatItem.AreaId == areaId )
-                    {
-                        _chatFrameTitle.text = $"Area {areaId + 1}";
-                    }
-                }
-            }
-        }
 
         private void OnDestroy()
         {

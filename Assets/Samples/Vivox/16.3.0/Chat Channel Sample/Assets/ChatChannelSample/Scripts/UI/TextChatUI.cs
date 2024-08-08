@@ -23,11 +23,6 @@ public class TextChatUI : MonoBehaviour
     public GameObject MessageObject;
     public Button EnterButton;
     public InputField MessageInputField;
-    public Button SendTTSMessageButton;
-    public Toggle ToggleTTS;
-    public GameObject ChannelEffectPanel;
-    public Dropdown ChannelEffectDropdown;
-
     private Task FetchMessages = null;
     private DateTime? oldestMessage = null;
 
@@ -37,6 +32,8 @@ public class TextChatUI : MonoBehaviour
     {
         OnTyping?.Invoke(false);
     }
+    
+    private string _lastMessageDisplayName = string.Empty;
 
     IEnumerator Start()
     {
@@ -52,17 +49,10 @@ public class TextChatUI : MonoBehaviour
 #if !(UNITY_STANDALONE || UNITY_IOS || UNITY_ANDROID)
         MessageInputField.gameObject.SetActive(false);
         EnterButton.gameObject.SetActive(false);
-        SendTTSMessageButton.gameObject.SetActive(false);
 #else
         EnterButton.onClick.AddListener(SendMessage);
         MessageInputField.onValueChanged.AddListener(OnvalueChange);
         MessageInputField.onEndEdit.AddListener((string text) => { EnterKeyOnTextField(); });
-        SendTTSMessageButton.onClick.AddListener(SubmitTTSMessageToVivox);
-        ToggleTTS.onValueChanged.AddListener(TTSToggleValueChanged);
-        ChannelEffectDropdown.onValueChanged.AddListener(ChannelEffectValueChanged);
-        AudioTapsManager.Instance.OnTapsFeatureChanged += OnAudioTapsManagerFeatureChanged;
-
-        ChannelEffectPanel.gameObject.SetActive(AudioTapsManager.Instance.IsFeatureEnabled);
 #endif
         m_TextChatScrollRect.onValueChanged.AddListener(ScrollRectChange);
     }
@@ -115,11 +105,13 @@ public class TextChatUI : MonoBehaviour
             var historyMessages =
                 await VivoxService.Instance.GetChannelTextMessageHistoryAsync(currentChannelName, 10,
                     chatHistoryOptions);
-            var reversedMessages = historyMessages.Reverse();
-        
-            foreach (var historyMessage in reversedMessages)
+            var reversedMessages = historyMessages.Reverse().ToList();
+
+            for (int i = 0; i < reversedMessages.Count; i++)
             {
-                AddMessageToChat(historyMessage, true, scrollToBottom);
+                var historyMessage = reversedMessages[i];
+                var prevDisplayName = i > 0 ? reversedMessages[i - 1].SenderDisplayName : string.Empty;
+                AddMessageToChat(historyMessage, true, scrollToBottom, prevDisplayName:prevDisplayName);
                 await UniTask.WaitForEndOfFrame();
             }
 
@@ -151,28 +143,8 @@ public class TextChatUI : MonoBehaviour
         EnterButton.onClick.RemoveAllListeners();
         MessageInputField.onValueChanged.RemoveAllListeners();
         MessageInputField.onEndEdit.RemoveAllListeners();
-        SendTTSMessageButton.onClick.RemoveAllListeners();
-        ToggleTTS.onValueChanged.RemoveAllListeners();
 #endif
         m_TextChatScrollRect.onValueChanged.RemoveAllListeners();
-    }
-
-    void TTSToggleValueChanged(bool toggleTTS)
-    {
-        if ( !ToggleTTS.isOn )
-        {
-            VivoxService.Instance.TextToSpeechCancelMessages(TextToSpeechMessageType.LocalPlayback);
-        }
-    }
-
-    private void OnAudioTapsManagerFeatureChanged(bool enabled)
-    {
-        ChannelEffectPanel.gameObject.SetActive(enabled);
-    }
-
-    private void ChannelEffectValueChanged(int value)
-    {
-        AudioTapsManager.Instance.AddChannelAudioEffect((AudioTapsManager.Effects)value);
     }
 
     void ClearMessageObjectPool()
@@ -252,7 +224,7 @@ public class TextChatUI : MonoBehaviour
 
     void OnDirectedMessageReceived(VivoxMessage message)
     {
-        AddMessageToChat(message, false, true);
+        AddMessageToChat(message, false, true, prevDisplayName:_lastMessageDisplayName);
     }
 
     private string currentChannelName = string.Empty;
@@ -291,7 +263,7 @@ public class TextChatUI : MonoBehaviour
 
     void OnChannelMessageReceived(VivoxMessage message)
     {
-        AddMessageToChat(message, false, true);
+        AddMessageToChat(message, false, true, prevDisplayName:_lastMessageDisplayName);
     }
 
     private void OnChannelMessageEdited(VivoxMessage message)
@@ -308,7 +280,7 @@ public class TextChatUI : MonoBehaviour
         editedMessage?.SetTextMessage(message, true);
     }
 
-    void AddMessageToChat(VivoxMessage message, bool isHistory = false, bool scrollToBottom = false, bool isLastMessage = false)
+    void AddMessageToChat(VivoxMessage message, bool isHistory = false, bool scrollToBottom = false, bool isLastMessage = false, string prevDisplayName = "")
     {
         var newMessageObj = Instantiate(MessageObject, ChatContentObj.transform);
         var newMessageTextObject = newMessageObj.GetComponent<MessageObjectUI>();
@@ -323,10 +295,12 @@ public class TextChatUI : MonoBehaviour
             m_MessageObjPool.Add(new KeyValuePair<string, MessageObjectUI>(message.MessageId, newMessageTextObject));
         }
 
-        newMessageTextObject.SetTextMessage(message);
+        newMessageTextObject.SetTextMessage(message, showName:message.SenderDisplayName != prevDisplayName);
         if ( scrollToBottom )
         {
             StartCoroutine(SendScrollRectToBottom());
         }
+
+        _lastMessageDisplayName = message.SenderDisplayName;
     }
 }
