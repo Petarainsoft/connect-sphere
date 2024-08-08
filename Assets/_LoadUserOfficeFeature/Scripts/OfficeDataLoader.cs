@@ -52,6 +52,7 @@ namespace ConnectSphere
         private const int SECONDS_IN_HOUR = 3600;
         private const int SECONDS_IN_DAY = 3600 * 24;
 
+        private int ActiveCount;
         private void OnEnable()
         {
             _ = LoadAllOffices();
@@ -83,10 +84,15 @@ namespace ConnectSphere
 
         public void Search()
         {
+            ActiveCount = 0;
             for (int i = 0; i < _officeSO.Count; i++)
             {
-                _offices[i].SetActive(_officeSO[i].name.Contains(_searchField.text));
+                bool isActive = _officeSO[i].name.Contains(_searchField.text);
+                _offices[i].SetActive(isActive);
+                if (isActive) ActiveCount += 1;
             }
+
+            SetContentOfficeHeight(ActiveCount);
         }
 
         private async UniTaskVoid LoadAllOffices()
@@ -122,8 +128,7 @@ namespace ConnectSphere
             _usernameBox.text = PlayerPrefs.GetString("username").Split("@")[0];
 
             int count = _officeSO.Count;
-            RectTransform rect = _officeItemHolder.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(rect.sizeDelta.x, CalculateHeight(count));
+            SetContentOfficeHeight(count);
             for (int i = 0; i < count; i++)
             {
                 GameObject office = Instantiate(_officeItemPrefabs, _officeItemHolder.transform);
@@ -188,7 +193,7 @@ namespace ConnectSphere
             float paddingTop = _layoutHolderOfficeData.padding.top;
             Debug.Log(count / NUMBER_COLUMNS_IN_ROW);
             return paddingTop
-                + (elementHeight + spacingTop) * ((count / NUMBER_COLUMNS_IN_ROW));
+                + (elementHeight + spacingTop) * (Mathf.CeilToInt((float)count/NUMBER_COLUMNS_IN_ROW));
         }
 
         public void JoinOffice(string name)
@@ -222,9 +227,21 @@ namespace ConnectSphere
 
         public void Filter(string typeUser)
         {
+            ActiveCount = 0;
             for (int i = 0; i < _officeSO.Count; i++) {
-                _offices[i].SetActive(_officeSO[i].type_user.Contains(typeUser));
+                bool isActive = _officeSO[i].type_user.Contains(typeUser) && _officeSO[i].name.Contains(_searchField.text);
+                _offices[i].SetActive(isActive);
+                if(isActive) ActiveCount += 1;
             }
+            SetContentOfficeHeight(ActiveCount);
+
         }
+
+        private void SetContentOfficeHeight(int count)
+        {
+            RectTransform rect = _officeItemHolder.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(rect.sizeDelta.x, CalculateHeight(count));
+        }
+
     }
 }
