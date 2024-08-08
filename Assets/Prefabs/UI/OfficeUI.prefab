@@ -46827,6 +46827,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _checkingInterval: 0.2
   _distanceScanner: {fileID: 1489893705320929572}
+  _vivoxHelper: {fileID: 7528049980501378430}
 --- !u!1 &7414836160425754542
 GameObject:
   m_ObjectHideFlags: 0

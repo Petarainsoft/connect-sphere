@@ -10,6 +10,8 @@ namespace ConnectSphere.Chat
         [SerializeField] private float _checkingInterval = 0.2f;
         [SerializeField]
         private DistanceScanner _distanceScanner;
+
+        [SerializeField]
         private VivoxServiceHelper _vivoxHelper;
 
         private void OnEnable()
