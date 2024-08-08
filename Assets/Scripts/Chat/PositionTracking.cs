@@ -19,6 +19,8 @@ namespace ConnectSphere
 
         [SerializeField] private float _reportInterval = 0.1f;
 
+        public int UserId => _userId;
+
         private async void Start()
         {
             await UniTask.WaitUntil(() => GetComponent<Player>() != null);

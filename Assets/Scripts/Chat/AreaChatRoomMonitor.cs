@@ -39,7 +39,7 @@ namespace ConnectSphere
         {
             Debug.Log($"<color=red>listPlayers {string.Join(",", usersInArea)}</color>");
             var meEnterArea = userId == _playerInfoSo.DatabaseId;
-            if (meEnterArea)
+            if (meEnterArea && usersInArea.Count > 1)
             {
                 foreach (var areaChatItem in _areaChatItems)
                 {

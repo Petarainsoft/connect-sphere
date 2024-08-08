@@ -39,10 +39,10 @@ namespace ConnectSphere
                 _playersInThisArea.Add(playerObject);
                 
                 OnPlayerEnteredArea?.Invoke(areaId, 
-                    playerObject.GetComponent<Player>().DatabaseId, 
-                    _playersInThisArea.ConvertAll(x => x.GetComponent<Player>().DatabaseId));
+                    playerObject.GetComponent<PositionTracking>().UserId,
+                    _playersInThisArea.ConvertAll(x => x.GetComponent<PositionTracking>().UserId));
                 
-                OnPlayerEntered?.Invoke(playerObject.GetComponent<Player>().DatabaseId);
+                OnPlayerEntered?.Invoke(playerObject.GetComponent<PositionTracking>().UserId);
                 
                 if (!playerObject.HasStateAuthority)
                     return;
@@ -75,9 +75,9 @@ namespace ConnectSphere
                 if ( playerObject != null && playerObject.GetComponent<Player>() != null)
                 {
                     OnPlayerExitArea?.Invoke(areaId,
-                        playerObject.GetComponent<Player>().DatabaseId,
-                        _playersInThisArea.ConvertAll(x => x.GetComponent<Player>().DatabaseId));
-                    OnPlayerExit?.Invoke(playerObject.GetComponent<Player>().DatabaseId);
+                        playerObject.GetComponent<PositionTracking>().UserId,
+                        _playersInThisArea.ConvertAll(x => x.GetComponent<PositionTracking>().UserId));
+                    OnPlayerExit?.Invoke(playerObject.GetComponent<PositionTracking>().UserId);
 
                 }
 
