@@ -31,7 +31,7 @@ namespace ConnectSphere
         public void Back()
         {
            var officeApiHandler = ApiManager.Instance.GetComponent<OfficeApiHandler>();
-            Debug.Log(PlayerPrefs.GetString("office") + " " + PlayerPrefs.GetString("username"));
+           PlayerPrefs.SetInt("back", 1);
             _ = officeApiHandler.UpdateLastAccess(PlayerPrefs.GetString("office"), PlayerPrefs.GetString("username"));
         }
     }
