@@ -49,6 +49,14 @@ namespace ConnectSphere
             GatheringArea.OnPlayerExitArea -= HandlePlayerExit;
         }
 
+        private void OnDestroy()
+        {
+            if (_userId > -1)
+            {
+                AEventHandler.ExecuteEvent(GlobalEvents.StopPositionTracking, _userId);
+            }
+        }
+
         private void HandlePlayerEnter(int areaId, int enteredUserId, List<int> userInArea)
         {
             if ( enteredUserId == _userId ) // me entering
@@ -67,9 +75,9 @@ namespace ConnectSphere
             }
         }
    
-        private void HandlePlayerExit(int exitedUserId, int enteredUserId, List<int> userInArea)
+        private void HandlePlayerExit(int areaId, int exitUserId, List<int> userInArea)
         {
-            if ( enteredUserId == _userId ) // me entering
+            if ( exitUserId == _userId ) // me exiting
             {
                 _enablePositionTracking = true;
                 Debug.Log($"RESUME TRACKING POSITION FOR USER {_userId}");
