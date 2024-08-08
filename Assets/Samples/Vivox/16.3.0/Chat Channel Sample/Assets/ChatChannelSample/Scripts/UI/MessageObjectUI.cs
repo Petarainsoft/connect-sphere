@@ -57,6 +57,8 @@ public class MessageObjectUI : MonoBehaviour
         {
             if ( message.FromSelf )
             {
+                LayoutGroup.padding.left = 80;
+                LayoutGroup.padding.right = 0;
                 MessageText.alignment = TextAlignmentOptions.MidlineRight;
                 MessageText.text =
                     string.Format(
@@ -64,6 +66,8 @@ public class MessageObjectUI : MonoBehaviour
             }
             else
             {
+                LayoutGroup.padding.right = 80;
+                LayoutGroup.padding.left = 0;
                 MessageText.text = string.Format($"<margin-left=5%>{message.MessageText}\n<color=#5A5A5A><size=15><margin-left=5%>{editedText}{message.ReceivedTime}</size></color>"); // Channel Message
                 MessageText.alignment = TextAlignmentOptions.MidlineLeft;
             }

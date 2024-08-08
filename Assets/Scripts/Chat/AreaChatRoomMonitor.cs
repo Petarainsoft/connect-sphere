@@ -38,8 +38,10 @@ namespace ConnectSphere
         private async void HandlePlayerEnter(int areaId, int userId, List<int> usersInArea)
         {
             Debug.Log($"<color=red>listPlayers {string.Join(",", usersInArea)}</color>");
-            var meEnterArea = userId == _playerInfoSo.DatabaseId;
-            if (meEnterArea && usersInArea.Count > 1)
+            var iEnterArea = userId == _playerInfoSo.DatabaseId;
+            var iEnterAreaWithSomeWereThere = iEnterArea && usersInArea.Count > 1;
+            var iamInAreaAndOtherEnter = !iEnterArea && usersInArea.Contains(_playerInfoSo.DatabaseId);
+            if (iEnterAreaWithSomeWereThere || iamInAreaAndOtherEnter)
             {
                 foreach (var areaChatItem in _areaChatItems)
                 {
@@ -50,7 +52,7 @@ namespace ConnectSphere
                     {
                         _vivoxHelper.JoinAreaChat(areaId);
                         _vivoxHelper.JoinAudio(areaId);
-                        _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
+                        // _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
                     }
                 }
             }
@@ -58,8 +60,9 @@ namespace ConnectSphere
 
         private void HandlePlayerExit(int areaId, int userId, List<int> usersInArea)
         {
-            var meOutOfArea = userId == _playerInfoSo.DatabaseId;
-            if (meOutOfArea)
+            var iLeftArea = userId == _playerInfoSo.DatabaseId;
+            var someoneLeftAndImLastOne = !iLeftArea && usersInArea.Count == 1 && usersInArea.Contains(_playerInfoSo.DatabaseId);
+            if (iLeftArea || someoneLeftAndImLastOne)
             {
                 foreach (var areaChatItem in _areaChatItems)
                 {
@@ -69,7 +72,7 @@ namespace ConnectSphere
                     {
                         _vivoxHelper.LeaveAreaChat(areaId);
                         _vivoxHelper.LeaveAudio(areaId);
-                        _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
+                        // _chatFrameTitle.text = $"{_playerInfoSo.RoomName} Office";
                     }
                 }
             }

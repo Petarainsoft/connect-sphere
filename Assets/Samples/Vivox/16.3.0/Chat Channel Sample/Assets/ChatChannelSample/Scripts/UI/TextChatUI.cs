@@ -41,8 +41,6 @@ public class TextChatUI : MonoBehaviour
         VivoxService.Instance.ChannelJoined += OnChannelJoined;
         VivoxService.Instance.DirectedMessageReceived += OnDirectedMessageReceived;
         VivoxService.Instance.ChannelMessageReceived += OnChannelMessageReceived;
-        VivoxService.Instance.ChannelMessageEdited += OnChannelMessageEdited;
-        VivoxService.Instance.ChannelMessageDeleted += OnChannelMessageDeleted;
 
         m_TextChatScrollRect = GetComponent<ScrollRect>();
 
@@ -131,7 +129,7 @@ public class TextChatUI : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         VivoxService.Instance.ChannelJoined -= OnChannelJoined;
         VivoxService.Instance.DirectedMessageReceived -= OnDirectedMessageReceived;
@@ -147,7 +145,7 @@ public class TextChatUI : MonoBehaviour
         m_TextChatScrollRect.onValueChanged.RemoveAllListeners();
     }
 
-    void ClearMessageObjectPool()
+    private void ClearMessageObjectPool()
     {
         foreach (KeyValuePair<string, MessageObjectUI> keyValuePair in m_MessageObjPool)
         {
@@ -157,14 +155,14 @@ public class TextChatUI : MonoBehaviour
         m_MessageObjPool.Clear();
     }
 
-    void ClearTextField()
+    private void ClearTextField()
     {
         MessageInputField.text = string.Empty;
         MessageInputField.Select();
         MessageInputField.ActivateInputField();
     }
 
-    void EnterKeyOnTextField()
+    private void EnterKeyOnTextField()
     {
         OnTyping?.Invoke(false);
         if ( !Input.GetKeyDown(KeyCode.Return) )
@@ -176,7 +174,7 @@ public class TextChatUI : MonoBehaviour
         SendMessage();
     }
 
-    void SendMessage()
+    private void SendMessage()
     {
         if ( string.IsNullOrEmpty(MessageInputField.text) )
         {
@@ -193,27 +191,7 @@ public class TextChatUI : MonoBehaviour
         ClearTextField();
     }
 
-    private void ClearOldMessage()
-    {
-        foreach (Transform tfChild in ChatContentObj.transform)
-        {
-            Destroy(tfChild.gameObject);
-        }
-    }
-
-    void SubmitTTSMessageToVivox()
-    {
-        if ( string.IsNullOrEmpty(MessageInputField.text) )
-        {
-            return;
-        }
-
-        VivoxService.Instance.TextToSpeechSendMessage(MessageInputField.text,
-            TextToSpeechMessageType.RemoteTransmissionWithLocalPlayback);
-        ClearTextField();
-    }
-
-    IEnumerator SendScrollRectToBottom()
+    private IEnumerator SendScrollRectToBottom()
     {
         yield return new WaitForEndOfFrame();
 
@@ -222,7 +200,7 @@ public class TextChatUI : MonoBehaviour
         yield return null;
     }
 
-    void OnDirectedMessageReceived(VivoxMessage message)
+    private void OnDirectedMessageReceived(VivoxMessage message)
     {
         AddMessageToChat(message, false, true, prevDisplayName:_lastMessageDisplayName);
     }
@@ -261,7 +239,7 @@ public class TextChatUI : MonoBehaviour
         return splits.Last();
     }
 
-    void OnChannelMessageReceived(VivoxMessage message)
+    private void OnChannelMessageReceived(VivoxMessage message)
     {
         AddMessageToChat(message, false, true, prevDisplayName:_lastMessageDisplayName);
     }
@@ -280,8 +258,13 @@ public class TextChatUI : MonoBehaviour
         editedMessage?.SetTextMessage(message, true);
     }
 
-    void AddMessageToChat(VivoxMessage message, bool isHistory = false, bool scrollToBottom = false, bool isLastMessage = false, string prevDisplayName = "")
+    private void AddMessageToChat(VivoxMessage message, bool isHistory = false, bool scrollToBottom = false, bool isLastMessage = false, string prevDisplayName = "")
     {
+        if (m_MessageObjPool.Any(e => e.Key == message.MessageId))
+        {
+            return;
+        }
+        
         var newMessageObj = Instantiate(MessageObject, ChatContentObj.transform);
         var newMessageTextObject = newMessageObj.GetComponent<MessageObjectUI>();
         if ( isHistory )

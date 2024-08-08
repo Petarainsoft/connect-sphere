@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -165,6 +166,27 @@ namespace Chat
             else
             {
                 _textChatUI.ResetChannelName();
+            }
+        }
+        
+        public bool IsDirectVoiceCallActive(string voiceConnectId)
+        {
+            return VivoxService.Instance.ActiveChannels.ContainsKey(voiceConnectId);
+        }
+        
+        public void JoinDirectVoiceCall(string voiceConnectId)
+        {
+            if ( !IsDirectVoiceCallActive(voiceConnectId) )
+            {
+                VivoxService.Instance.JoinGroupChannelAsync(voiceConnectId, ChatCapability.AudioOnly);
+            }
+        }
+        
+        public void LeaveDirectVoiceCall(string voiceConnectId)
+        {
+            if ( IsDirectVoiceCallActive(voiceConnectId) )
+            {
+                VivoxService.Instance.LeaveChannelAsync(voiceConnectId);
             }
         }
 
@@ -507,6 +529,14 @@ namespace Chat
             if ( _vivoxChatUI != null ) _vivoxChatUI.SetActive(false);
             Debug.Log("*** LOGGED OUT VIVOX****");
             IsReadyForVoiceAndChat = false;
+        }
+
+        public List<string> GetDirectCallActiveChannels()
+        {
+            Debug.Log("List of direct calls");
+            var returnList = VivoxService.Instance.ActiveChannels.Keys.ToList().Where(e => !e.Contains("_audio_")).ToList();
+            Debug.Log(string.Join(",", returnList));
+            return returnList;
         }
     }
 }
