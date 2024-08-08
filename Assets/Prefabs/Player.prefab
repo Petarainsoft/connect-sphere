@@ -739,6 +739,7 @@ MonoBehaviour:
   _speed: 170
   _onOpenUserInfoButtonPressed: {fileID: 11400000, guid: 5e11660fdf6533f4ea083dc1834e5d27, type: 2}
   _onUiInteracting: {fileID: 11400000, guid: 034389e84d9c9cc4dae32c733c15d524, type: 2}
+  _onActivityPanelToggled: {fileID: 11400000, guid: 44293865871763b47bb33ece6e1a07c5, type: 2}
   _horizontalParam: 0
   _verticalPararm: 0
   _speedParam: 0

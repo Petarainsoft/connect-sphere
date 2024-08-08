@@ -13,6 +13,7 @@ namespace ConnectSphere
         [SerializeField] private Image _imageChosenAvatar;
         [SerializeField] private TMP_Text _textLongName;
         [SerializeField] private TMP_InputField _inputBiography;
+        [SerializeField] private Button _closeButton;
 
         [Header("Children Components")]
         [SerializeField] private Transform _avatarsContainer;
@@ -33,6 +34,7 @@ namespace ConnectSphere
         [SerializeField] private IntegerEventHandlerSO _onAvatarImageClicked;
         [SerializeField] private DoubleStringEventHandlerSO _onLongNameChanged;
         [SerializeField] private IntegerEventHandlerSO _onAvatarChanged;
+        [SerializeField] private BooleanEventHandlerSO _onUiInteracting;
 
         private int _selectedAvatarIndex = 0;
         private bool _isDirty;
@@ -42,6 +44,7 @@ namespace ConnectSphere
             _buttonCloseAvatarPicker.onClick.AddListener(OnAvatarPickerClosed);
             _buttonCloseTitlePicker.onClick.AddListener(OnTitlePickerClosed);
             _inputBiography.onEndEdit.AddListener(SaveBiography);
+            _closeButton.onClick.AddListener(CloseUserInfo);
         }
 
         private void OnEnable()
@@ -52,11 +55,6 @@ namespace ConnectSphere
         private void OnDisable()
         {
             _onAvatarImageClicked.OnEventRaised -= HandleSelectedAvatar;
-
-            if (_isDirty)
-            {
-                SaveToDb();
-            }
         }
 
         private void Start()
@@ -157,6 +155,16 @@ namespace ConnectSphere
         private async void SaveToDb()
         {
             await ApiManager.Instance.ProfileApi.UpdateUserProfile(_playerInfo.AvatarIndex, _playerInfo.PlayerName, _playerInfo.Title, "", "", _playerInfo.Biography);
+        }
+
+        private void CloseUserInfo()
+        {
+            if (_isDirty)
+            {
+                SaveToDb();
+            }
+            _onUiInteracting.RaiseEvent(false);
+            gameObject.SetActive(false);
         }
     }
 }
