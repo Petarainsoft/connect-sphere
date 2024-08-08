@@ -31,7 +31,7 @@ namespace ConnectSphere
             }
         }
 
-        public void Shutdown() => Runner.Shutdown();
+        public async void Shutdown() => await Runner.Shutdown();
 
         public override void Render()
         {

@@ -89,10 +89,11 @@ namespace ConnectSphere
         [Rpc(RpcSources.All, RpcTargets.All)]
         private void SendInvitationToAnotherUserRpc([RpcTarget] PlayerRef player)
         {
-            if (_linkedActivity.InteractingPlayers.Count > 1)
-            {
-                _linkedActivity.StartActivity();
-            }
+            _linkedActivity.StartActivity();
+            //if (_linkedActivity.InteractingPlayers.Count > 1)
+            //{
+            //    _linkedActivity.StartActivity();
+            //}
         }
 
         private PlayerRef GetPlayerRefById(int playerId)
