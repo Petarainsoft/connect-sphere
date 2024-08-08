@@ -24,6 +24,7 @@ namespace ConnectSphere
             SitRight = 3,
             Door = 4,
             StickerBoard = 5,
+            Whiteboard = 6,
         }
 
         [Header("Data")]
@@ -182,6 +183,19 @@ namespace ConnectSphere
                     {
                         BlockControl(true);
                         var target = _interactionTarget.GetComponent<StickerBoardInteractable>();
+                        target.ActivateLocalCanvas();
+                        _interactionTarget.ToggleHighlight(false);
+                    }
+                }
+                else if (InteractionCode == (int)Interaction.Whiteboard)
+                {
+                    if (_isBlockingControl)
+                        return;
+
+                    if (_interactionTarget != null)
+                    {
+                        BlockControl(true);
+                        var target = _interactionTarget.GetComponent<WhiteboardInteractable>();
                         target.ActivateLocalCanvas();
                         _interactionTarget.ToggleHighlight(false);
                     }
