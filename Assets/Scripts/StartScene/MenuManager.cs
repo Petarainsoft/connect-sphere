@@ -1,67 +1,83 @@
-using UnityEngine;
-using Fusion;
-using TMPro;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using System;
+using AccountManagement;
 using Cysharp.Threading.Tasks;
 using Doozy.Engine.UI;
+using Fusion;
+using System;
+using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Vivox;
-using System.Reflection;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace ConnectSphere
 {
     public class MenuManager : MonoBehaviour
     {
-        [Header("Prefabs")] [SerializeField] private NetworkRunner _networkRunnerPrefab;
+        [Header("Prefabs")] 
+        [SerializeField] private NetworkRunner _networkRunnerPrefab;
 
-        [Header("Network Canvas")] [SerializeField]
-        private TMP_InputField _inputRoomName;
-
+        [Header("Network Canvas")] 
+        [SerializeField] private TMP_InputField _inputRoomName;
         [SerializeField] private TextMeshProUGUI _roomNamePlaceholder;
 
-        [Header("Selection Canvas")] [SerializeField]
-        private TMP_InputField _inputPlayerName;
-
+        [Header("Selection Canvas")] 
+        [SerializeField] private TMP_InputField _inputPlayerName;
         [SerializeField] private TextMeshProUGUI _playerNamePlaceholder;
         [SerializeField] private Transform _avatarsContainer;
         [SerializeField] private TextMeshProUGUI _textConnectionStatus;
         [SerializeField] private Button _buttonStart;
 
-        [Header("Others")] [SerializeField] GameObject _loadingCanvas;
+        [Header("Others")]
+        [SerializeField] GameObject _loadingCanvas;
         [SerializeField] GameObject _networkCanvasObject;
         [SerializeField] GameObject _selectionCanvasObject;
         [SerializeField] private PlayerInfoSO _playerInfoSo;
         [SerializeField] private string _gameScenePath;
-
-
-        [Header("Vivox")] [SerializeField] private float _timeout = 3f;
-
-
+        [SerializeField] private IntegerEventHandlerSO _onAvatarImageClicked;
+        
+        [Header("Vivox")] [SerializeField]
+        private float _timeout = 3f;
         private NetworkRunner _runnerInstance;
+
         private string _tempRoomName;
         private string _tempPlayerName;
         private int _selectedAvatarIndex = 0;
 
-        public static Action<int> OnAvatarImageClicked;
 
+        [SerializeField]
+        private GameObject _officeLoaderUI;
         public string RoomName => _tempRoomName;
 
         private void OnEnable()
         {
-            OnAvatarImageClicked += HandleSelectedAvatar;
+            _onAvatarImageClicked.OnEventRaised += HandleSelectedAvatar;
         }
 
         private void OnDisable()
         {
-            OnAvatarImageClicked -= HandleSelectedAvatar;
+            _onAvatarImageClicked.OnEventRaised -= HandleSelectedAvatar;
+        }
+
+        private async void Start()
+        {
+            Profile userProfile = await GetUserProfileFromDb();
+            if (userProfile != null)
+            {
+                _playerInfoSo.MapData(userProfile);
+                _inputPlayerName.text = _playerInfoSo.PlayerName.Equals(string.Empty)
+                    ? RandomNameGenerator.GetRandomName(false)
+                    : _playerInfoSo.PlayerName;
+                HandleSelectedAvatar(
+                    _playerInfoSo.AvatarIndex == -1 ? 0 : _playerInfoSo.AvatarIndex
+                );
+            }
         }
 
         public void OnJoinButtonClicked()
         {
-            if ( string.IsNullOrEmpty(_inputRoomName.text.Trim()) )
+            if (string.IsNullOrEmpty(_inputRoomName.text.Trim()))
             {
                 _tempRoomName = _roomNamePlaceholder.text;
             }
@@ -79,14 +95,14 @@ namespace ConnectSphere
             _tempRoomName = string.Empty;
             _networkCanvasObject.SetActive(true);
             _selectionCanvasObject.SetActive(false);
-            OnAvatarImageClicked?.Invoke(0);
+            _onAvatarImageClicked.RaiseEvent(0);
         }
 
         private void HandleSelectedAvatar(int index)
         {
             foreach (Transform child in _avatarsContainer)
             {
-                if ( child.GetSiblingIndex() == index )
+                if (child.GetSiblingIndex() == index)
                 {
                     child.GetComponent<Image>().enabled = true;
                     _selectedAvatarIndex = index;
@@ -100,7 +116,7 @@ namespace ConnectSphere
 
         public void OnStartButtonClicked()
         {
-            if ( string.IsNullOrEmpty(_inputPlayerName.text.Trim()) )
+            if (string.IsNullOrEmpty(_inputPlayerName.text.Trim()))
             {
                 _tempPlayerName = _playerNamePlaceholder.text;
             }
@@ -114,59 +130,58 @@ namespace ConnectSphere
             _playerInfoSo.RoomName = _tempRoomName;
             _playerInfoSo.Email = PlayerPrefs.GetString("username");
             _playerInfoSo.DatabaseId = PlayerPrefs.GetInt("userId");
-
+            SaveUserProfileToDb();
+            PlayerPrefs.SetString("office", _tempRoomName);
             StartGame(GameMode.Shared, _tempRoomName, _gameScenePath);
         }
+
+        public void OnJoinOfficeEvent(string officeName)
+        {
+            OnJoinButtonClicked();
+            _tempRoomName = officeName;
+        }
+
+        [SerializeField] private string _server = "https://unity.vivox.com/appconfig/10793-conne-77095-udash";
+        [SerializeField] private string _domain = "mtu1xp.vivox.com";
+        [SerializeField] private string _tokenIssuer = "10793-conne-77095-udash";
+        [SerializeField] private string _tokenKey = "8OZBvVqIzQMq1qqMQ3C23DWrrXNJrVuM";
 
         private async UniTask<bool> JoinVivox(string playerEmail)
         {
             Debug.Log("** Initialize Unity Service");
-            var initializationOptions = new InitializationOptions();
-            
-            initializationOptions.SetVivoxCredentials(
-                server: "https://unity.vivox.com/appconfig/10793-conne-77095-udash",
-                domain: "mtu1xp.vivox.com",
-                issuer: "10793-conne-77095-udash",
-                "8OZBvVqIzQMq1qqMQ3C23DWrrXNJrVuM");
-            
-            await UnityServices.InitializeAsync( initializationOptions);
-            var validName = playerEmail.Replace("@","_").Replace(".","_");
+            var options = new InitializationOptions();
+            options.SetVivoxCredentials(_server, _domain, _tokenIssuer, _tokenKey);
+            await UnityServices.InitializeAsync(options);
+            var validName = playerEmail.Replace("@", "_").Replace(".", "_");
             AuthenticationService.Instance.SwitchProfile(validName);
             Debug.Log("** Sign In AuthenticationService");
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            Debug.Log("** Sign In AuthenticationService 2");
             var checkNull = UniTask.WaitUntil(() => VivoxService.Instance != null);
-            Debug.Log("** Sign In AuthenticationService 3");
             var timeout = UniTask.WaitForSeconds(_timeout);
-            Debug.Log("** Sign In AuthenticationService 4");
             await UniTask.WhenAny(checkNull, timeout);
-            if ( VivoxService.Instance == null )
+            if (VivoxService.Instance == null)
             {
-                Debug.Log("** Sign In AuthenticationService 5");
                 Debug.LogWarning("** Cannot start Vivox service");
                 return false;
             }
-            Debug.Log("** Sign In AuthenticationService 6");
             await VivoxService.Instance.InitializeAsync();
             Debug.Log($"** Initialize Vivox done!");
-            Debug.Log("** Sign In AuthenticationService 7");
 
             var loginOptions = new LoginOptions()
             {
                 DisplayName = validName,
-                ParticipantUpdateFrequency = ParticipantPropertyUpdateFrequency.FivePerSecond
+                ParticipantUpdateFrequency = ParticipantPropertyUpdateFrequency.OnePerSecond
             };
-            Debug.Log("** Sign In AuthenticationService 8");
+
             await VivoxService.Instance.LoginAsync(loginOptions);
-            Debug.Log("** Sign In AuthenticationService 9");
             Debug.Log($"** Login vivox done!");
             return true;
         }
 
         private async void StartGame(GameMode mode, string roomName, string sceneName)
         {
-            _runnerInstance = FindObjectOfType<NetworkRunner>();
-            if ( _runnerInstance == null )
+            
+            if (_runnerInstance == null)
             {
                 _runnerInstance = Instantiate(_networkRunnerPrefab);
             }
@@ -186,11 +201,14 @@ namespace ConnectSphere
 
             try
             {
-                if ( !await JoinVivox(_playerInfoSo.Email.Trim()) )
+                if (!await JoinVivox(_playerInfoSo.Email.Trim()))
                 {
                     var warningPopup = UIPopupManager.GetPopup("ActionPopup");
                     warningPopup.Data.SetButtonsLabels("Ok");
-                    warningPopup.Data.SetLabelsTexts("Chat Service", "Currently Chat feature isn't available!");
+                    warningPopup.Data.SetLabelsTexts(
+                        "Chat Service",
+                        "Currently Chat feature isn't available!"
+                    );
                     warningPopup.Show();
                     await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
                 }
@@ -199,32 +217,53 @@ namespace ConnectSphere
             {
                 var warningPopup = UIPopupManager.GetPopup("ActionPopup");
                 warningPopup.Data.SetButtonsLabels("Ok");
-                warningPopup.Data.SetLabelsTexts("Services Error",
-                    "Currently voice/chat isn't available!\nRetry again!");
+                warningPopup.Data.SetLabelsTexts(
+                    "Services Error",
+                    "Currently voice/chat isn't available!\nRetry again!"
+                );
                 warningPopup.Show();
                 await UniTask.WaitUntil(() => warningPopup.IsDestroyed());
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
-
             // GameMode.Host = Start a session with a specific name
             // GameMode.Client = Join a session with a specific name
+            
+            _runnerInstance = FindObjectOfType<NetworkRunner>();
             await _runnerInstance.StartGame(startGameArgs);
-
-            if ( _runnerInstance.IsServer )
+            
+            if (_runnerInstance.IsServer)
             {
                 await _runnerInstance.LoadScene(sceneName);
             }
+
         }
 
         public void ExitGame()
         {
             Application.Quit();
+            _officeLoaderUI.SetActive(true);
+            _networkCanvasObject.SetActive(false);
         }
 
         private async UniTask ShowLoadingScreen()
         {
             await UniTask.Delay(TimeSpan.FromSeconds(0.25f));
             _loadingCanvas.SetActive(true);
+        }
+
+        private async UniTask<Profile> GetUserProfileFromDb()
+        {
+            int userId = PlayerPrefs.GetInt("userId");
+            var userProfile = await ApiManager.Instance.ProfileApi.GetUserProfile(userId);
+            return userProfile;
+        }
+
+        private async void SaveUserProfileToDb()
+        {
+            await ApiManager.Instance.ProfileApi.UpdateUserProfile(
+                _playerInfoSo.AvatarIndex,
+                _playerInfoSo.PlayerName
+            );
         }
     }
 }

@@ -3,23 +3,53 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Windows;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace ConnectSphere
 {
     public class PlayerController : NetworkBehaviour
     {
+        private enum State
+        {
+            Normal = 0,
+            BlockControl = 1,
+            Busy = 2
+        }
+
+        private enum Interaction
+        {
+            SitDown = 0,
+            SitUp = 1,
+            SitLeft = 2,
+            SitRight = 3,
+            Door = 4,
+            StickerBoard = 5,
+            Whiteboard = 6,
+        }
+
+        [Header("Data")]
         [SerializeField] private float _speed = 5f;
+        [Networked] public int InteractionCode { get; set; } = -1;
+
+        [Header("Events")]
+        [SerializeField] private VoidEventHandlerSO _onOpenUserInfoButtonPressed;
+        [SerializeField] private BooleanEventHandlerSO _onUiInteracting;
+        [SerializeField] private BooleanEventHandlerSO _onActivityPanelToggled;
+
         private Rigidbody2D _rigidbody;
         private Animator _animator;
+        private Interactable _interactionTarget;
+        private Player _player;
+        private SpriteRenderer _characterSprite;
         private Vector2 _movementDirection;
+        private Vector2 refVelocity;
+        private Vector2 _interactPosition;
         private float _movementSpeed;
         private bool _isMobile;
-        private Vector2 refVelocity;
-        public int InteractionCode { get; set; } = -1;
-        public bool CanInteract { get; set; }
-        private bool _isInInteraction;
-        private Vector2 _interactPosition;
-        private GameObject _interactionTarget;
+        private bool _canInteract;
+        private bool _isBlockingControl;
+        private bool _isReadyForActivity;
+        private bool _isInActivity;
 
         [Networked, OnChangedRender(nameof(OnHorizontalChanged))] public float horizontalParam { get; set; }
         [Networked, OnChangedRender(nameof(OnVerticalChanged))] public float verticalPararm { get; set; }
@@ -27,10 +57,22 @@ namespace ConnectSphere
         [Networked, OnChangedRender(nameof(OnSittingChanged))] public bool sittingParam { get; set; }
         private NetworkButtons previousButton { get; set; }
 
-        private int _hashHorizontal = Animator.StringToHash("Horizontal");
-        private int _hashVertical = Animator.StringToHash("Vertical");
-        private int _hashSpeed = Animator.StringToHash("Speed");
-        private int _hashSitting = Animator.StringToHash("Sitting");
+        private readonly int _hashHorizontal = Animator.StringToHash("Horizontal");
+        private readonly int _hashVertical = Animator.StringToHash("Vertical");
+        private readonly int _hashSpeed = Animator.StringToHash("Speed");
+        private readonly int _hashSitting = Animator.StringToHash("Sitting");
+
+        private void OnEnable()
+        {
+            _onUiInteracting.OnEventRaised += BlockControl;
+            _onActivityPanelToggled.OnEventRaised += SetInActivity;
+        }
+
+        private void OnDisable()
+        {
+            _onUiInteracting.OnEventRaised -= BlockControl;
+            _onActivityPanelToggled.OnEventRaised -= SetInActivity;
+        }
 
         private void Start()
         {
@@ -43,19 +85,16 @@ namespace ConnectSphere
             {
                 MovementHandler(input);
                 Animate();
-                Interact(input);
+                ProcessInput(input);
             }
         }
 
         public void SetupComponents()
         {
+            _player = GetComponent<Player>();
             _rigidbody = GetComponent<Rigidbody2D>();
+            _characterSprite = GetComponentInChildren<SpriteRenderer>();
             _animator = GetComponentInChildren<Animator>();
-        }
-
-        public void SetInteractionStatus(bool value)
-        {
-            _isInInteraction = value;
         }
 
         private bool CheckRunOnMobile()
@@ -72,7 +111,7 @@ namespace ConnectSphere
         
         private void MovementHandler(PlayerInput input)
         {
-            if (_isInInteraction)
+            if (_isBlockingControl)
                 return;
 
             if (!_isMobile)
@@ -97,9 +136,9 @@ namespace ConnectSphere
             _movementDirection = new Vector2(movement.x, movement.y);
         }
 
-        public void SetInteractionData(int code, Vector2 interactPosition = default, GameObject interactionTarget = null)  
+        public void SetInteractionData(int code, Vector2 interactPosition = default, Interactable interactionTarget = null)  
         {
-            CanInteract = code != -1 ? true : false;
+            _canInteract = code != -1 ? true : false;
             InteractionCode = code;
             _interactPosition = interactPosition;
             _interactionTarget = code != -1 ? interactionTarget : null;
@@ -119,52 +158,93 @@ namespace ConnectSphere
             }
         }
 
-        private void Interact(PlayerInput input)
+        private void ProcessInput(PlayerInput input)
         {
-            if (input.Buttons.WasPressed(previousButton, PlayerButtons.Interact) && CanInteract)
+            if (input.Buttons.WasPressed(previousButton, PlayerButtons.Interact) && _canInteract)
             {
-                if (InteractionCode >= 0 && InteractionCode <= 3)
+                if (InteractionCode >= (int)Interaction.SitDown && InteractionCode <= (int)Interaction.SitRight)
                 {
                     HandleSitting();
                 }
-                else if (InteractionCode == 4)
+                else if (InteractionCode == (int)Interaction.Door)
                 {
                     if (_interactionTarget != null)
                     {
                         var targetDoor = _interactionTarget.GetComponent<SlidingDoorInteractable>();
-                        targetDoor.ToggleDoor(!targetDoor.IsActivated);
+                        targetDoor.ToggleDoorRpc(!targetDoor.IsActivated);
                     }
                 }
-                else if (InteractionCode == 5)
+                else if (InteractionCode == (int)Interaction.StickerBoard)
                 {
-                    if (_isInInteraction)
+                    if (_isBlockingControl)
                         return;
 
                     if (_interactionTarget != null)
                     {
-                        _isInInteraction = !_isInInteraction;
+                        BlockControl(true);
                         var target = _interactionTarget.GetComponent<StickerBoardInteractable>();
-                        target.ActivateLocalCanvas(this);
+                        target.ActivateLocalCanvas();
+                        _interactionTarget.ToggleHighlight(false);
+                    }
+                }
+                else if (InteractionCode == (int)Interaction.Whiteboard)
+                {
+                    if (_isBlockingControl)
+                        return;
+
+                    if (_interactionTarget != null)
+                    {
+                        BlockControl(true);
+                        var target = _interactionTarget.GetComponent<WhiteboardInteractable>();
+                        target.ActivateLocalCanvas();
+                        _interactionTarget.ToggleHighlight(false);
                     }
                 }
             }
-            previousButton = input.Buttons;
+
+            if (input.Buttons.WasPressed(previousButton, PlayerButtons.OpenUserInfo))
+            {
+                if (_isBlockingControl)
+                    return;
+
+                _onOpenUserInfoButtonPressed.RaiseEvent();
+            }
+
+            if (input.Buttons.WasPressed(previousButton, PlayerButtons.InviteToGame))
+            {
+                if (!_isReadyForActivity || _isInActivity)
+                    return;
+
+                if (_interactionTarget != null)
+                {
+                    _interactionTarget.SendInvite();
+                }
+            }
+
+             previousButton = input.Buttons;
         }
 
         private void HandleSitting()
         {
-            if (_isInInteraction)
+            if (_isBlockingControl)
             {
+                _interactionTarget.SetLimit(false, Object.InputAuthority.PlayerId);
                 verticalPararm = 0;
                 horizontalParam = 0;
                 sittingParam = false;
-                _isInInteraction = false;
+                BlockControl(false);
+                _isReadyForActivity = false;
             }
             else
             {
-                _rigidbody.velocity = Vector2.zero;
-                _isInInteraction = true;
+                if (_interactionTarget.LimitToOne)
+                    return;
+
+                _interactionTarget.SetLimit(true, Object.InputAuthority.PlayerId);
+                _interactionTarget.ToggleHighlight(false);
+                BlockControl(true);
                 transform.position = _interactPosition;
+                _isReadyForActivity = _interactionTarget.GetActivityAvail();
 
                 switch (InteractionCode)
                 {
@@ -210,6 +290,30 @@ namespace ConnectSphere
         private void OnSittingChanged()
         {
             _animator.SetBool(_hashSitting, sittingParam);
+        }
+
+        private void BlockControl(bool isBlocking)
+        {
+            _isBlockingControl = isBlocking;
+            if (isBlocking)
+            {
+                _rigidbody.velocity = Vector3.zero;
+            }
+        }
+
+        private void SetInActivity(bool value)
+        {
+            _isInActivity = value;
+        }
+
+        public string GetPlayerName()
+        {
+            return $"{_player.NickName}";
+        }
+
+        public Sprite GetCharacterSprite()
+        {
+            return _characterSprite.sprite;
         }
     }
 }

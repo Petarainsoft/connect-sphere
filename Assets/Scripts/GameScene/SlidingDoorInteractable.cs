@@ -33,7 +33,6 @@ namespace ConnectSphere
 
         public override void Spawned()
         {
-            Object.ReleaseStateAuthority();
             SetStartingPosition();
         }
 
@@ -43,13 +42,13 @@ namespace ConnectSphere
             {
                 if (!networkObject.HasStateAuthority)
                     return;
-                Object.RequestStateAuthority();
             }
 
             if (collision.transform.parent.TryGetComponent<PlayerController>(out var playerObject))
             {
-                playerObject.SetInteractionData(InteractionCode, transform.position, gameObject);
-                LocalUi.OnTriggerInteraction?.Invoke();
+                ToggleHighlight(true);
+                playerObject.SetInteractionData(InteractionCode, transform.position, this);
+                _onInteractionTriggered.RaiseEvent();
             }
         }
 
@@ -59,13 +58,13 @@ namespace ConnectSphere
             {
                 if (!networkObject.HasStateAuthority)
                     return;
-                Object.ReleaseStateAuthority();
             }
 
             if (collision.transform.parent.TryGetComponent<PlayerController>(out var playerObject))
             {
+                ToggleHighlight(false);
                 playerObject.SetInteractionData(-1);
-                LocalUi.OnTriggerInteraction?.Invoke();
+                _onInteractionTriggered.RaiseEvent();
             }
         }
 
@@ -99,16 +98,10 @@ namespace ConnectSphere
             }
         }
 
-        public void ToggleDoor(bool isActivated)
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        public void ToggleDoorRpc(bool isActivated)
         {
-            if (isActivated)
-            {
-                IsActivated = isActivated;
-            }
-            else
-            {
-                IsActivated = isActivated;
-            }
+            IsActivated = isActivated;
         }
 
         private void OnActivationChanged()
@@ -124,7 +117,7 @@ namespace ConnectSphere
                 {
                     _leftDoor.DOLocalMoveX(_initialLeft, _moveDuration).SetEase(Ease.Linear);
                     _rightDoor.DOLocalMoveX(_initialRight, _moveDuration).SetEase(Ease.Linear);
-                    
+
                 }
             }
             else
