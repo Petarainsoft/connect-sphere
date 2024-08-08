@@ -1,3 +1,5 @@
+using AccountManagement;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using Fusion.Sockets;
 using System;
@@ -61,8 +63,11 @@ namespace ConnectSphere
 
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
 
-        public void OnConnectedToServer(NetworkRunner runner) { }
-
+        public void OnConnectedToServer(NetworkRunner runner)
+        {
+            _ = JoinOfficeSuccess();
+        }
+        
         public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
 
         public void OnConnectRequest(
@@ -105,5 +110,14 @@ namespace ConnectSphere
         public void OnSceneLoadDone(NetworkRunner runner) { }
 
         public void OnSceneLoadStart(NetworkRunner runner) { }
+
+
+        private async UniTaskVoid JoinOfficeSuccess()
+        {
+            OfficeApiHandler officeLoader = ApiManager.Instance.GetComponent<OfficeApiHandler>();
+            await officeLoader.CreateNewOffice(PlayerPrefs.GetString("office"), "/office-1");
+            await officeLoader.UpdateLastAccess(PlayerPrefs.GetString("office"), PlayerPrefs.GetString("username"));
+
+        }
     }
 }

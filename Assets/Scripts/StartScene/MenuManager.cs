@@ -180,10 +180,7 @@ namespace ConnectSphere
 
         private async void StartGame(GameMode mode, string roomName, string sceneName)
         {
-            OfficeDataLoader officeLoader = _officeLoaderUI.GetComponentInChildren<OfficeDataLoader>();
-            officeLoader.JoinOffice(roomName);
-            officeLoader.UpdateLastAccess(roomName, PlayerPrefs.GetString("username"));
-            _runnerInstance = FindObjectOfType<NetworkRunner>();
+            
             if (_runnerInstance == null)
             {
                 _runnerInstance = Instantiate(_networkRunnerPrefab);
@@ -230,13 +227,15 @@ namespace ConnectSphere
             }
             // GameMode.Host = Start a session with a specific name
             // GameMode.Client = Join a session with a specific name
-
+            
+            _runnerInstance = FindObjectOfType<NetworkRunner>();
             await _runnerInstance.StartGame(startGameArgs);
             
             if (_runnerInstance.IsServer)
             {
                 await _runnerInstance.LoadScene(sceneName);
             }
+
         }
 
         public void ExitGame()
