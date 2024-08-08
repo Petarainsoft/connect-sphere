@@ -7,18 +7,17 @@ namespace AccountManagement
 {
     public class LoginState : AppBaseState
     {
-        [Header("GameEvents")] [SerializeField]
-        private string _backToIntroEventName = "BackIntroduction";
-
-        [Header("UI")] [SerializeField] private TMP_InputField _emailInput;
+        [Header("GameEvents")]
+        [SerializeField] private string _backToIntroEventName = "BackIntroduction";
+        
+        [Header("UI")]
+        [SerializeField] private TMP_InputField _emailInput;
         [SerializeField] private TMP_InputField _passwordInput;
-
         [SerializeField] private UIButton _nextButton;
         [SerializeField] private UIButton _resetPassButton;
         [SerializeField] private UIButton _backButton;
-
         [SerializeField] private GameObject _networkCanvas;
-        
+        [SerializeField] private GameObject _officeLoaderUI;
 
         public override void OnEnter()
         {
@@ -31,6 +30,7 @@ namespace AccountManagement
         }
 
         private void ToResetPass() => Machine?.ChangeState<ResetPasswordState>();
+
         private void ToCreateAccount() => Machine?.ChangeState<CreateAccountState>();
 
         public override void OnExit()
@@ -41,7 +41,6 @@ namespace AccountManagement
             _backButton.OnClick.OnTrigger.Event.RemoveListener(ToCreateAccount);
         }
 
-
         private void Login()
         {
             _ = InternalLogin();
@@ -50,27 +49,30 @@ namespace AccountManagement
         private async UniTaskVoid InternalLogin()
         {
             Utils.ShowLoading();
-            
+
             var email = _emailInput.text.Trim();
             var password = _passwordInput.text.Trim();
 
-            if ( !Utils.ValidateEmail(email) || !Utils.ValidatePassword(password) )
+            if (!Utils.ValidateEmail(email) || !Utils.ValidatePassword(password))
             {
                 var warningPopup = UIPopupManager.GetPopup("ActionPopup");
                 warningPopup.Data.SetButtonsLabels("Ok");
-                warningPopup.Data.SetLabelsTexts("Authentication", "Invalid email or/and password (at least 6 characters)");
+                warningPopup.Data.SetLabelsTexts(
+                    "Authentication",
+                    "Invalid email or/and password (at least 6 characters)"
+                );
                 warningPopup.Show();
-                
-            
+
                 Utils.HideLoading();
                 return;
             }
 
             var loginResult = await ApiManager.Instance.AuthApi.Login(email, password);
 
-            if ( loginResult.data != null )
+            if (loginResult.data != null)
             {
-                _networkCanvas.SetActive(true);
+                _officeLoaderUI.SetActive(true);
+                PlayerPrefs.SetString("username", email);
                 Machine.ChangeState<Empty>();
             }
             else
@@ -80,7 +82,7 @@ namespace AccountManagement
                 warningPopup.Data.SetLabelsTexts("Authentication", loginResult.message);
                 warningPopup.Show();
             }
-            
+
             Utils.HideLoading();
         }
 
