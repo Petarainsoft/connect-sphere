@@ -52,7 +52,7 @@ namespace ConnectSphere
         private const int SECONDS_IN_HOUR = 3600;
         private const int SECONDS_IN_DAY = 3600 * 24;
 
-        private int ActiveCount;
+        public int ActiveCount { get; private set; }
         private void OnEnable()
         {
             _ = LoadAllOffices();
@@ -128,6 +128,7 @@ namespace ConnectSphere
             _usernameBox.text = PlayerPrefs.GetString("username").Split("@")[0];
 
             int count = _officeSO.Count;
+            ActiveCount = count;
             SetContentOfficeHeight(count);
             for (int i = 0; i < count; i++)
             {
