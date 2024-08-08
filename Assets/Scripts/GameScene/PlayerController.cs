@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Windows;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace ConnectSphere
 {
@@ -15,9 +16,19 @@ namespace ConnectSphere
             Busy = 2
         }
 
+        private enum Interaction
+        {
+            SitDown = 0,
+            SitUp = 1,
+            SitLeft = 2,
+            SitRight = 3,
+            Door = 4,
+            StickerBoard = 5,
+        }
+
         [Header("Data")]
         [SerializeField] private float _speed = 5f;
-        public int InteractionCode { get; set; } = -1;
+        [Networked] public int InteractionCode { get; set; } = -1;
 
         [Header("Events")]
         [SerializeField] private VoidEventHandlerSO _onOpenUserInfoButtonPressed;
@@ -27,6 +38,8 @@ namespace ConnectSphere
         private Rigidbody2D _rigidbody;
         private Animator _animator;
         private Interactable _interactionTarget;
+        private Player _player;
+        private SpriteRenderer _characterSprite;
         private Vector2 _movementDirection;
         private Vector2 refVelocity;
         private Vector2 _interactPosition;
@@ -77,7 +90,9 @@ namespace ConnectSphere
 
         public void SetupComponents()
         {
+            _player = GetComponent<Player>();
             _rigidbody = GetComponent<Rigidbody2D>();
+            _characterSprite = GetComponentInChildren<SpriteRenderer>();
             _animator = GetComponentInChildren<Animator>();
         }
 
@@ -146,11 +161,11 @@ namespace ConnectSphere
         {
             if (input.Buttons.WasPressed(previousButton, PlayerButtons.Interact) && _canInteract)
             {
-                if (InteractionCode >= 0 && InteractionCode <= 3)
+                if (InteractionCode >= (int)Interaction.SitDown && InteractionCode <= (int)Interaction.SitRight)
                 {
                     HandleSitting();
                 }
-                else if (InteractionCode == 4)
+                else if (InteractionCode == (int)Interaction.Door)
                 {
                     if (_interactionTarget != null)
                     {
@@ -158,7 +173,7 @@ namespace ConnectSphere
                         targetDoor.ToggleDoorRpc(!targetDoor.IsActivated);
                     }
                 }
-                else if (InteractionCode == 5)
+                else if (InteractionCode == (int)Interaction.StickerBoard)
                 {
                     if (_isBlockingControl)
                         return;
@@ -275,6 +290,16 @@ namespace ConnectSphere
         private void SetInActivity(bool value)
         {
             _isInActivity = value;
+        }
+
+        public string GetPlayerName()
+        {
+            return $"{_player.NickName}";
+        }
+
+        public Sprite GetCharacterSprite()
+        {
+            return _characterSprite.sprite;
         }
     }
 }

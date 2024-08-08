@@ -96,7 +96,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 1720257059
   ObjectInterest: 1
-  Flags: 786433
+  Flags: 524289
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 4790454176526043011}
@@ -114,8 +114,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InteractionCode: 4
   _highlightSprite: {fileID: 6006344212043710068}
-  _onInteractionTriggered: {fileID: 11400000, guid: 53f0cb6ed7b0f914dbab89c403e4113f, type: 2}
   _linkedActivity: {fileID: 0}
+  _onInteractionTriggered: {fileID: 11400000, guid: 53f0cb6ed7b0f914dbab89c403e4113f, type: 2}
+  _LimitToOne: 0
   _leftDoor: {fileID: 7348666783948084642}
   _rightDoor: {fileID: 2479712518273908332}
   _verticalDirection: 1

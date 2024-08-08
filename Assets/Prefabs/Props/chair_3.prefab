@@ -263,7 +263,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InteractionCode: 0
   _highlightSprite: {fileID: 4701671873775397695}
+  _linkedActivity: {fileID: 0}
   _onInteractionTriggered: {fileID: 11400000, guid: 53f0cb6ed7b0f914dbab89c403e4113f, type: 2}
+  _LimitToOne: 0
 --- !u!114 &4160483740350180978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -278,6 +280,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 0
   ObjectInterest: 1
-  Flags: 262144
+  Flags: 524288
   NestedObjects: []
   NetworkedBehaviours: []
