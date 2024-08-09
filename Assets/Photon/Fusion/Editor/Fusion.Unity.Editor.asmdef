@@ -23,11 +23,7 @@
         "Fusion.Common.dll",
         "Fusion.Runtime.dll",
         "Fusion.Realtime.dll",
-        "Fusion.Log.dll",
-        "Sirenix.OdinInspector.Editor.dll",
-        "Sirenix.Utilities.Editor.dll",
-        "Sirenix.Utilities.dll",
-        "Sirenix.OdinInspector.Attributes.dll"
+        "Fusion.Log.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
