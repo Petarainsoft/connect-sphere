@@ -52,7 +52,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae4421083b67617479bc32111a307b2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _baseUrl: http://192.168.1.23:5000/
+  _baseUrl: http://35.213.142.140:5000/
   _authApiHandler: {fileID: 4520365846142956396}
   _noteApiHandler: {fileID: 4789029961815483481}
   _profileApiHandler: {fileID: 2227327841007922620}

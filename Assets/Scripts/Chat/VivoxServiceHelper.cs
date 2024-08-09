@@ -80,10 +80,6 @@ namespace Chat
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
 
-            // auto connect when running, comment this when running the VideoCall-Vivox scene
-            Debug.Log($"<color=blue>CALLLING VIXOOOOV {_playerInfoSo.RoomName}</color>");
-            // LoginVivoxAndJoinRoom(_playerInfoSo.RoomName);
-            // MenuManager.Instance.RoomName
             gloablRoomName.text = $"{_playerInfoSo.RoomName} Office";
             gloablRoomNameInChat.text = $"{_playerInfoSo.RoomName} Office";
             gloablListChatName.text = $"{_playerInfoSo.RoomName} Office";
