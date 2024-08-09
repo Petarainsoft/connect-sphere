@@ -7,7 +7,7 @@ namespace ConnectSphere
 {
     public class OfficeApiHandler : ServerHandler
     {
-        private static string OFFICE_ROUTE = "/office";
+        private static string OFFICE_ROUTE = "office";
         private static string CREATE_OFFICE = "/create_office";
         private static string LOAD_ALL_OFFICE = "/get_old_offices";
         private static string EXIT_OFFICE = "/update_last_access";

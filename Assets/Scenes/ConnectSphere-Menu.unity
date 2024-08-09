@@ -812,9 +812,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 853846618225594360, guid: 8f5caafa2fc6c2a42aa5d9c08104db41, type: 3}
+      propertyPath: _baseUrl
+      value: http://35.213.142.140:5000/
+      objectReference: {fileID: 0}
     - target: {fileID: 6120487265216176860, guid: 8f5caafa2fc6c2a42aa5d9c08104db41, type: 3}
       propertyPath: m_Name
       value: ApiManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 6120487265216176860, guid: 8f5caafa2fc6c2a42aa5d9c08104db41, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1393,7 +1401,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &462657867
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1410,7 +1418,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
 --- !u!114 &462657868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1576,7 +1584,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &498516141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2737,7 +2745,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67cd6c47b470da34e8546fa275ea5acc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _serverUrl: http://192.168.1.23:5000/
+  _serverUrl: http:///35.213.142.140:5000/
+--- !u!114 &716291231 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 853846618225594360, guid: 8f5caafa2fc6c2a42aa5d9c08104db41, type: 3}
+  m_PrefabInstance: {fileID: 318157655}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 716291221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae4421083b67617479bc32111a307b2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &718626470
 GameObject:
   m_ObjectHideFlags: 0
@@ -3462,6 +3481,10 @@ PrefabInstance:
       propertyPath: _officeApiHandler
       value: 
       objectReference: {fileID: 716291227}
+    - target: {fileID: 6932500620979706406, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
+      propertyPath: _serverUrl
+      value: http://35.213.142.140:5000/
+      objectReference: {fileID: 0}
     - target: {fileID: 7505669738591013005, guid: 6e24b7b71750e80449197817d086fe03, type: 3}
       propertyPath: m_Name
       value: OfficeLoaderUI
@@ -5480,6 +5503,10 @@ PrefabInstance:
       value: AccountManagerUI
       objectReference: {fileID: 0}
     - target: {fileID: 3118807433987671117, guid: 8bb8e557d5f2e5248a61ccd8d6f56a54, type: 3}
+      propertyPath: _apiManager
+      value: 
+      objectReference: {fileID: 716291231}
+    - target: {fileID: 3118807433987671117, guid: 8bb8e557d5f2e5248a61ccd8d6f56a54, type: 3}
       propertyPath: _networkCanvas
       value: 
       objectReference: {fileID: 1039320160}
@@ -5577,11 +5604,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7725317629072717694, guid: 8bb8e557d5f2e5248a61ccd8d6f56a54, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 29.88281
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8225501011031317028, guid: 8bb8e557d5f2e5248a61ccd8d6f56a54, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 29.88281
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

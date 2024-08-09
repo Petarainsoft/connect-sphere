@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4520365846142956396}
   - component: {fileID: 4789029961815483481}
   - component: {fileID: 2227327841007922620}
+  - component: {fileID: 1988291747624395763}
   m_Layer: 5
   m_Name: ApiManager
   m_TagString: Untagged
@@ -104,3 +105,16 @@ MonoBehaviour:
   _serverUrl: http://35.213.142.140:5000/
   _getUserProfile: chat/get_user_by_id
   _updateUserProfile: auth/update_profile
+--- !u!114 &1988291747624395763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6120487265216176860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67cd6c47b470da34e8546fa275ea5acc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _serverUrl: http://35.213.148.125:5000/
