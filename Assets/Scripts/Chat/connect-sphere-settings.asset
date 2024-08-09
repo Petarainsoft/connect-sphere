@@ -24,7 +24,7 @@ MonoBehaviour:
         m_url: ws://35.213.142.140:3456/ws
         m_iceServers:
         - m_urls:
-          - stun:stun.relay.metered.ca:80
+          - stun:stun.relay.metered.ca:88
           m_username: 
           m_credentialType: 1
           m_credential: 
