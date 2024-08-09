@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ConnectSphere;
-using Sirenix.OdinInspector;
 using TMPro;
 using Unity.Services.Vivox;
 using UnityEngine;
@@ -127,8 +126,7 @@ public class MessageObjectUI : MonoBehaviour
             }
         }
     }
-
-    [Button]
+    
     public void ChangePivot(int newPivotX)
     {
         // Calculate the difference in pivot
